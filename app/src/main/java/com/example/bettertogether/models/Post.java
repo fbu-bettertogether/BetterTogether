@@ -1,10 +1,15 @@
 package com.example.bettertogether.models;
 
+import android.text.format.DateUtils;
+
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+
+import java.util.Date;
 
 @ParseClassName("Post")
 public class Post extends ParseObject {
@@ -72,5 +77,30 @@ public class Post extends ParseObject {
         put(TAGGED_USERS, taggedUsers);
     }
 
+    public static class Query extends ParseQuery<Post> {
+        public Query() {
+            super(Post.class);
+        }
 
+        public Query getTop() {
+            setLimit(20);
+            return this;
+        }
+
+        public Query withUser() {
+            include("user");
+
+            return this;
+        }
+
+    }
+
+    public String getRelativeTimeAgo(Date date) {
+        String relativeDate = "";
+        long dateMillis = date.getTime();
+        relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
+                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+
+        return relativeDate;
+    }
 }
