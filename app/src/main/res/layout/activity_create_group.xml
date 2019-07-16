@@ -10,7 +10,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".CreateGroupActivity">
+        tools:context=".MakeNewGroupActivity">
 
         <ImageView
             android:id="@+id/ivGroupProf"
@@ -113,20 +113,24 @@
             android:id="@+id/tvGroupGoalLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
             android:text="The goal of this group is to"
-            app:layout_constraintTop_toBottomOf="@+id/spCategory"
-            tools:layout_editor_absoluteX="8dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spCategory" />
 
         <TextView
             android:id="@+id/tvCategoryLable"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="32dp"
             android:text="Category"
             android:textSize="16dp"
-            app:layout_constraintTop_toTopOf="@+id/divider"
-            tools:layout_editor_absoluteX="8dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/divider" />
 
         <Spinner
             android:id="@+id/spCategory"
@@ -221,6 +225,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spFrequency" />
+        <Button
+            android:id="@+id/create_btn"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginRight="24dp"
+            android:text="Create Group"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/calEndDate"/>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

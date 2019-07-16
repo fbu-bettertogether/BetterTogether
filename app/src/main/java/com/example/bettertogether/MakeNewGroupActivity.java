@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -34,6 +35,7 @@ import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,8 +50,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private Spinner spPrivacy;
     private Spinner spCategory;
     private Spinner spFrequency;
-    private CalendarDay cdStartDate;
-    private CalendarDay cdEndDate;
+    private MaterialCalendarView cdStartDate;
+    private MaterialCalendarView cdEndDate;
     private Button createBtn;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
@@ -66,13 +68,13 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         descriptionInput = findViewById(R.id.tvGroupDescription);
         ivGroupProf = findViewById(R.id.ivGroupProf);
         spPrivacy = (Spinner) findViewById(R.id.spPrivacy);
-        spPrivacy.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
+        //spPrivacy.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
         spCategory = (Spinner) findViewById(R.id.spCategory);
-        spPrivacy.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
+        //spPrivacy.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
         spFrequency = (Spinner) findViewById(R.id.spFrequency);
-        cdStartDate = (CalendarDay) findViewById(R.id.cdStartDate);
-        cdEndDate = (CalendarDay) findViewById(R.id.cdEndDate);
-        createBtn = findViewById(R.id.create_btn);
+        cdStartDate = (MaterialCalendarView) findViewById(R.id.calStartDate);
+        cdEndDate = (MaterialCalendarView) findViewById(R.id.calEndDate);
+        createBtn = (Button) findViewById(R.id.create_btn);
 
         ivGroupProf.setOnClickListener(new View.OnClickListener() {
 
@@ -172,7 +174,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         // wrap File object into a content provider
         // required for API >= 24
         // See https://guides.codepath.com/android/Sharing-Content-with-Intents#sharing-files-with-api-24-or-higher
-        Uri fileProvider = FileProvider.getUriForFile(getApplicationContext(), "com.codepath.fileprovider", photoFile);
+        Uri fileProvider = FileProvider.getUriForFile(getApplicationContext(), "com.bettertogether.fileprovider", photoFile);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider);
 
         // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
