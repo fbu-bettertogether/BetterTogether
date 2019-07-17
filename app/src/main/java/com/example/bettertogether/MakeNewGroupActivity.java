@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,8 +25,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.example.bettertogether.models.Group;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -103,6 +106,18 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     return;
                 } else {
                     active = false;
+                }
+
+                if (description == null || description == "") {
+                    Log.e(APP_TAG, "Description field is empty.");
+                    Toast.makeText(getApplicationContext(), "Description cannot be empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (groupName == null || groupName == "") {
+                    Log.e(APP_TAG, "Groupname field is empty.");
+                    Toast.makeText(getApplicationContext(), "Your group needs a name!", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 //later on, they user can choose to take an image or upload an image
@@ -223,7 +238,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setEndDate(endDate);
         newGroup.setOwner(user);
         newGroup.setIsActive(active);
-        //ParseRelation<ParseObject> relation = newPost.getRelation("likes");
 
         newGroup.saveInBackground(new SaveCallback() {
             @Override
