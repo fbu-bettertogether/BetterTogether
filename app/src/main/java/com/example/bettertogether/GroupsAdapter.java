@@ -74,7 +74,10 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         }
 
         public void bind(Group group) {
+
             tvGroupName.setText(group.getName());
+
+            // loading in the rest of the group fields if they are available
             if (group.getCategory() != null) {
                 tvCategory.setText(group.getCategory());
             } else {
@@ -104,7 +107,6 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(context, "group clicked", Toast.LENGTH_LONG).show();
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 // get the clicked-on group
