@@ -14,7 +14,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -69,30 +69,39 @@
             android:inputType="textMultiLine" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/ivIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/ivCamera"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_below="@+id/tilPost"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="512dp"
+        android:layout_marginTop="8dp"
         android:theme="@style/AppTheme"
-        android:tint="@color/colorPrimary"
-        android:layout_below="@+id/tilPost"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon"
+        app:layout_constraintTop_toBottomOf="@+id/ivTag"
         app:srcCompat="@drawable/camera" />
 
     <ImageView
         android:id="@+id/ivTag"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_below="@+id/ivCamera"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="424dp"
+        android:layout_marginTop="350dp"
         android:theme="@style/AppTheme"
         android:tint="@color/colorPrimary"
-        android:layout_below="@+id/ivCamera"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivIcon"
         app:srcCompat="@drawable/tag" />

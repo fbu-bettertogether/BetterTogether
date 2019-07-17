@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CreatePostActivity"></activity>
+        <activity android:name=".TagActivity"></activity>
+        <activity android:name=".CreatePostActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
