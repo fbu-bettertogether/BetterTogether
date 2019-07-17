@@ -64,8 +64,19 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
         public void bind(Group group) {
             tvGroupName.setText(group.getName());
-//            tvCategory.setText(group.getCategory().toString());
-//            tvDescription.setText(group.getDescription());
+            if (group.getCategory() != null) {
+                tvCategory.setText(group.getCategory());
+            } else {
+                tvCategory.setText("");
+            }
+
+            if (group.getDescription() != null) {
+                tvDescription.setText(group.getDescription());
+            } else {
+                tvDescription.setText(String.format("We set aside time to meet our goals %d times every week!", group.getFrequency()));
+            }
+
+            //TODO -- set dates once dates get worked out
         }
     }
 }
