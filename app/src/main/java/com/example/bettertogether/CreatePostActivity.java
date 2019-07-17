@@ -45,7 +45,7 @@ public class CreatePostActivity extends AppCompatActivity {
     public final static int PROFILE_IMAGE_ACTIVITY_REQUEST_CODE = 583;
     public static final int RESULT_OK = -1;
     public final String APP_TAG = "BetterTogether";
-    ParseRelation<ParseUser> relation;
+    ParseRelation<ParseObject> relation;
 
     private String photoFileName = "photo.jpg";
     private File photoFile;
@@ -129,8 +129,6 @@ public class CreatePostActivity extends AppCompatActivity {
             for (int i = 0; i < taggedUsers.size(); i++) {
                 relation.add(taggedUsers.get(i));
             }
-            // Tags are not being saved properly
-            post.setTaggedUsers(relation);
         }
         post.setDescription(etPost.getText().toString());
         post.setUser(ParseUser.getCurrentUser());
@@ -141,6 +139,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 if (e != null) {
                     e.printStackTrace();
                 } else {
+                    Log.d(APP_TAG, "success");
                     finish();
                 }
             }
