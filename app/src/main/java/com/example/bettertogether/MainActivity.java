@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null) {
             Log.d("LoginActivity", "Login successful");
 
-            final Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            final Intent intent = new Intent(MainActivity.this, MakeNewGroupActivity.class);
             startActivity(intent);
             finish();
         } else {
