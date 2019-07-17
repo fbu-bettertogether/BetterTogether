@@ -47,6 +47,7 @@ public class GroupsFragment extends Fragment {
 
         // initialize the data source
         mGroups = new ArrayList<>();
+        //mGroups.addAll((List<Group>) (Object) getCurrentUser().get("groups"));
         // initialize the adapter
         adapter = new GroupsAdapter(getContext(), mGroups);
         // set the adapter on the recycler view
@@ -57,7 +58,7 @@ public class GroupsFragment extends Fragment {
         queryGroups();
     }
 
-    private void queryGroups() {
+    public void queryGroups() {
         getCurrentUser().getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> groups, ParseException e) {
