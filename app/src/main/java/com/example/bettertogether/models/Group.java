@@ -7,6 +7,8 @@ import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Dictionary;
 
@@ -28,6 +30,7 @@ public class Group extends ParseObject {
     public static final String NUM_CHECK_INS = "numCheckIns";
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
+    public static final String MIN_TIME = "minTime";
 
     public ParseUser getOwner() {
         return getParseUser(KEY_OWNER);
@@ -109,27 +112,26 @@ public class Group extends ParseObject {
         put(PRIVACY, privacy);
     }
 
-    public Date getStartDate() {
-        return getDate(START_DATE);
+    public String getStartDate() {
+        return getString(START_DATE);
     }
 
-    public void setStartDate(Date startDate) {
-        put(START_DATE, startDate);
-    }
+    public void setStartDate(String startDate) { put(START_DATE, startDate); }
 
-    public Date getEndDate() { return getDate(END_DATE); }
+    public String getEndDate() { return getString(END_DATE); }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(String endDate) {
         put(END_DATE, endDate);
     }
 
-    public String getIsActive() {
-        return getString(IS_ACTIVE);
+    public Boolean getIsActive() {
+        return getBoolean(IS_ACTIVE);
     }
 
     public void setIsActive(boolean isActive) {
         put(IS_ACTIVE, isActive);
     }
+
     public ParseObject getLocation() {
         return getParseObject(LOCATION);
     }
@@ -140,7 +142,6 @@ public class Group extends ParseObject {
 
     public ParseRelation<ParseUser> getUsers() {
         return getRelation(USERS);
-
     }
 
     public void setUsers(ParseRelation users) {
@@ -150,6 +151,7 @@ public class Group extends ParseObject {
     public ParseObject getNumCheckIns() {
         return getParseObject(NUM_CHECK_INS);
     }
+
     public void setNumCheckIns(ParseObject numCheckIns) {
         put(NUM_CHECK_INS, numCheckIns);
     }
@@ -158,5 +160,8 @@ public class Group extends ParseObject {
         return String.valueOf(getCreatedAt());
     }
 
+    public void setMinTime(int minTime) {
+        put(MIN_TIME, minTime);
+    }
 
     }

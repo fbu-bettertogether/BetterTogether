@@ -5,9 +5,7 @@
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MakeNewGroupActivity">
@@ -115,22 +113,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            android:text="The goal of this group is to"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spCategory" />
-
-        <TextView
-            android:id="@+id/tvCategoryLable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginTop="32dp"
-            android:text="Category"
-            android:textSize="16dp"
+            android:text="The goal of this group is to make time for"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/divider" />
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <Spinner
             android:id="@+id/spCategory"
@@ -143,26 +129,16 @@
             android:layout_marginRight="8dp"
             android:entries="@array/category_options"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvCategoryLable"
-            app:layout_constraintTop_toBottomOf="@+id/divider" />
-
-        <TextView
-            android:id="@+id/tvFillCategory"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
             app:layout_constraintStart_toEndOf="@+id/tvGroupGoalLabel"
-            app:layout_constraintTop_toBottomOf="@+id/spCategory" />
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <Spinner
             android:id="@+id/spFrequency"
             android:layout_width="75dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="112dp"
-            android:layout_marginLeft="112dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="24dp"
             android:entries="@array/frequency_options"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
@@ -173,14 +149,26 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:text="times a week, from"
+            android:text="times a week, for"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.045"
             app:layout_constraintStart_toEndOf="@+id/spFrequency"
             app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
+
+        <NumberPicker
+            android:id="@+id/npMinTime"
+            android:layout_width="65dp"
+            android:layout_height="42dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/calEndDate"
+            app:layout_constraintEnd_toStartOf="@+id/tvFromLabel"
+            app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel"
+            app:layout_constraintVertical_bias="0.0" />
 
         <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/calStartDate"
@@ -188,7 +176,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             app:layout_constraintEnd_toStartOf="@+id/tvToLabel"
@@ -203,7 +191,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -218,13 +206,14 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="64dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:text="to"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spFrequency" />
+
         <Button
             android:id="@+id/create_btn"
             style="@style/Widget.AppCompat.Button.Colored"
@@ -239,7 +228,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/calEndDate"/>
+            app:layout_constraintTop_toBottomOf="@+id/calEndDate" />
+
+        <TextView
+            android:id="@+id/tvFromLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="minutes from"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

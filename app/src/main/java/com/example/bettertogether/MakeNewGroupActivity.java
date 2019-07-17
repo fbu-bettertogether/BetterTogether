@@ -1,37 +1,35 @@
 package com.example.bettertogether;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.MenuPopupWindow;
 import androidx.core.content.FileProvider;
 
-import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
-import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -39,8 +37,8 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "ComposeFragment";
@@ -53,6 +51,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private MaterialCalendarView cdStartDate;
     private MaterialCalendarView cdEndDate;
     private Button createBtn;
+    private Boolean active;
+    private NumberPicker npMinTime;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     public String photoFileName = "photo.jpg";
@@ -75,6 +75,20 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         cdStartDate = (MaterialCalendarView) findViewById(R.id.calStartDate);
         cdEndDate = (MaterialCalendarView) findViewById(R.id.calEndDate);
         createBtn = (Button) findViewById(R.id.create_btn);
+        npMinTime = (NumberPicker) findViewById(R.id.npMinTime);
+
+        // configuring the number picker
+        String[] npVals = new String[60];
+        // setting the number picker values from 10-600 with 10 step size
+        for (int i = 1; i <= 60; i++) {
+            npVals[i-1] = Integer.toString(i * 10);
+        }
+        npMinTime.setDisplayedValues(npVals);
+        npMinTime.setMaxValue(59);
+        npMinTime.setMinValue(0);
+        npMinTime.setWrapSelectorWheel(true);
+        // preventing keyboard from popping up
+        npMinTime.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
         ivGroupProf.setOnClickListener(new View.OnClickListener() {
 
@@ -93,9 +107,35 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 final String privacy = spPrivacy.toString();
                 final String category = spCategory.toString();
                 final String frequency = spFrequency.toString();
-//                final Date startDate = cdStartDate.getDate();
-//                final Date endDate = cdEndDate.getDate();
+                String start = cdStartDate.getSelectedDate().toString();
+                final String startDate = start.substring(12, start.length() - 1);
+                String end = cdEndDate.getSelectedDate().toString();
+                final String endDate = end.substring(12, end.length() - 1);
                 final ParseUser user = ParseUser.getCurrentUser();
+                final int minTime = npMinTime.getValue();
+
+                final CalendarDay now = CalendarDay.today();
+                if (cdStartDate.getSelectedDate().isAfter(now) && cdEndDate.getSelectedDate().isAfter(cdStartDate.getSelectedDate())) {
+                    active = true;
+                } else if (cdStartDate.getSelectedDate().isBefore(now) || cdEndDate.getSelectedDate().isBefore(cdStartDate.getSelectedDate())) {
+                    Log.e(APP_TAG, "Start date or end date is out of range.");
+                    Toast.makeText(getApplicationContext(), "Start date or end date is out of range.", Toast.LENGTH_SHORT).show();
+                    return;
+                } else {
+                    active = false;
+                }
+
+                if (description == null || description == "") {
+                    Log.e(APP_TAG, "Description field is empty.");
+                    Toast.makeText(getApplicationContext(), "Description cannot be empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (groupName == null || groupName == "") {
+                    Log.e(APP_TAG, "Groupname field is empty.");
+                    Toast.makeText(getApplicationContext(), "Your group needs a name!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 //later on, they user can choose to take an image or upload an image
 
@@ -111,8 +151,9 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "There is no photo!", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 final ParseFile parseFile = new ParseFile(file);
-                createGroup(description, parseFile, groupName, privacy, category, frequency, user);
+                createGroup(description, parseFile, groupName, privacy, category, frequency, startDate, endDate, user, minTime);
             }
         });
     }
@@ -202,7 +243,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         return file;
     }
 
-    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, String category, String frequency, ParseUser user) {
+    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, String category, String frequency, String startDate, String endDate, ParseUser user, int minTime) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
         newGroup.setIcon(imageFile);
@@ -210,10 +251,11 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setPrivacy(privacy);
         newGroup.setCategory(category);
         newGroup.setFrequency(frequency);
-        //newGroup.setStartDate(startDate);
-        //newGroup.setEndDate(endDate);
+        newGroup.setStartDate(startDate);
+        newGroup.setEndDate(endDate);
         newGroup.setOwner(user);
-        //ParseRelation<ParseObject> relation = newPost.getRelation("likes");
+        newGroup.setIsActive(active);
+        newGroup.setMinTime(minTime);
 
         newGroup.saveInBackground(new SaveCallback() {
             @Override
