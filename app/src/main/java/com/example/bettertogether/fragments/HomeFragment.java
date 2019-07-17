@@ -14,10 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
-import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
