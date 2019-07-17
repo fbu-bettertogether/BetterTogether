@@ -2,18 +2,23 @@ package com.example.bettertogether;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
 
 import java.util.List;
@@ -48,7 +53,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         return groups.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private ImageView ivGroupProf;
         private TextView tvGroupName;
@@ -64,6 +69,8 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             tvCategory = itemView.findViewById(R.id.tvCategory);
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvDates = itemView.findViewById(R.id.tvDates);
+
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Group group) {
@@ -87,12 +94,25 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             }
 
             if(group.getIsActive()) {
-                // TODO -- change to actual dates when dates gets sorted out
                 tvDates.setText("Active: " + group.getStartDate() + " - " + group.getEndDate());
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
             } else {
                 tvDates.setText("Inactive: " + group.getStartDate() + " - " + group.getEndDate());
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            Toast.makeText(context, "group clicked", Toast.LENGTH_LONG).show();
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                // get the clicked-on group
+                Group group = groups.get(position);
+                // switch to group-detail view fragment
+                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+                GroupFragment fragment = GroupFragment.newInstance(group);
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
             }
         }
     }

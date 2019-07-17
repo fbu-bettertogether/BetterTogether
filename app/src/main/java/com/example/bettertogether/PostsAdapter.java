@@ -11,7 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.bettertogether.models.Post;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import java.util.List;
@@ -47,7 +49,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.tvBody.setText(post.getDescription());
         holder.tvTime.setText(post.getRelativeTimeAgo(post.getCreatedAt()));
 
-        // TODO -- load in profile pictures, make user class?
+        ParseFile profileImage = (ParseFile) user.get("profileImage");
+        if (profileImage != null) {
+            Glide.with(context)
+                    .load(profileImage.getUrl())
+                    .into(holder.ivProfileImage);
+        }
     }
 
     @Override
