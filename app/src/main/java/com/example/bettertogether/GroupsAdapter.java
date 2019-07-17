@@ -1,6 +1,8 @@
 package com.example.bettertogether;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.bettertogether.models.Group;
 
 import java.util.List;
@@ -76,7 +80,20 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 tvDescription.setText(String.format("We set aside time to meet our goals %d times every week!", group.getFrequency()));
             }
 
-            //TODO -- set dates once dates get worked out
+            if(group.getIcon() != null) {
+                Glide.with(context)
+                        .load(group.getIcon().getUrl())
+                        .into(ivGroupProf);
+            }
+
+            if(group.getIsActive()) {
+                // TODO -- change to actual dates when dates gets sorted out
+                tvDates.setText("Active: " + group.getStartDate() + " - " + group.getEndDate());
+                tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
+            } else {
+                tvDates.setText("Inactive: " + group.getStartDate() + " - " + group.getEndDate());
+                tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            }
         }
     }
 }
