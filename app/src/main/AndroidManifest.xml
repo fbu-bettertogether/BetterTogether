@@ -11,9 +11,11 @@
         android:icon="@drawable/handshake"
         android:label="@string/app_name"
         android:roundIcon="@drawable/handshake"
-        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".CreatePostActivity"></activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.bettertogether.fileprovider"
@@ -23,9 +25,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/fileprovider" />
         </provider>
-        <activity android:name=".HomeActivity" android:label=""></activity>
-        <activity android:name=".MakeNewGroupActivity" android:label=""></activity>
-        <activity android:name=".MainActivity" android:label="">
+
+        <activity
+            android:name=".HomeActivity"
+            android:label="" />
+        <activity
+            android:name=".MakeNewGroupActivity"
+            android:label="" />
+        <activity
+            android:name=".MainActivity"
+            android:label="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
