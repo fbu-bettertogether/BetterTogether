@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".TagActivity"></activity>
+        <activity android:name=".AddUsersActivity"></activity>
+        <activity android:name=".TagActivity" />
         <activity android:name=".CreatePostActivity" />
 
         <provider
@@ -29,19 +30,20 @@
 
         <activity
             android:name=".HomeActivity"
-            android:label="" />
-        <activity
-            android:name=".MakeNewGroupActivity"
-            android:label="" />
-        <activity
-            android:name=".MainActivity"
-            android:label="">
+            android:label="" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MakeNewGroupActivity"
+            android:label="">
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label=""></activity>
     </application>
 
 </manifest>
