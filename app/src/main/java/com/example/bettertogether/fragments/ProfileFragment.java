@@ -20,10 +20,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.FriendAdapter;
-import com.example.bettertogether.MemberAdapter;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
+import com.example.bettertogether.SimpleGroupAdapter;
 import com.example.bettertogether.models.Award;
+import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -55,13 +56,14 @@ public class ProfileFragment extends Fragment {
     private TextView tvUsername;
     private TextView tvDate;
     private RecyclerView rvPosts;
-    private RecyclerView rvAwards;
+    private RecyclerView rvGroups;
     private RecyclerView rvFriends;
     private List<Post> posts;
-    private List<Award> awards;
+    private List<Group> groups;
     private List<ParseUser> friends;
     private PostsAdapter postsAdapter;
     private FriendAdapter friendAdapter;
+    private SimpleGroupAdapter simpleGroupAdapter;
 
 
     public ProfileFragment() {
@@ -83,12 +85,14 @@ public class ProfileFragment extends Fragment {
             user = getArguments().getParcelable(param_user);
         }
         posts = new ArrayList<>();
-        awards = new ArrayList<>();
+        groups = new ArrayList<>();
         friends = new ArrayList<>();
         postsAdapter = new PostsAdapter(getContext(), posts);
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
+        simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
         queryPosts();
         queryFriends();
+        queryGroups();
     }
 
     @Override
@@ -106,14 +110,15 @@ public class ProfileFragment extends Fragment {
         tvUsername = view.findViewById(R.id.tvUsername);
         tvDate = view.findViewById(R.id.tvDate);
         rvPosts = view.findViewById(R.id.rvPosts);
-        rvAwards = view.findViewById(R.id.rvAwards);
+        rvGroups = view.findViewById(R.id.rvGroups);
         rvFriends = view.findViewById(R.id.rvFriends);
 
         rvPosts.setAdapter(postsAdapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         rvFriends.setAdapter(friendAdapter);
         rvFriends.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        rvGroups.setAdapter(simpleGroupAdapter);
+        rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
@@ -127,7 +132,7 @@ public class ProfileFragment extends Fragment {
         });
 
         tvUsername.setText(user.getUsername());
-        tvDate.setText(Post.getRelativeTimeAgo(user.getCreatedAt()));
+        tvDate.setText(String.format("Joined %s", Post.getRelativeTimeAgo(user.getCreatedAt())));
 
 
     }
@@ -165,6 +170,24 @@ public class ProfileFragment extends Fragment {
                 // add new posts to the list and notify adapter
                 posts.addAll((List<Post>) (Object) objects);
                 postsAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+    public void queryGroups() {
+        ParseQuery<ParseObject> query = user.getRelation("groups").getQuery();
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null) {
+                    Log.e("Querying groups", "error with query");
+                    e.printStackTrace();
+                    return;
+                }
+
+                // add new posts to the list and notify adapter
+                groups.addAll((List<Group>) (Object) objects);
+                simpleGroupAdapter.notifyDataSetChanged();
+
             }
         });
     }

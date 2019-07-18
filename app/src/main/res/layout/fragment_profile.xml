@@ -72,7 +72,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvDate" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAwards"
+        android:id="@+id/rvGroups"
         android:layout_width="132dp"
         android:layout_height="196dp"
         android:layout_marginStart="8dp"
