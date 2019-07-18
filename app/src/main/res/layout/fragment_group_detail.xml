@@ -83,7 +83,9 @@
         android:hint="Create a new post!"
         android:inputType="textPersonName"
         app:layout_constraintLeft_toRightOf="@id/ivUserIcon"
-        app:layout_constraintTop_toBottomOf="@id/btnCheckIn" />
+        app:layout_constraintTop_toBottomOf="@id/btnCheckIn"
+        android:focusable="true"
+        android:clickable="true"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTimeline"
