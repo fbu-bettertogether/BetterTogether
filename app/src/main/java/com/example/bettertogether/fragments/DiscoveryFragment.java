@@ -51,6 +51,7 @@ public class DiscoveryFragment extends Fragment {
     private List<Group> mGroups = new ArrayList<>();
     private ProgressBar progressBar = null;
     private Button createGroupBtn;
+    private List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
     private final int REQUEST_CODE = 20;
 
     @Nullable
@@ -66,12 +67,61 @@ public class DiscoveryFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
-
         ParseQuery<Category> query = ParseQuery.getQuery(Category.class);
 
-        queryCategories(listOfListOfItems);
+        queryCategories();
+    }
 
+    private void queryCategories() {
+        final Category.Query catQuery = new Category.Query();
+        catQuery.findInBackground(new FindCallback<Category>() {
+            @Override
+            public void done(List<Category> objects, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < objects.size(); ++i) {
+                        Log.d("DiscoveryActivity", "Category[" + i + "] = "
+                                + objects.get(i).getName());
+                    }
+                    mCategories.addAll(objects);
+                    mainRecyclerAdapter.notifyDataSetChanged();
+                    addGroups();
+                    //rvDiscovery.scrollToPosition(0);
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void addGroups() {
+        if (mCategories != null && mCategories.size() != 0) {
+            for (int i = 0; i < mCategories.size(); i++) {
+                queryGroups(mCategories.get(i));
+                listOfListOfItems.add(mGroups);
+            }
+        }
+    }
+
+    private void queryGroups(Category cat) {
+        cat.getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> groups, ParseException e) {
+                if (e != null) {
+                    Log.e("Querying groups", "error with query");
+                    e.printStackTrace();
+                    return;
+                }
+                Log.d("number of groups",Integer.toString(groups.size()));
+                // add posts to list and update view with adapter
+                mGroups.clear();
+                mGroups.addAll((List<Group>) (Object) groups);
+                //mainRecyclerAdapter.notifyDataSetChanged();
+                display();
+            }
+        });
+    }
+
+    private void display() {
         mainRecyclerAdapter = new DiscoveryAdapter(listOfListOfItems, getContext());
         mRecyclerView.setAdapter(mainRecyclerAdapter);
 
@@ -147,54 +197,6 @@ public class DiscoveryFragment extends Fragment {
                 Log.d("DiscoveryFragment", "Go to create new post page from discovery.");
                 Intent i = new Intent(getContext(), MakeNewGroupActivity.class);
                 startActivityForResult(i, REQUEST_CODE);
-            }
-        });
-    }
-
-    private void queryCategories(final List<List<Group>> listOfListOfItems) {
-        final Category.Query catQuery = new Category.Query();
-        catQuery.findInBackground(new FindCallback<Category>() {
-            @Override
-            public void done(List<Category> objects, ParseException e) {
-                if (e == null) {
-                    for (int i = 0; i < objects.size(); ++i) {
-                        Log.d("DiscoveryActivity", "Category[" + i + "] = "
-                                + objects.get(i).getName());
-                    }
-                    mCategories.addAll(objects);
-                    mainRecyclerAdapter.notifyDataSetChanged();
-                    addGroups(listOfListOfItems);
-                    //rvDiscovery.scrollToPosition(0);
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private void addGroups(List<List<Group>> listOfListOfItems) {
-        if (mCategories != null && mCategories.size() != 0) {
-            for (int i = 0; i < mCategories.size(); i++) {
-                queryGroups(mCategories.get(i));
-                listOfListOfItems.add(mGroups);
-            }
-        }
-    }
-
-    private void queryGroups(Category cat) {
-        cat.getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> groups, ParseException e) {
-                if (e != null) {
-                    Log.e("Querying groups", "error with query");
-                    e.printStackTrace();
-                    return;
-                }
-                Log.d("number of groups",Integer.toString(groups.size()));
-                // add posts to list and update view with adapter
-                mGroups.clear();
-                mGroups.addAll((List<Group>) (Object) groups);
-                mainRecyclerAdapter.notifyDataSetChanged();
             }
         });
     }

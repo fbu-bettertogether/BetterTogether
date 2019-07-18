@@ -295,7 +295,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
         newGroup.setCategory(category);
-//        newGroup.setFrequency(frequency);
+        newGroup.setFrequency(frequency);
         newGroup.setStartDate(startDate);
         newGroup.setEndDate(endDate);
         newGroup.setOwner(user);

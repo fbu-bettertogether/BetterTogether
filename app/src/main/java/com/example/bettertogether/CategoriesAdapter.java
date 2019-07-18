@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bettertogether.models.Group;
+import com.parse.ParseException;
 
 import java.util.List;
 
@@ -26,14 +27,18 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
-        public  ImageView ivGroupProf;
-        public  TextView tvGroupName;
+        public ImageView ivGroupProf;
+        public TextView tvGroupName;
+        public TextView tvNumMembers;
+        public TextView tvMembersText;
         public View rootView;
         public ViewHolder(View itemView) {
             super(itemView);
             rootView = itemView;
             ivGroupProf =(ImageView)itemView.findViewById(R.id.ivGroupIcon);
             tvGroupName =(TextView)itemView.findViewById(R.id.tvGroupName);
+            tvNumMembers = (TextView) itemView.findViewById(R.id.tvNumPeople);
+            tvMembersText = (TextView) itemView.findViewById(R.id.tvMembersText);
         }
     }
 
@@ -53,6 +58,11 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
                     .into(holder.ivGroupProf);
         }
         holder.tvGroupName.setText(group.getName());
+        try {
+            holder.tvNumMembers.setText(String.valueOf(group.getNumUsers()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
