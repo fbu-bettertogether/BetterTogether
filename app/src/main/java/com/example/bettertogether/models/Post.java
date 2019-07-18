@@ -95,7 +95,7 @@ public class Post extends ParseObject {
 
     }
 
-    public String getRelativeTimeAgo(Date date) {
+    public static String getRelativeTimeAgo(Date date) {
         String relativeDate = "";
         long dateMillis = date.getTime();
         relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,

@@ -1,7 +1,10 @@
 package com.example.bettertogether;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,10 +17,17 @@ import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.GroupsFragment;
 import com.example.bettertogether.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+
+import java.io.File;
 
 public class HomeActivity extends AppCompatActivity {
-
+    public final static int PROFILE_IMAGE_ACTIVITY_REQUEST_CODE = 131655;
     private BottomNavigationView bottomNavigationView;
+    public final String APP_TAG = "BetterTogether";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +58,7 @@ public class HomeActivity extends AppCompatActivity {
                         break;
                     case R.id.action_profile:
                     default:
-                        fragment = new ProfileFragment();
+                        fragment = ProfileFragment.newInstance(ParseUser.getCurrentUser());
                         break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
@@ -58,5 +68,7 @@ public class HomeActivity extends AppCompatActivity {
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.action_home);
     }
+
+
 }
 
