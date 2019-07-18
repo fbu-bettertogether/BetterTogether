@@ -50,6 +50,7 @@ public class AddUsersActivity extends AppCompatActivity {
         rvMembers.setLayoutManager(new LinearLayoutManager(rvMembers.getContext()));
 
         ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
+        userQuery.include("groups");
         userQuery.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
