@@ -24,6 +24,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
@@ -39,6 +41,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import java.io.File;
 import java.io.IOException;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
@@ -54,8 +57,15 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private Button createBtn;
     private Boolean active;
     private NumberPicker npMinTime;
+    private Button btnAddUsers;
+
+    // declaring added users fields
+    private RecyclerView rvAddedMembers;
+    private MemberAdapter adapter;
+    private ArrayList<ParseUser> addedMembers;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
+    private final int ADD_REQUEST_CODE = 20;
     public String photoFileName = "photo.jpg";
     private File photoFile;
     private final int REQUEST_CODE = 20;
@@ -77,6 +87,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         cdEndDate = (MaterialCalendarView) findViewById(R.id.calEndDate);
         createBtn = (Button) findViewById(R.id.create_btn);
         npMinTime = (NumberPicker) findViewById(R.id.npMinTime);
+        btnAddUsers = (Button) findViewById(R.id.btnAddUsers);
 
         // configuring the number picker
         String[] npVals = new String[60];
@@ -96,6 +107,23 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 launchCamera();
+            }
+        });
+
+//        // configuring recycler view for added members
+//        // setting up recycler view of posts
+//        rvAddedMembers = findViewById(R.id.rvTimeline);
+//        addedMembers = new ArrayList<>();
+//        adapter = new PostsAdapter(getContext(), mPosts);
+//        rvTimeline.setAdapter(adapter);
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+//        rvTimeline.setLayoutManager(linearLayoutManager);
+//
+        btnAddUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MakeNewGroupActivity.this, AddUsersActivity.class);;
+                startActivityForResult(intent, ADD_REQUEST_CODE);
             }
         });
 
@@ -185,6 +213,15 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 //            Uri selectedImage = data.getData();
 //            photoFile = getPhotoFileUri(getRealPathFromURI(getApplicationContext(), selectedImage));
 //            groupProf.setImageURI(selectedImage);
+        } else if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
+            addedMembers = data.getParcelableArrayListExtra("addedMembers");
+//            if (addedMembers.size() != 0) {
+//                relation = post.getRelation("taggedUsers");
+//                for (int i = 0; i < taggedUsers.size(); i++) {
+//                    relation.add(taggedUsers.get(i));
+//                }
+//            }
+            Toast.makeText(this, "added members", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -260,7 +297,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
         newGroup.setCategory(category);
-        newGroup.setFrequency(frequency);
+//        newGroup.setFrequency(frequency);
         newGroup.setStartDate(startDate);
         newGroup.setEndDate(endDate);
         newGroup.setOwner(user);
@@ -271,9 +308,19 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Log.d("HomeActivity", "Create post success!");
-                    Intent i = new Intent(getApplicationContext(), GroupFragment.class);
-                    startActivityForResult(i, REQUEST_CODE);
+                    Log.d("Carmel", "made it this far");
+                    ParseRelation<ParseUser> relation = newGroup.getRelation("users");
+                    for (int i = 0; i < addedMembers.size(); i++) {
+                        relation.add(addedMembers.get(i));
+                    }
+                    newGroup.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            Log.d("HomeActivity", "Create post success!");
+                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                            startActivityForResult(i, REQUEST_CODE);
+                        }
+                    });
                 } else {
                     e.printStackTrace();
                 }

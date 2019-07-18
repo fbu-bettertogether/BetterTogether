@@ -12,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -21,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -38,7 +36,6 @@ import com.parse.SaveCallback;
 import org.parceler.Parcels;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class CreatePostActivity extends AppCompatActivity {
@@ -69,7 +66,7 @@ public class CreatePostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
         ivIcon = findViewById(R.id.ivIcon);
-        ivTag = findViewById(R.id.ivTag);
+        ivTag = findViewById(R.id.ivAdd);
         ivCamera = findViewById(R.id.ivCamera);
         tvTag = findViewById(R.id.tvTag);
         tvCamera = findViewById(R.id.tvCamera);
