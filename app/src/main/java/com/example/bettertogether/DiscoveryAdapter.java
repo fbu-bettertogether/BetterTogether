@@ -40,7 +40,6 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
 
     @Override
     public int getItemCount() {
-
         return mRows.size();
     }
 
@@ -54,10 +53,9 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
         CategoriesAdapter rowsRecyclerAdapter = new CategoriesAdapter(mContext,RowItems);
         holder.mRecyclerViewRow.setAdapter(rowsRecyclerAdapter);
 
-
         final RecyclerView finalRecyclerView = holder.mRecyclerViewRow;
 
-        finalRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        finalRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged (RecyclerView recyclerView, int newState){
 
@@ -84,7 +82,6 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
                             x2 =v2.getX();
                         }
 
-
                         Log.i(LOGTAG,"x1 = " + x1);
                         Log.i(LOGTAG,"x2 = " + x2);
 
@@ -110,22 +107,19 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
 
                         int position = 0;
                         if(visiblePortionOfItem1>=visiblePortionOfItem2){
-                            position = finalRecyclerView.getChildPosition(finalRecyclerView.findChildViewUnder(targetBottomPosition1,0));
+                            position = finalRecyclerView.getChildAdapterPosition(finalRecyclerView.findChildViewUnder(targetBottomPosition1,0));
                         }else{
 
-                            position = finalRecyclerView.getChildPosition(finalRecyclerView.findChildViewUnder(targetBottomPosition2,0));
+                            position = finalRecyclerView.getChildAdapterPosition(finalRecyclerView.findChildViewUnder(targetBottomPosition2,0));
                         }
                         finalRecyclerView.scrollToPosition(position);
                         break;
 
                     case RecyclerView.SCROLL_STATE_DRAGGING:
-
                         break;
 
                     case RecyclerView.SCROLL_STATE_SETTLING:
-
                         break;
-
                 }
             }
 

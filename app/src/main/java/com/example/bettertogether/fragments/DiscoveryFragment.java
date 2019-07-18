@@ -19,6 +19,7 @@ import com.example.bettertogether.GroupsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -42,8 +43,9 @@ public class DiscoveryFragment extends Fragment {
     private LinearLayoutManager mLayoutManager;
     boolean scrolling;
     private RecyclerView rvDiscovery;
-    private DiscoveryAdapter adapter;
-    private List<Category> mCategories;
+    private DiscoveryAdapter mainRecyclerAdapter;
+    private List<Category> mCategories = new ArrayList<>();
+    private List<Group> mGroups = new ArrayList<>();
     private ProgressBar progressBar = null;
 
     @Nullable
@@ -60,21 +62,21 @@ public class DiscoveryFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
 
-        int numOfRows = 1;
-        int numOfColumns = 1;
-        for(int i = 0 ; i<numOfRows ; i++){
-            List<Group> listOfItems = new ArrayList<Group>();
-            for(int j = 0 ; j<numOfColumns ; j++){
-                Group item = new Group();
-                listOfItems.add(item);
+        ParseQuery<Category> query = ParseQuery.getQuery(Category.class);
+
+        queryCategories();
+
+        if (mCategories != null) {
+            for (int i = 0; i < mCategories.size(); i++) {
+                queryGroups(mCategories.get(i));
+                listOfListOfItems.add(mGroups);
             }
-            listOfListOfItems.add(listOfItems);
         }
 
-        DiscoveryAdapter mainRecyclerAdapter = new DiscoveryAdapter(listOfListOfItems, getContext());
+        mainRecyclerAdapter = new DiscoveryAdapter(listOfListOfItems, getContext());
         mRecyclerView.setAdapter(mainRecyclerAdapter);
 
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged (RecyclerView recyclerView, int newState){
 
@@ -151,45 +153,44 @@ public class DiscoveryFragment extends Fragment {
 //				Log.i(LOGTAG,"X = " + dx + " and Y = " + dy);
             }
         });
-
-//        for (int i = 0; i < mCategories.size(); i++) {
-//            queryCategories(mCategories.get(i));
-//        }
     }
 
-    private void queryCategories(Category cat) {
-        cat.getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
+    private void queryCategories() {
+        final Category.Query catQuery = new Category.Query();
+        //catQuery.getTop();
+        catQuery.findInBackground(new FindCallback<Category>() {
             @Override
-            public void done(List<ParseObject> categories, ParseException e) {
-                if (e != null) {
-                    Log.e("Querying groups", "error with query");
+            public void done(List<Category> objects, ParseException e) {
+                if (e == null) {
+                    for (int i = 0; i < objects.size(); ++i) {
+                        Log.d("DiscoveryActivity", "Category[" + i + "] = "
+                                + objects.get(i).getName());
+                    }
+                    mCategories.addAll(objects);
+                    mainRecyclerAdapter.notifyDataSetChanged();
+                    //rvDiscovery.scrollToPosition(0);
+                } else {
                     e.printStackTrace();
-                    return;
                 }
-
-                Log.d("carmel",Integer.toString(categories.size()));
-
-                // add posts to list and update view with adapter
-                mCategories.addAll((List<Category>) (Object) categories);
-                adapter.notifyDataSetChanged();
             }
         });
     }
     private void queryGroups(Category cat) {
         cat.getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> categories, ParseException e) {
+            public void done(List<ParseObject> groups, ParseException e) {
                 if (e != null) {
                     Log.e("Querying groups", "error with query");
                     e.printStackTrace();
                     return;
                 }
 
-                Log.d("carmel",Integer.toString(categories.size()));
+                Log.d("number of groups",Integer.toString(groups.size()));
 
                 // add posts to list and update view with adapter
-                mCategories.addAll((List<Category>) (Object) categories);
-                adapter.notifyDataSetChanged();
+                mGroups.clear();
+                mGroups.addAll((List<Group>) (Object) groups);
+                mainRecyclerAdapter.notifyDataSetChanged();
             }
         });
     }
