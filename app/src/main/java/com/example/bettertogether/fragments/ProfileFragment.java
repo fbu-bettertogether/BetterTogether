@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -27,6 +28,7 @@ import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -128,7 +130,11 @@ public class ProfileFragment extends Fragment {
         ivUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (user.getObjectId() == ParseUser.getCurrentUser().getObjectId()){
+                    Toast.makeText(view.getContext(), "Is current user", Toast.LENGTH_SHORT).show();
+                }
             }
+            
         });
 
         tvUsername.setText(user.getUsername());
@@ -194,6 +200,7 @@ public class ProfileFragment extends Fragment {
 
     public void queryFriends() {
         ParseQuery<ParseObject> query = user.getRelation("friends").getQuery();
+        query.include("friends");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
