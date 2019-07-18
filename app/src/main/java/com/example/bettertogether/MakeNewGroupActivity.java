@@ -270,7 +270,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             public void done(ParseException e) {
                 if (e == null) {
                     Log.d("HomeActivity", "Create post success!");
-                    Intent i = new Intent(getApplicationContext(), GroupFragment.class);
+                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                     startActivityForResult(i, REQUEST_CODE);
                 } else {
                     e.printStackTrace();
