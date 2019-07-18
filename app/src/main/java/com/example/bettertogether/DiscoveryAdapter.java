@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 
 import java.util.List;
@@ -31,8 +32,8 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
-        public  RecyclerView mRecyclerViewRow;
-        public  TextView tvCatName;
+        public RecyclerView mRecyclerViewRow;
+        public TextView tvCatName;
         public ViewHolder(View itemView) {
             super(itemView);
             mRecyclerViewRow =(RecyclerView)itemView.findViewById(R.id.recyclerView_row);
@@ -54,7 +55,7 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
         holder.mRecyclerViewRow.setHasFixedSize(true);
         CategoriesAdapter rowsRecyclerAdapter = new CategoriesAdapter(mContext, RowItems);
         holder.mRecyclerViewRow.setAdapter(rowsRecyclerAdapter);
-        //holder.tvCatName.setText(RowItems.get(0).getCategory());
+        holder.tvCatName.setText(RowItems.get(0).getCategory());
 
         final RecyclerView finalRecyclerView = holder.mRecyclerViewRow;
 

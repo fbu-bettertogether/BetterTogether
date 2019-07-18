@@ -4,12 +4,12 @@ import android.os.Parcelable;
 
 import com.parse.Parse;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Dictionary;
@@ -144,6 +144,10 @@ public class Group extends ParseObject implements Parcelable {
 
     public ParseRelation<ParseUser> getUsers() {
         return getRelation(USERS);
+    }
+
+    public int getNumUsers() throws ParseException {
+        return getRelation(USERS).getQuery().count();
     }
 
     public void setUsers(ParseRelation users) {
