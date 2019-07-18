@@ -64,14 +64,7 @@ public class DiscoveryFragment extends Fragment {
 
         ParseQuery<Category> query = ParseQuery.getQuery(Category.class);
 
-        queryCategories();
-
-        if (mCategories != null) {
-            for (int i = 0; i < mCategories.size(); i++) {
-                queryGroups(mCategories.get(i));
-                listOfListOfItems.add(mGroups);
-            }
-        }
+        queryCategories(listOfListOfItems);
 
         mainRecyclerAdapter = new DiscoveryAdapter(listOfListOfItems, getContext());
         mRecyclerView.setAdapter(mainRecyclerAdapter);
@@ -127,10 +120,10 @@ public class DiscoveryFragment extends Fragment {
 
                         int position = 0;
                         if(visiblePortionOfItem1<=visiblePortionOfItem2){
-                            position = mRecyclerView.getChildPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition1));
+                            position = mRecyclerView.getChildAdapterPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition1));
                         }else{
 
-                            position = mRecyclerView.getChildPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition2));
+                            position = mRecyclerView.getChildAdapterPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition2));
                         }
                         mRecyclerView.scrollToPosition(position);
 
@@ -155,7 +148,7 @@ public class DiscoveryFragment extends Fragment {
         });
     }
 
-    private void queryCategories() {
+    private void queryCategories(final List<List<Group>> listOfListOfItems) {
         final Category.Query catQuery = new Category.Query();
         //catQuery.getTop();
         catQuery.findInBackground(new FindCallback<Category>() {
@@ -168,6 +161,7 @@ public class DiscoveryFragment extends Fragment {
                     }
                     mCategories.addAll(objects);
                     mainRecyclerAdapter.notifyDataSetChanged();
+                    addGroups(listOfListOfItems);
                     //rvDiscovery.scrollToPosition(0);
                 } else {
                     e.printStackTrace();
@@ -175,6 +169,16 @@ public class DiscoveryFragment extends Fragment {
             }
         });
     }
+
+    private void addGroups(List<List<Group>> listOfListOfItems) {
+        if (mCategories != null && mCategories.size() != 0) {
+            for (int i = 0; i < mCategories.size(); i++) {
+                queryGroups(mCategories.get(i));
+                listOfListOfItems.add(mGroups);
+            }
+        }
+    }
+
     private void queryGroups(Category cat) {
         cat.getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -191,6 +195,7 @@ public class DiscoveryFragment extends Fragment {
                 mGroups.clear();
                 mGroups.addAll((List<Group>) (Object) groups);
                 mainRecyclerAdapter.notifyDataSetChanged();
+
             }
         });
     }

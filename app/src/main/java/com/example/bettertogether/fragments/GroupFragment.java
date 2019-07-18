@@ -1,6 +1,7 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,10 +18,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Group;
@@ -33,6 +36,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.parceler.Parcels;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -126,8 +130,8 @@ public class GroupFragment extends Fragment {
         tvEndDate.setText(group.getEndDate());
 
         if(group.getIsActive()) {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
         } else {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
@@ -137,6 +141,16 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.d("Check in button", "Success");
+            }
+        });
+
+        tvCreatePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "text view clicked", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(getContext(), CreatePostActivity.class);
+                i.putExtra("group", Parcels.wrap(group));
+                startActivity(i);
             }
         });
 

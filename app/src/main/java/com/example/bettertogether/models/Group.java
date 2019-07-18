@@ -102,7 +102,7 @@ public class Group extends ParseObject implements Parcelable {
         return getString(FREQUENCY);
     }
 
-    public void setFrequency(String frequency) {
+    public void setFrequency(int frequency) {
         put(FREQUENCY, frequency);
     }
 
