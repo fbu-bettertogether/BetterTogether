@@ -98,7 +98,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
             if(group.getIsActive()) {
                 tvDates.setText("Active: " + group.getStartDate() + " - " + group.getEndDate());
-                tvDates.setTextColor(ContextCompat.getColor(context, R.color.teal));
+                tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
             } else {
                 tvDates.setText("Inactive: " + group.getStartDate() + " - " + group.getEndDate());
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
