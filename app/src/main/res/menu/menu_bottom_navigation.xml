@@ -11,7 +11,7 @@
     <item
         android:id="@+id/action_discovery"
         android:icon="@drawable/compass"
-        android:title="Compose"
+        android:title="Discovery"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_profile"
@@ -21,6 +21,6 @@
     <item
         android:id="@+id/action_groups"
         android:icon="@drawable/account_group"
-        android:title="Profile"
+        android:title="My Groups"
         app:showAsAction="always" />
 </menu>

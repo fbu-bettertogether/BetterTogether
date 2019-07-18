@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -40,7 +41,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
-    public final String APP_TAG = "ComposeFragment";
+    public final String APP_TAG = "MakeNewGroupActivity";
     private EditText groupNameInput;
     private EditText descriptionInput;
     private ImageView ivGroupProf;
@@ -91,14 +92,18 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 final String privacy = spPrivacy.toString();
                 final String category = spCategory.toString();
                 final String frequency = spFrequency.toString();
-                String start = cdStartDate.getSelectedDate().toString();
-                final String startDate = start.substring(12, start.length() - 1);
-                String end = cdEndDate.getSelectedDate().toString();
-                final String endDate = end.substring(12, end.length() - 1);
                 final ParseUser user = ParseUser.getCurrentUser();
 
                 final CalendarDay now = CalendarDay.today();
-                if (cdStartDate.getSelectedDate().isAfter(now) && cdEndDate.getSelectedDate().isAfter(cdStartDate.getSelectedDate())) {
+                if (cdStartDate.getSelectedDate() == null) {
+                    Log.e(APP_TAG, "startDate is empty.");
+                    Toast.makeText(getApplicationContext(), "There needs to be a start date!", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (cdEndDate.getSelectedDate() == null) {
+                    Log.e(APP_TAG, "endDate is empty.");
+                    Toast.makeText(getApplicationContext(), "There needs to be an end date!", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (cdStartDate.getSelectedDate().isAfter(now) && cdEndDate.getSelectedDate().isAfter(cdStartDate.getSelectedDate())) {
                     active = true;
                 } else if (cdStartDate.getSelectedDate().isBefore(now) || cdEndDate.getSelectedDate().isBefore(cdStartDate.getSelectedDate())) {
                     Log.e(APP_TAG, "Start date or end date is out of range.");
@@ -107,6 +112,11 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 } else {
                     active = false;
                 }
+
+                String start = cdStartDate.getSelectedDate().toString();
+                final String startDate = start.substring(12, start.length() - 1);
+                String end = cdEndDate.getSelectedDate().toString();
+                final String endDate = end.substring(12, end.length() - 1);
 
                 if (description == null || description == "") {
                     Log.e(APP_TAG, "Description field is empty.");
@@ -244,9 +254,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             public void done(ParseException e) {
                 if (e == null) {
                     Log.d("HomeActivity", "Create post success!");
-//                    descriptionInput.setText("");
-//                    ivGroupProf.setImageResource(0);
-                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                    Intent i = new Intent(getApplicationContext(), GroupFragment.class);
                     startActivityForResult(i, REQUEST_CODE);
                 } else {
                     e.printStackTrace();

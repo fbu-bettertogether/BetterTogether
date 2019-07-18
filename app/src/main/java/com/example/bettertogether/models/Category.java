@@ -30,7 +30,6 @@ public class Category extends ParseObject {
 
     public ParseRelation<ParseObject> getGroups() {
         return getRelation(GROUPS);
-
     }
 
     public void setGroups(ParseRelation groups) {

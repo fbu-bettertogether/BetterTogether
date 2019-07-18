@@ -9,8 +9,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.DiscoveryFragment;
+import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.GroupsFragment;
 import com.example.bettertogether.fragments.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
