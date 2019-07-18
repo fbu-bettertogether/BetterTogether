@@ -16,6 +16,7 @@ import com.example.bettertogether.GroupsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Group;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -59,7 +60,9 @@ public class GroupsFragment extends Fragment {
     }
 
     public void queryGroups() {
-        getCurrentUser().getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<ParseObject> parseQuery = getCurrentUser().getRelation("groups").getQuery();
+        parseQuery.addDescendingOrder("createdAt");
+        parseQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> groups, ParseException e) {
                 if (e != null) {

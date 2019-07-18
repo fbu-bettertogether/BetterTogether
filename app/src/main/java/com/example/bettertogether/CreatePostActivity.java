@@ -35,6 +35,8 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import org.parceler.Parcels;
+
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -80,9 +82,15 @@ public class CreatePostActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         // The Group needs to be passed to this activity through an intent
-        group = getIntent().getParcelableExtra("group");
+        group = (Group) Parcels.unwrap(getIntent().getParcelableExtra("group"));
 
-        Glide.with(this).load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl()).apply(RequestOptions.circleCropTransform()).into(ivIcon);
+        if(ParseUser.getCurrentUser().getParseFile("profileImage") != null) {
+            // loading in profile image if available
+            Glide.with(this)
+                    .load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl())
+                    .apply(RequestOptions.circleCropTransform()).into(ivIcon);
+        }
+
         tvUsername.setText(ParseUser.getCurrentUser().getUsername());
         tvGroup.setText(String.format("Post in %s", group.getName()));
         ivCamera.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +128,7 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     public void createPost() {
-        Post post = new Post();
+        final Post post = new Post();
         if (photoFile != null) {
             post.setMedia(new ParseFile(photoFile));
         }
@@ -140,9 +148,21 @@ public class CreatePostActivity extends AppCompatActivity {
             public void done(ParseException e) {
                 if (e != null) {
                     e.printStackTrace();
-                } else {
-                    finish();
                 }
+
+                ParseRelation<Post> groupRelation = group.getRelation("posts");
+                groupRelation.add(post);
+
+                group.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        } else {
+                            finish();
+                        }
+                    }
+                });
             }
         });
     }

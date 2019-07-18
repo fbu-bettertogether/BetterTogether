@@ -1,5 +1,7 @@
 package com.example.bettertogether.models;
 
+import android.os.Parcelable;
+
 import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -13,7 +15,7 @@ import java.util.Date;
 import java.util.Dictionary;
 
 @ParseClassName("Group")
-public class Group extends ParseObject {
+public class Group extends ParseObject implements Parcelable {
     public static final String KEY_OWNER = "owner";
     public static final String KEY_DESCRIPTION = "description";
     public static final String BANNER = "banner";
