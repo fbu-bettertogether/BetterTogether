@@ -1,11 +1,14 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -15,14 +18,31 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.bettertogether.CreatePostActivity;
+import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Post;
+import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+
+import org.parceler.Parcels;
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.parse.ParseUser.getCurrentUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,7 +62,12 @@ public class GroupFragment extends Fragment {
     private TextView tvGroupName;
     private TextView tvCreatePost;
     private Button btnCheckIn;
+    private TextView tvStartDate;
+    private TextView tvEndDate;
+
     private RecyclerView rvTimeline;
+    private PostsAdapter adapter;
+    private List<Post> mPosts;
 
 
     public GroupFragment() {
@@ -70,7 +95,7 @@ public class GroupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_group, container, false);
+        return inflater.inflate(R.layout.fragment_group_detail, container, false);
 
     }
 
@@ -82,7 +107,16 @@ public class GroupFragment extends Fragment {
         tvGroupName = view.findViewById(R.id.tvGroupName);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
+        tvStartDate = view.findViewById(R.id.tvStartDate);
+        tvEndDate = view.findViewById(R.id.tvEndDate);
+
+        // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
+        mPosts = new ArrayList<>();
+        adapter = new PostsAdapter(getContext(), mPosts);
+        rvTimeline.setAdapter(adapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        rvTimeline.setLayoutManager(linearLayoutManager);
 
         if (group.getBanner() != null) {
             Glide.with(view.getContext()).load(group.getBanner().getUrl()).into(ivBanner);
@@ -90,7 +124,19 @@ public class GroupFragment extends Fragment {
         if (ParseUser.getCurrentUser().getParseFile("profileImage") != null) {
             Glide.with(view.getContext()).load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl()).apply(RequestOptions.circleCropTransform()).into(ivUserIcon);
         }
+
         tvGroupName.setText(group.getName());
+        tvStartDate.setText(group.getStartDate());
+        tvEndDate.setText(group.getEndDate());
+
+        if(group.getIsActive()) {
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
+        } else {
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        }
+
         btnCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,8 +144,41 @@ public class GroupFragment extends Fragment {
             }
         });
 
+        tvCreatePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "text view clicked", Toast.LENGTH_LONG).show();
+                Intent i = new Intent(getContext(), CreatePostActivity.class);
+                i.putExtra("group", Parcels.wrap(group));
+                startActivity(i);
+            }
+        });
+
+        queryPosts();
     }
 
+    private void queryPosts() {
+        ParseQuery<ParseObject> parseQuery = group.getRelation("posts").getQuery();
+        parseQuery.addDescendingOrder("createdAt");
+        parseQuery.include("user");
+        parseQuery.setLimit(25);
+        parseQuery.addDescendingOrder("createdAt");
+
+        parseQuery.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> posts, ParseException e) {
+                if (e != null) {
+                    Log.e("Querying posts", "error with query");
+                    e.printStackTrace();
+                    return;
+                }
+
+                // add new posts to the list and notify adapter
+                mPosts.addAll((List<Post>) (Object) posts);
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

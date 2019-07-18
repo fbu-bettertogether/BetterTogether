@@ -1,5 +1,7 @@
 package com.example.bettertogether.models;
 
+import android.os.Parcelable;
+
 import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -13,7 +15,7 @@ import java.util.Date;
 import java.util.Dictionary;
 
 @ParseClassName("Group")
-public class Group extends ParseObject {
+public class Group extends ParseObject implements Parcelable {
     public static final String KEY_OWNER = "owner";
     public static final String KEY_DESCRIPTION = "description";
     public static final String BANNER = "banner";
@@ -30,6 +32,7 @@ public class Group extends ParseObject {
     public static final String NUM_CHECK_INS = "numCheckIns";
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
+    public static final String MIN_TIME = "minTime";
 
     public ParseUser getOwner() {
         return getParseUser(KEY_OWNER);
@@ -159,5 +162,8 @@ public class Group extends ParseObject {
         return String.valueOf(getCreatedAt());
     }
 
+    public void setMinTime(int minTime) {
+        put(MIN_TIME, minTime);
+    }
 
     }
