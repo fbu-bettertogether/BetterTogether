@@ -79,9 +79,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         descriptionInput = findViewById(R.id.tvGroupDescription);
         ivGroupProf = findViewById(R.id.ivGroupProf);
         spPrivacy = (Spinner) findViewById(R.id.spPrivacy);
-        //spPrivacy.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
         spCategory = (Spinner) findViewById(R.id.spCategory);
-        //spPrivacy.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
         spFrequency = (Spinner) findViewById(R.id.spFrequency);
         cdStartDate = (MaterialCalendarView) findViewById(R.id.calStartDate);
         cdEndDate = (MaterialCalendarView) findViewById(R.id.calEndDate);
@@ -133,9 +131,9 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             public void onClick(View view) {
                 final String description = descriptionInput.getText().toString();
                 final String groupName = groupNameInput.getText().toString();
-                final String privacy = spPrivacy.toString();
-                final String category = spCategory.toString();
-                final String frequency = spFrequency.toString();
+                final String privacy = spPrivacy.getSelectedItem().toString();
+                final String category = spCategory.getSelectedItem().toString();
+                final int frequency = Integer.parseInt(spFrequency.getSelectedItem().toString());
                 final ParseUser user = ParseUser.getCurrentUser();
                 final int minTime = npMinTime.getValue();
 
@@ -290,7 +288,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         return file;
     }
 
-    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, String category, String frequency, String startDate, String endDate, ParseUser user, int minTime) {
+    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, String category, int frequency, String startDate, String endDate, ParseUser user, int minTime) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
         newGroup.setIcon(imageFile);

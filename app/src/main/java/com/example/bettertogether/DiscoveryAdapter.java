@@ -32,9 +32,11 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         public  RecyclerView mRecyclerViewRow;
+        public  TextView tvCatName;
         public ViewHolder(View itemView) {
             super(itemView);
             mRecyclerViewRow =(RecyclerView)itemView.findViewById(R.id.recyclerView_row);
+            tvCatName = (TextView)itemView.findViewById(R.id.tvCategoryName);
         }
     }
 
@@ -50,8 +52,9 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext,LinearLayoutManager.HORIZONTAL,false);
         holder.mRecyclerViewRow.setLayoutManager(layoutManager);
         holder.mRecyclerViewRow.setHasFixedSize(true);
-        CategoriesAdapter rowsRecyclerAdapter = new CategoriesAdapter(mContext,RowItems);
+        CategoriesAdapter rowsRecyclerAdapter = new CategoriesAdapter(mContext, RowItems);
         holder.mRecyclerViewRow.setAdapter(rowsRecyclerAdapter);
+        //holder.tvCatName.setText(RowItems.get(0).getCategory());
 
         final RecyclerView finalRecyclerView = holder.mRecyclerViewRow;
 
