@@ -1,11 +1,13 @@
 package com.example.bettertogether.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.DiscoveryAdapter;
 import com.example.bettertogether.GroupsAdapter;
+import com.example.bettertogether.MakeNewGroupActivity;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
@@ -47,6 +50,8 @@ public class DiscoveryFragment extends Fragment {
     private List<Category> mCategories = new ArrayList<>();
     private List<Group> mGroups = new ArrayList<>();
     private ProgressBar progressBar = null;
+    private Button createGroupBtn;
+    private final int REQUEST_CODE = 20;
 
     @Nullable
     @Override
@@ -57,6 +62,7 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_rootview);
+        createGroupBtn = (Button) view.findViewById(R.id.create_group_btn);
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -74,7 +80,6 @@ public class DiscoveryFragment extends Fragment {
             public void onScrollStateChanged (RecyclerView recyclerView, int newState){
 
                 switch(newState){
-
                     case RecyclerView.SCROLL_STATE_IDLE:
 
                         Log.i(LOGTAG,"X = " + (mRecyclerView.getX() + mRecyclerView.getWidth() )+ " and Y = " + (mRecyclerView.getY()+ mRecyclerView.getHeight()));
@@ -91,18 +96,15 @@ public class DiscoveryFragment extends Fragment {
                         if(v1!=null){
                             y1 =v1.getY();
                         }
-
                         float y2 = targetBottomPosition2;
                         if(v2!=null){
                             y2 =v2.getY();
                         }
-
                         Log.i(LOGTAG,"y1 = " + y1);
                         Log.i(LOGTAG,"y2 = " + y2);
 
                         float dy1 = Math.abs(y1-mRecyclerView.getY() );
                         float dy2 = Math.abs(y2-(mRecyclerView.getY()+ mRecyclerView.getHeight()));
-
                         Log.i(LOGTAG,"dy1 = " + dy1);
                         Log.i(LOGTAG,"dy2 = " + dy2);
 
@@ -117,7 +119,6 @@ public class DiscoveryFragment extends Fragment {
                             visiblePortionOfItem2 = v2.getHeight() - dy2;
                         }
 
-
                         int position = 0;
                         if(visiblePortionOfItem1<=visiblePortionOfItem2){
                             position = mRecyclerView.getChildAdapterPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition1));
@@ -126,31 +127,32 @@ public class DiscoveryFragment extends Fragment {
                             position = mRecyclerView.getChildAdapterPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition2));
                         }
                         mRecyclerView.scrollToPosition(position);
-
                         break;
-
                     case RecyclerView.SCROLL_STATE_DRAGGING:
-
                         break;
-
                     case RecyclerView.SCROLL_STATE_SETTLING:
-
                         break;
-
                 }
             }
 
             @Override
             public void onScrolled (RecyclerView recyclerView, int dx, int dy){
-
 //				Log.i(LOGTAG,"X = " + dx + " and Y = " + dy);
+            }
+        });
+        createGroupBtn.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                Log.d("DiscoveryFragment", "Go to create new post page from discovery.");
+                Intent i = new Intent(getContext(), MakeNewGroupActivity.class);
+                startActivityForResult(i, REQUEST_CODE);
             }
         });
     }
 
     private void queryCategories(final List<List<Group>> listOfListOfItems) {
         final Category.Query catQuery = new Category.Query();
-        //catQuery.getTop();
         catQuery.findInBackground(new FindCallback<Category>() {
             @Override
             public void done(List<Category> objects, ParseException e) {
@@ -188,14 +190,11 @@ public class DiscoveryFragment extends Fragment {
                     e.printStackTrace();
                     return;
                 }
-
                 Log.d("number of groups",Integer.toString(groups.size()));
-
                 // add posts to list and update view with adapter
                 mGroups.clear();
                 mGroups.addAll((List<Group>) (Object) groups);
                 mainRecyclerAdapter.notifyDataSetChanged();
-
             }
         });
     }
