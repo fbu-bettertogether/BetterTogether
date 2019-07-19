@@ -3,6 +3,7 @@ package com.example.bettertogether;
 import android.app.Application;
 
 import com.example.bettertogether.models.Award;
+import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Like;
@@ -10,9 +11,7 @@ import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.ParseComment;
 import com.example.bettertogether.models.Post;
 import com.parse.Parse;
-import com.parse.ParseACL;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -39,6 +38,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(Category.class);
         ParseObject.registerSubclass(Award.class);
         ParseObject.registerSubclass(Membership.class);
+        ParseObject.registerSubclass(CatMembership.class);
 
         // set applicationId, and server server based on the values in the Heroku settings.
         // clientKey is not needed unless explicitly configured

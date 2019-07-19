@@ -28,8 +28,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.fragments.GroupFragment;
+import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -300,6 +302,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIcon(imageFile);
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
+        newGroup.setCategory(category);
         newGroup.setFrequency(frequency);
         newGroup.setStartDate(startDate);
         newGroup.setEndDate(endDate);
@@ -332,15 +335,44 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                         cat.setName(category);
                         cat.saveInBackground();
                     }
-                    groupToCatRelation = cat.getRelation("groups");
-                    newGroup.saveInBackground();
-                    groupToCatRelation.add(newGroup);
+                    final CatMembership catMembership = new CatMembership();
+                    catMembership.setGroup(newGroup);
+                    catMembership.setCategory(cat);
                     newGroup.setCategory(cat.getObjectId());
-                    cat.saveInBackground(new SaveCallback() {
+                    newGroup.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            Log.d("HomeActivity", "Category relation works!");
-                            saveGroup(newGroup);
+                            List<Membership> memberships = new ArrayList<>();
+                            for (int i = 0; i < addedMembers.size(); i++) {
+                                memberships.add( new Membership());
+                                memberships.get(i).setGroup(newGroup);
+                                memberships.get(i).setUser(addedMembers.get(i));
+                                memberships.get(i).saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("HomeActivity", "Category relation works!");
+                                        catMembership.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                if (e == null) {
+                                                    newGroup.saveInBackground(new SaveCallback() {
+                                                        @Override
+                                                        public void done(ParseException e) {
+                                                            Log.d("HomeActivity", "Create group success!");
+                                                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                                                            startActivityForResult(i, REQUEST_CODE);
+                                                        }
+                                                    });
+                                                } else {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+
+                                    }
+                                });
+                            }
+
                         }
                     });
                 } else {
@@ -351,27 +383,5 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     }
 
     private void saveGroup(final Group newGroup) {
-        newGroup.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e == null) {
-                    Log.d("Renee", "made it this far");
-                    ParseRelation<ParseUser> relation = newGroup.getRelation("users");
-                    for (int i = 0; i < addedMembers.size(); i++) {
-                        relation.add(addedMembers.get(i));
-                    }
-                    newGroup.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            Log.d("HomeActivity", "Create group success!");
-                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                            startActivityForResult(i, REQUEST_CODE);
-                        }
-                    });
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 }
