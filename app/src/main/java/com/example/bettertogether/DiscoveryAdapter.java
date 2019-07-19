@@ -31,7 +31,7 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
         mRows = objects;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder extends RecyclerView.ViewHolder {
         public RecyclerView mRecyclerViewRow;
         public TextView tvCatName;
         public ViewHolder(View itemView) {

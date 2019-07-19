@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,9 +49,9 @@ public class DiscoveryFragment extends Fragment {
     private RecyclerView rvDiscovery;
     private DiscoveryAdapter mainRecyclerAdapter;
     private List<Category> mCategories = new ArrayList<>();
-    private List<Group> mGroups = new ArrayList<>();
     private ProgressBar progressBar = null;
     private Button createGroupBtn;
+    private CardView cvGroup;
     private List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
     private final int REQUEST_CODE = 20;
 
@@ -64,6 +65,7 @@ public class DiscoveryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_rootview);
         createGroupBtn = (Button) view.findViewById(R.id.create_group_btn);
+        cvGroup = (CardView) view.findViewById(R.id.cvItemGroupDiscovery);
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -83,23 +85,18 @@ public class DiscoveryFragment extends Fragment {
                                 + objects.get(i).getName());
                     }
                     mCategories.addAll(objects);
-                    mainRecyclerAdapter.notifyDataSetChanged();
-                    addGroups();
+                    //mainRecyclerAdapter.notifyDataSetChanged();
+                    if (mCategories != null && mCategories.size() != 0) {
+                        for (int i = 0; i < mCategories.size(); i++) {
+                            queryGroups(mCategories.get(i));
+                        }
+                    }
                     //rvDiscovery.scrollToPosition(0);
                 } else {
                     e.printStackTrace();
                 }
             }
         });
-    }
-
-    private void addGroups() {
-        if (mCategories != null && mCategories.size() != 0) {
-            for (int i = 0; i < mCategories.size(); i++) {
-                queryGroups(mCategories.get(i));
-                listOfListOfItems.add(mGroups);
-            }
-        }
     }
 
     private void queryGroups(Category cat) {
@@ -113,9 +110,10 @@ public class DiscoveryFragment extends Fragment {
                 }
                 Log.d("number of groups",Integer.toString(groups.size()));
                 // add posts to list and update view with adapter
-                mGroups.clear();
+                List<Group> mGroups = new ArrayList<>();
                 mGroups.addAll((List<Group>) (Object) groups);
                 //mainRecyclerAdapter.notifyDataSetChanged();
+                listOfListOfItems.add(mGroups);
                 display();
             }
         });
