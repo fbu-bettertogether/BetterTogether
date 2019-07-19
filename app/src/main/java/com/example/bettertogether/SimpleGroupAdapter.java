@@ -1,6 +1,7 @@
 package com.example.bettertogether;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +17,29 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static com.parse.ParseUser.getCurrentUser;
 
 public class SimpleGroupAdapter extends RecyclerView.Adapter<SimpleGroupAdapter.ViewHolder> {
 
     private Context context;
     private List<Group> groups;
+    private List<Group> userGroups;
 
     public SimpleGroupAdapter(Context context, List<Group> groups) {
         this.context = context;
         this.groups = groups;
+        this.userGroups = new ArrayList<>();
+        queryGroups();
     }
 
     @NonNull
@@ -47,6 +60,27 @@ public class SimpleGroupAdapter extends RecyclerView.Adapter<SimpleGroupAdapter.
     @Override
     public int getItemCount() {
         return groups.size();
+    }
+
+    public void queryGroups() {
+        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+        parseQuery.addDescendingOrder("createdAt");
+        parseQuery.whereEqualTo("user", getCurrentUser());
+        parseQuery.include("group");
+        parseQuery.findInBackground(new FindCallback<Membership>() {
+            @Override
+            public void done(List<Membership> memberships, ParseException e) {
+                if (e != null) {
+                    Log.e("Querying groups", "error with query");
+                    e.printStackTrace();
+                    return;
+                }
+
+                Log.d("carmel",Integer.toString(memberships.size()));
+                userGroups.addAll(Membership.getAllGroups(memberships));
+            }
+        });
+
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -85,13 +119,19 @@ public class SimpleGroupAdapter extends RecyclerView.Adapter<SimpleGroupAdapter.
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                // get the clicked-on group
-                Group group = groups.get(position);
-                // switch to group-detail view fragment
-                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
-                GroupFragment fragment = GroupFragment.newInstance(group);
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                if (position != RecyclerView.NO_POSITION) {
+                    for (int i = 0; i < userGroups.size(); i++) {
+                        if (!userGroups.get(i).getObjectId().equals(groups.get(i).getObjectId())) {
+                            return;
+                        }
+                    }
+                        // get the clicked-on group
+                        Group group = groups.get(position);
+                        // switch to group-detail view fragment
+                        FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+                        GroupFragment fragment = GroupFragment.newInstance(group);
+                        fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+
             }
         }
     }

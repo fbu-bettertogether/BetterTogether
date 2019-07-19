@@ -5,6 +5,9 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @ParseClassName("Membership")
 public class Membership extends ParseObject {
     public static final String KEY_USER = "user";
@@ -16,7 +19,7 @@ public class Membership extends ParseObject {
     }
 
     public Group getGroup() {
-        return (Group)getParseObject(GROUP);
+        return (Group) getParseObject(GROUP);
     }
 
     public void setGroup(Group group) {
@@ -29,6 +32,22 @@ public class Membership extends ParseObject {
 
     public void setUser(ParseUser parseUser) {
         put(KEY_USER, parseUser);
+    }
+
+    public static List<Group> getAllGroups(List<Membership> memberships) {
+        List<Group> groups = new ArrayList<>();
+        for (int i = 0; i < memberships.size(); i++) {
+            groups.add(memberships.get(i).getGroup());
+        }
+        return  groups;
+    }
+
+    public static List<ParseUser> getAllUsers(List<Membership> memberships) {
+        List<ParseUser> users = new ArrayList<>();
+        for (int i = 0; i < memberships.size(); i++) {
+            users.add(memberships.get(i).getUser());
+        }
+        return users;
     }
 
 }

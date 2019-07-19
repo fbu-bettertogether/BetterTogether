@@ -27,6 +27,7 @@ import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
 import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -38,6 +39,8 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.parse.ParseUser.getCurrentUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -178,22 +181,26 @@ public class ProfileFragment extends Fragment {
         });
     }
     public void queryGroups() {
-        ParseQuery<ParseObject> query = user.getRelation("groups").getQuery();
-        query.findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+        parseQuery.addDescendingOrder("createdAt");
+        parseQuery.whereEqualTo("user", user);
+        parseQuery.include("group");
+        parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e) {
+            public void done(List<Membership> memberships, ParseException e) {
                 if (e != null) {
                     Log.e("Querying groups", "error with query");
                     e.printStackTrace();
                     return;
                 }
 
-                // add new posts to the list and notify adapter
-                groups.addAll((List<Group>) (Object) objects);
-                simpleGroupAdapter.notifyDataSetChanged();
+                Log.d("carmel",Integer.toString(memberships.size()));
 
+                groups.addAll(Membership.getAllGroups(memberships));
+                simpleGroupAdapter.notifyDataSetChanged();
             }
         });
+
     }
 
     public void queryFriends() {
