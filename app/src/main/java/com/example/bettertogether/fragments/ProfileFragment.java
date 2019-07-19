@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
@@ -41,7 +42,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ProfileFragment.OnFragmentInteractionListener} interface
+ * {@link ProfileFragment.OnProfileFragmentInteraction} interface
  * to handle interaction events.
  * Use the {@link ProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -52,7 +53,7 @@ public class ProfileFragment extends Fragment {
     public final String APP_TAG = "BetterTogether";
 
     private ParseUser user;
-    private OnFragmentInteractionListener mListener;
+    private OnProfileFragmentInteraction mListener;
 
     private ImageView ivUserIcon;
     private TextView tvUsername;
@@ -132,6 +133,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 if (user.getObjectId() == ParseUser.getCurrentUser().getObjectId()){
                     Toast.makeText(view.getContext(), "Is current user", Toast.LENGTH_SHORT).show();
+                    mListener.createProfilePicture(view);
                 }
             }
             
@@ -142,17 +144,13 @@ public class ProfileFragment extends Fragment {
 
 
     }
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnProfileFragmentInteraction) {
+            mListener = (OnProfileFragmentInteraction) context;
         } else {
         }
     }
@@ -224,7 +222,8 @@ public class ProfileFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
+    public interface OnProfileFragmentInteraction {
+        void createProfilePicture(View view);
     }
+
 }
