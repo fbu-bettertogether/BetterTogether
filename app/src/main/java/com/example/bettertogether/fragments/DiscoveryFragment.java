@@ -51,7 +51,6 @@ public class DiscoveryFragment extends Fragment {
     private List<Category> mCategories = new ArrayList<>();
     private ProgressBar progressBar = null;
     private Button createGroupBtn;
-    private CardView cvGroup;
     private List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
     private final int REQUEST_CODE = 20;
 
@@ -65,7 +64,6 @@ public class DiscoveryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_rootview);
         createGroupBtn = (Button) view.findViewById(R.id.create_group_btn);
-        cvGroup = (CardView) view.findViewById(R.id.cvItemGroupDiscovery);
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -182,7 +180,6 @@ public class DiscoveryFragment extends Fragment {
                         break;
                 }
             }
-
             @Override
             public void onScrolled (RecyclerView recyclerView, int dx, int dy){
 //				Log.i(LOGTAG,"X = " + dx + " and Y = " + dy);

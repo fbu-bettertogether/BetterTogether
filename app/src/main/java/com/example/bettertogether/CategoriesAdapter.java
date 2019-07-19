@@ -21,7 +21,9 @@ import java.util.List;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 
+    //private static List<Group> mItems;
     private List<Group> mItems;
+    //static Context mContext;
     Context mContext;
     public CategoriesAdapter(Context context,List<Group> objects) {
         mContext = context;
@@ -29,12 +31,13 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
 
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView ivGroupProf;
         public TextView tvGroupName;
         public TextView tvNumMembers;
         public TextView tvMembersText;
         public View rootView;
+
         public ViewHolder(View itemView) {
             super(itemView);
             rootView = itemView;
@@ -47,15 +50,15 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
 
         @Override
         public void onClick(View view) {
-//            int position = getAdapterPosition();
-//            if (position != RecyclerView.NO_POSITION) {
-//                // get the clicked-on group
-//                Group group = mItems.get(position);
-//                // switch to group-detail view fragment
-//                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
-//                GroupFragment fragment = GroupFragment.newInstance(group);
-//                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-//            }
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                // get the clicked-on group
+                Group group = mItems.get(position);
+                // switch to group-detail view fragment
+                FragmentManager fragmentManager = ((AppCompatActivity) mContext).getSupportFragmentManager();
+                GroupFragment fragment = GroupFragment.newInstance(group);
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+            }
         }
     }
 
