@@ -41,6 +41,8 @@ import com.parse.SaveCallback;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.ZoneId;
@@ -69,7 +71,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private RecyclerView rvAddedMembers;
     private MemberAdapter adapter;
     private ArrayList<ParseUser> addedMembers;
-    private Dictionary numCheckIns;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     private final int ADD_REQUEST_CODE = 20;
@@ -220,10 +221,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 //            groupProf.setImageURI(selectedImage);
         } else if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
-            numCheckIns = new Hashtable();
-            for (int i = 0; i < addedMembers.size(); i++) {
-                numCheckIns.put(addedMembers.get(i).getObjectId(), 0);
-            }
         }
     }
 
@@ -305,7 +302,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setOwner(user);
         newGroup.setIsActive(active);
         newGroup.setMinTime(minTime);
-        newGroup.setNumCheckIns((ParseObject) (Object) numCheckIns);
 
         newGroup.saveInBackground(new SaveCallback() {
             @Override
@@ -316,6 +312,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                         memberships.add( new Membership());
                         memberships.get(i).setGroup(newGroup);
                         memberships.get(i).setUser(addedMembers.get(i));
+                        memberships.get(i).setNumCheckIns(0);
                         memberships.get(i).saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
