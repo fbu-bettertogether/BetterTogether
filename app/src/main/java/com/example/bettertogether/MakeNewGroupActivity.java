@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
@@ -67,6 +69,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private RecyclerView rvAddedMembers;
     private MemberAdapter adapter;
     private ArrayList<ParseUser> addedMembers;
+    private Dictionary numCheckIns;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     private final int ADD_REQUEST_CODE = 20;
@@ -217,13 +220,10 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 //            groupProf.setImageURI(selectedImage);
         } else if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
-//            if (addedMembers.size() != 0) {
-//                relation = post.getRelation("taggedUsers");
-//                for (int i = 0; i < taggedUsers.size(); i++) {
-//                    relation.add(taggedUsers.get(i));
-//                }
-//            }
-            Toast.makeText(this, "added members", Toast.LENGTH_LONG).show();
+            numCheckIns = new Hashtable();
+            for (int i = 0; i < addedMembers.size(); i++) {
+                numCheckIns.put(addedMembers.get(i).getObjectId(), 0);
+            }
         }
     }
 
@@ -305,6 +305,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setOwner(user);
         newGroup.setIsActive(active);
         newGroup.setMinTime(minTime);
+        newGroup.setNumCheckIns((ParseObject) (Object) numCheckIns);
 
         newGroup.saveInBackground(new SaveCallback() {
             @Override

@@ -36,11 +36,13 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -162,6 +164,16 @@ public class GroupFragment extends Fragment {
                     @Override
                     public void onFinish() {
                         tvTimer.setText("Finished!");
+                        Dictionary d = (Dictionary) (Object) group.getNumCheckIns();
+                        int currNumCheckIns = (int) d.remove(getCurrentUser().getObjectId());
+                        d.put(getCurrentUser().getObjectId(), currNumCheckIns + 1);
+                        group.setNumCheckIns((ParseObject) (Object) d);
+                        group.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                Log.d("Check in", "done updating numCheckIns");
+                            }
+                        });
                     }
                 }.start();
             }
