@@ -65,7 +65,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private Boolean active;
     private NumberPicker npMinTime;
     private Button btnAddUsers;
-    ParseRelation<ParseObject> groupToCatRelation;
 
     // declaring added users fields
     private RecyclerView rvAddedMembers;
@@ -73,7 +72,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private ArrayList<ParseUser> addedMembers;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    private final int ADD_REQUEST_CODE = 30;
+    private final int ADD_REQUEST_CODE = 20;
     public String photoFileName = "photo.jpg";
     private File photoFile;
     private final int REQUEST_CODE = 20;
@@ -96,7 +95,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         btnAddUsers = (Button) findViewById(R.id.btnAddUsers);
 
         // configuring the number picker
-        String[] npVals = new String[60];
+        final String[] npVals = new String[60];
         // setting the number picker values from 10-600 with 10 step size
         for (int i = 1; i <= 60; i++) {
             npVals[i-1] = Integer.toString(i * 10);
@@ -143,7 +142,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 final String category = spCategory.getSelectedItem().toString();
                 final int frequency = Integer.parseInt(spFrequency.getSelectedItem().toString());
                 final ParseUser user = ParseUser.getCurrentUser();
-                final int minTime = npMinTime.getValue();
+                final int minTime = Integer.parseInt(npVals[npMinTime.getValue()]);
 
                 final CalendarDay now = CalendarDay.today();
                 if (cdStartDate.getSelectedDate() == null) {
@@ -221,13 +220,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 //            groupProf.setImageURI(selectedImage);
         } else if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
-//            if (addedMembers.size() != 0) {
-//                relation = post.getRelation("taggedUsers");
-//                for (int i = 0; i < taggedUsers.size(); i++) {
-//                    relation.add(taggedUsers.get(i));
-//                }
-//            }
-            Toast.makeText(this, "added members", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -347,6 +339,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                                 memberships.add( new Membership());
                                 memberships.get(i).setGroup(newGroup);
                                 memberships.get(i).setUser(addedMembers.get(i));
+                                memberships.get(i).setNumCheckIns(0);
+                                memberships.get(i).setPoints(0);
                                 memberships.get(i).saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
