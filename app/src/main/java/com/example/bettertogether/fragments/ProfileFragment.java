@@ -238,33 +238,4 @@ public class ProfileFragment extends Fragment {
     public interface OnProfileFragmentInteraction {
         void createProfilePicture(View view);
     }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.profile, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if(id==R.id.action_logout) {
-            ParseUser.logOut();
-            ParseUser currentUser = ParseUser.getCurrentUser();
-            final Intent intent = new Intent(getContext(), MainActivity.class);
-            startActivity(intent);
-            AppCompatActivity appAct = (AppCompatActivity) getActivity();
-            appAct.finish();
-//        } else if (id == R.id.change_profile_picture) {
-//            Intent intent=new Intent(getApplicationContext(), UploadProPicActivity.class);
-//            startActivity(intent);
-//            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }
