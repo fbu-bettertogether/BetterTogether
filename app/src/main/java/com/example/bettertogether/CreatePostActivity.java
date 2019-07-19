@@ -145,7 +145,7 @@ public class CreatePostActivity extends AppCompatActivity {
                     e.printStackTrace();
                 } else {
                     Log.d(APP_TAG, "success");
-                    finish();
+//                    finish();
                 }
 
                 ParseRelation<Post> groupRelation = group.getRelation("posts");
@@ -221,6 +221,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 }
                 tagText = tagText.substring(0, tagText.length() - 1);
                 tvTag.setText(tagText);
+                etPost.setText(etPost.getText() + " " + tagText);
             }
         }
     }
