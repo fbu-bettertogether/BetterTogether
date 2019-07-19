@@ -98,7 +98,7 @@ public class DiscoveryFragment extends Fragment {
     }
 
     private void queryGroups(Category cat) {
-        cat.getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
+        cat.getRelation("groups").getQuery().include("category").findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> groups, ParseException e) {
                 if (e != null) {

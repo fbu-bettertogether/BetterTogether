@@ -28,6 +28,7 @@ import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -164,14 +165,22 @@ public class GroupFragment extends Fragment {
                     @Override
                     public void onFinish() {
                         tvTimer.setText("Finished!");
-                        Dictionary d = (Dictionary) (Object) group.getNumCheckIns();
-                        int currNumCheckIns = (int) d.remove(getCurrentUser().getObjectId());
-                        d.put(getCurrentUser().getObjectId(), currNumCheckIns + 1);
-                        group.setNumCheckIns((ParseObject) (Object) d);
-                        group.saveInBackground(new SaveCallback() {
+                        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+                        parseQuery.whereEqualTo("user", getCurrentUser());
+                        parseQuery.whereEqualTo("group", group);
+                        parseQuery.include("numCheckIns");
+                        parseQuery.findInBackground(new FindCallback<Membership>() {
                             @Override
-                            public void done(ParseException e) {
-                                Log.d("Check in", "done updating numCheckIns");
+                            public void done(List<Membership> objects, ParseException e) {
+                                Membership currMem = objects.get(0);
+                                int currCheckIns = currMem.getNumCheckIns();
+                                currMem.setNumCheckIns(currCheckIns + 1);
+                                currMem.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("checking in", "saved check in");
+                                    }
+                                });
                             }
                         });
                     }

@@ -29,12 +29,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
-import com.example.bettertogether.models.Membership;
 import com.parse.Parse;
-import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -46,9 +43,6 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "MakeNewGroupActivity";
@@ -69,7 +63,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private RecyclerView rvAddedMembers;
     private MemberAdapter adapter;
     private ArrayList<ParseUser> addedMembers;
-    private Dictionary numCheckIns;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     private final int ADD_REQUEST_CODE = 20;
@@ -95,7 +88,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         btnAddUsers = (Button) findViewById(R.id.btnAddUsers);
 
         // configuring the number picker
-        final String[] npVals = new String[60];
+        String[] npVals = new String[60];
         // setting the number picker values from 10-600 with 10 step size
         for (int i = 1; i <= 60; i++) {
             npVals[i-1] = Integer.toString(i * 10);
@@ -142,7 +135,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 final String category = spCategory.getSelectedItem().toString();
                 final int frequency = Integer.parseInt(spFrequency.getSelectedItem().toString());
                 final ParseUser user = ParseUser.getCurrentUser();
-                final int minTime = Integer.parseInt(npVals[npMinTime.getValue()]);
+                final int minTime = npMinTime.getValue();
 
                 final CalendarDay now = CalendarDay.today();
                 if (cdStartDate.getSelectedDate() == null) {
@@ -220,10 +213,13 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 //            groupProf.setImageURI(selectedImage);
         } else if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
-            numCheckIns = new Hashtable();
-            for (int i = 0; i < addedMembers.size(); i++) {
-                numCheckIns.put(addedMembers.get(i).getObjectId(), 0);
-            }
+//            if (addedMembers.size() != 0) {
+//                relation = post.getRelation("taggedUsers");
+//                for (int i = 0; i < taggedUsers.size(); i++) {
+//                    relation.add(taggedUsers.get(i));
+//                }
+//            }
+            Toast.makeText(this, "added members", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -298,37 +294,35 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIcon(imageFile);
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
-//        newGroup.setCategory(category);
+        newGroup.setCategory(category);
         newGroup.setFrequency(frequency);
         newGroup.setStartDate(startDate);
         newGroup.setEndDate(endDate);
         newGroup.setOwner(user);
         newGroup.setIsActive(active);
         newGroup.setMinTime(minTime);
-        newGroup.setNumCheckIns((ParseObject) (Object) numCheckIns);
 
         newGroup.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    List<Membership> memberships = new ArrayList<>();
+                    Log.d("Carmel", "made it this far");
+                    ParseRelation<ParseUser> relation = newGroup.getRelation("users");
                     for (int i = 0; i < addedMembers.size(); i++) {
-                        memberships.add( new Membership());
-                        memberships.get(i).setGroup(newGroup);
-                        memberships.get(i).setUser(addedMembers.get(i));
-                        memberships.get(i).saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                Log.d(APP_TAG, e.toString());
-                            }
-                        });
+                        relation.add(addedMembers.get(i));
                     }
-                    Log.d("HomeActivity", "Create post success!");
-                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                    startActivityForResult(i, REQUEST_CODE);
+                    newGroup.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            Log.d("HomeActivity", "Create post success!");
+                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                            startActivityForResult(i, REQUEST_CODE);
                         }
+                    });
+                } else {
+                    e.printStackTrace();
                 }
             }
-        );
+        });
     }
 }

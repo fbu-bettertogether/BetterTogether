@@ -12,6 +12,7 @@ import java.util.List;
 public class Membership extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String GROUP = "group";
+    public static final String KEY_NUM_CHECK_INS = "numCheckIns";
 
 
     public String getDate() {
@@ -48,6 +49,14 @@ public class Membership extends ParseObject {
             users.add(memberships.get(i).getUser());
         }
         return users;
+    }
+
+    public void setNumCheckIns(int i) {
+        put(KEY_NUM_CHECK_INS, i);
+    }
+
+    public int getNumCheckIns() {
+        return getInt(KEY_NUM_CHECK_INS);
     }
 
 }
