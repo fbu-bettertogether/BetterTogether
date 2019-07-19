@@ -2,6 +2,7 @@ package com.example.bettertogether.models;
 
 import android.os.Parcelable;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
@@ -10,9 +11,12 @@ import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import org.xml.sax.Parser;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.List;
 
 @ParseClassName("Group")
 public class Group extends ParseObject implements Parcelable {
@@ -75,11 +79,13 @@ public class Group extends ParseObject implements Parcelable {
     }
 
     public String getCategory() {
-        return getString(CATEGORY);
+        ParseObject cat = getParseObject(CATEGORY);
+        return cat.getString(NAME);
     }
 
-    public void setCategory(String category) {
-        put(CATEGORY, category);
+    public void setCategory(String catId) {
+        put(CATEGORY, ParseObject.createWithoutData("Category", catId) );
+        saveInBackground();
     }
 
     public int getTotalPoints() {
