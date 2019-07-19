@@ -300,7 +300,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIcon(imageFile);
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
-        newGroup.setCategory(category);
         newGroup.setFrequency(frequency);
         newGroup.setStartDate(startDate);
         newGroup.setEndDate(endDate);
@@ -334,6 +333,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                         cat.saveInBackground();
                     }
                     groupToCatRelation = cat.getRelation("groups");
+                    newGroup.saveInBackground();
                     groupToCatRelation.add(newGroup);
                     newGroup.setCategory(cat.getObjectId());
                     cat.saveInBackground(new SaveCallback() {
