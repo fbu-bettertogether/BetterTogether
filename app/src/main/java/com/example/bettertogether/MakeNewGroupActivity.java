@@ -29,9 +29,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.parse.Parse;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -43,6 +46,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "MakeNewGroupActivity";
@@ -294,7 +298,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIcon(imageFile);
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
-        newGroup.setCategory(category);
+//        newGroup.setCategory(category);
         newGroup.setFrequency(frequency);
         newGroup.setStartDate(startDate);
         newGroup.setEndDate(endDate);
@@ -306,23 +310,33 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Log.d("Carmel", "made it this far");
-                    ParseRelation<ParseUser> relation = newGroup.getRelation("users");
+                    List<Membership> memberships = new ArrayList<>();
                     for (int i = 0; i < addedMembers.size(); i++) {
-                        relation.add(addedMembers.get(i));
+                        memberships.add( new Membership());
+                        memberships.get(i).setGroup(newGroup);
+                        memberships.get(i).setUser(addedMembers.get(i));
+                        memberships.get(i).saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                Log.d(APP_TAG, e.toString());
+                            }
+                        });
                     }
-                    newGroup.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            Log.d("HomeActivity", "Create post success!");
-                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                            startActivityForResult(i, REQUEST_CODE);
+                    Log.d("HomeActivity", "Create post success!");
+                    Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                    startActivityForResult(i, REQUEST_CODE);
+
+//                    ParseObject.saveAllInBackground(memberships, new SaveCallback() {
+//                        @Override
+//                        public void done(ParseException e) {
+//                            if (e == null) {
+//                            }
+//                            e.printStackTrace();
+//                        }
+//                    });
                         }
-                    });
-                } else {
-                    e.printStackTrace();
                 }
             }
-        });
+        );
     }
 }

@@ -20,7 +20,7 @@ public class Membership extends ParseObject {
     }
 
     public void setGroup(Group group) {
-        put("post", group);
+        put(GROUP, group);
     }
 
     public ParseUser getUser() {

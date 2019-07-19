@@ -6,6 +6,7 @@ import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Like;
+import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.ParseComment;
 import com.example.bettertogether.models.Post;
 import com.parse.Parse;
@@ -37,6 +38,7 @@ public class ParseApplication extends Application {
         ParseObject.registerSubclass(Group.class);
         ParseObject.registerSubclass(Category.class);
         ParseObject.registerSubclass(Award.class);
+        ParseObject.registerSubclass(Membership.class);
 
         // set applicationId, and server server based on the values in the Heroku settings.
         // clientKey is not needed unless explicitly configured
