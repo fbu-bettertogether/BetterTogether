@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
 import com.parse.ParseException;
 
@@ -26,7 +29,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
 
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView ivGroupProf;
         public TextView tvGroupName;
         public TextView tvNumMembers;
@@ -39,6 +42,20 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
             tvGroupName =(TextView)itemView.findViewById(R.id.tvGroupName);
             tvNumMembers = (TextView) itemView.findViewById(R.id.tvNumPeople);
             tvMembersText = (TextView) itemView.findViewById(R.id.tvMembersText);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+//            int position = getAdapterPosition();
+//            if (position != RecyclerView.NO_POSITION) {
+//                // get the clicked-on group
+//                Group group = mItems.get(position);
+//                // switch to group-detail view fragment
+//                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+//                GroupFragment fragment = GroupFragment.newInstance(group);
+//                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+//            }
         }
     }
 
