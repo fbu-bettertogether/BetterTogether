@@ -2,6 +2,7 @@ package com.example.bettertogether;
 
 import android.app.Activity;
 import android.content.Context;
+import android.inputmethodservice.Keyboard;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,7 +56,9 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
         holder.mRecyclerViewRow.setHasFixedSize(true);
         CategoriesAdapter rowsRecyclerAdapter = new CategoriesAdapter(mContext, RowItems);
         holder.mRecyclerViewRow.setAdapter(rowsRecyclerAdapter);
-        holder.tvCatName.setText(RowItems.get(0).getCategory());
+        if (RowItems != null && RowItems.size() > 0) {
+            holder.tvCatName.setText(RowItems.get(0).getCategory());
+        }
 
         final RecyclerView finalRecyclerView = holder.mRecyclerViewRow;
 
