@@ -61,7 +61,7 @@ public class HomeFragment extends Fragment {
                     return;
                 }
 
-                for (int i = 0; i < groups.size() && i < 3; i++) {
+                for (int i = 0; i < groups.size(); i++) {
                     ParseQuery<Post> postQuery = new ParseQuery<Post>(Post.class);
                     postQuery.whereEqualTo("group", groups.get(i));
                     postQuery.setLimit(3);
