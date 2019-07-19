@@ -1,17 +1,22 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.HomeActivity;
+import com.example.bettertogether.MainActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
@@ -233,4 +239,32 @@ public class ProfileFragment extends Fragment {
         void createProfilePicture(View view);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.profile, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if(id==R.id.action_logout) {
+            ParseUser.logOut();
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            final Intent intent = new Intent(getContext(), MainActivity.class);
+            startActivity(intent);
+            AppCompatActivity appAct = (AppCompatActivity) getActivity();
+            appAct.finish();
+//        } else if (id == R.id.change_profile_picture) {
+//            Intent intent=new Intent(getApplicationContext(), UploadProPicActivity.class);
+//            startActivity(intent);
+//            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
