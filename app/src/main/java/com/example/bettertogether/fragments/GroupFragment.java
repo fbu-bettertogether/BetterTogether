@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.parse.ParseUser.getCurrentUser;
 
@@ -64,6 +66,8 @@ public class GroupFragment extends Fragment {
     private Button btnCheckIn;
     private TextView tvStartDate;
     private TextView tvEndDate;
+    private TextView tvTimer;
+    private int counter;
 
     private RecyclerView rvTimeline;
     private PostsAdapter adapter;
@@ -109,6 +113,7 @@ public class GroupFragment extends Fragment {
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         tvStartDate = view.findViewById(R.id.tvStartDate);
         tvEndDate = view.findViewById(R.id.tvEndDate);
+        tvTimer = view.findViewById(R.id.tvTimer);
 
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
@@ -141,6 +146,24 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Log.d("Check in button", "Success");
+                btnCheckIn.setVisibility(View.INVISIBLE);
+                tvTimer.setVisibility(View.VISIBLE);
+                final long timeInMillis = TimeUnit.MINUTES.toMillis(group.getInt("minTime"));
+
+                new CountDownTimer(timeInMillis, 1000) {
+
+                    @Override
+                    public void onTick(long l) {
+                        long timeInS = TimeUnit.MILLISECONDS.toSeconds(timeInMillis) - counter;
+                        tvTimer.setText(String.format("%02d : %02d", TimeUnit.SECONDS.toMinutes(timeInS), timeInS - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(timeInS))));
+                        counter++;
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        tvTimer.setText("Finished!");
+                    }
+                }.start();
             }
         });
 
