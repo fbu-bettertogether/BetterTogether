@@ -23,10 +23,6 @@ import com.parse.ParseQuery;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.bettertogether.models.Group.CATEGORY;
-import static com.example.bettertogether.models.Group.ICON;
-import static com.example.bettertogether.models.Group.KEY_DESCRIPTION;
-import static com.example.bettertogether.models.Group.NAME;
 import static com.parse.ParseUser.getCurrentUser;
 
 public class GroupsFragment extends Fragment {
