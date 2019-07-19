@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -52,15 +53,17 @@ public class TagActivity extends AppCompatActivity {
         rvMembers.setLayoutManager(new LinearLayoutManager(rvMembers.getContext()));
         rvMembers.setAdapter(adapter);
 
-        ParseQuery<ParseUser> groupQuery = group.getUsers().getQuery();
-        groupQuery.findInBackground(new FindCallback<ParseUser>() {
+        ParseQuery<Membership> membershipParseQuery = new ParseQuery<>(Membership.class);
+        membershipParseQuery.whereEqualTo("group", group);
+        membershipParseQuery.include("user");
+        membershipParseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<ParseUser> objects, ParseException e) {
+            public void done(List<Membership> objects, ParseException e) {
                 if (e != null) {
                     Log.e("Querying groups", "error with query");
                     e.printStackTrace();
                 }
-                groupMembers.addAll(objects);
+                groupMembers.addAll(Membership.getAllUsers(objects));
                 adapter.notifyDataSetChanged();
             }
         });

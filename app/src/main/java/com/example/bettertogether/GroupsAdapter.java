@@ -78,11 +78,11 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             tvGroupName.setText(group.getName());
 
             // loading in the rest of the group fields if they are available
-            if (group.getCategory() != null) {
-                tvCategory.setText(group.getCategory());
-            } else {
+//            if (group.getCategory() != null) {
+//                tvCategory.setText(group.getCategory());
+//            } else {
                 tvCategory.setText("");
-            }
+//            }
 
             if (group.getDescription() != null) {
                 tvDescription.setText(group.getDescription());

@@ -2,6 +2,8 @@ package com.example.bettertogether.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -48,6 +50,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static android.app.Activity.RESULT_OK;
 import static com.parse.ParseUser.getCurrentUser;
 
 /**
@@ -62,6 +65,7 @@ public class GroupFragment extends Fragment {
     private static final String ARG_GROUP = "group";
     private Group group;
     private OnGroupFragmentInteractionListener mListener;
+    public static final int REQUEST_CODE = 45;
 
     private ImageView ivBanner;
     private ImageView ivUserIcon;
@@ -210,10 +214,17 @@ public class GroupFragment extends Fragment {
                 Toast.makeText(getContext(), "text view clicked", Toast.LENGTH_LONG).show();
                 Intent i = new Intent(getContext(), CreatePostActivity.class);
                 i.putExtra("group", Parcels.wrap(group));
-                startActivity(i);
+                startActivityForResult(i, REQUEST_CODE);
             }
         });
 
+        queryPosts();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPosts.clear();
         queryPosts();
     }
 
