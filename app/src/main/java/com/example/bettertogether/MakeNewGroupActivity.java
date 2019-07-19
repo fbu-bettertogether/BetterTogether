@@ -325,15 +325,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     Log.d("HomeActivity", "Create post success!");
                     Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                     startActivityForResult(i, REQUEST_CODE);
-
-//                    ParseObject.saveAllInBackground(memberships, new SaveCallback() {
-//                        @Override
-//                        public void done(ParseException e) {
-//                            if (e == null) {
-//                            }
-//                            e.printStackTrace();
-//                        }
-//                    });
                         }
                 }
             }
