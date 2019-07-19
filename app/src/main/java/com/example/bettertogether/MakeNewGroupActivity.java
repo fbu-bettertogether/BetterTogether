@@ -309,11 +309,13 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 if (e == null) {
                     List<Membership> memberships = new ArrayList<>();
                     for (int i = 0; i < addedMembers.size(); i++) {
-                        memberships.add( new Membership());
-                        memberships.get(i).setGroup(newGroup);
-                        memberships.get(i).setUser(addedMembers.get(i));
-                        memberships.get(i).setNumCheckIns(0);
-                        memberships.get(i).saveInBackground(new SaveCallback() {
+                        Membership member = new Membership();
+                        memberships.add(member);
+                        member.setGroup(newGroup);
+                        member.setUser(addedMembers.get(i));
+                        member.setNumCheckIns(0);
+                        member.setPoints(0);
+                        member.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
                                 Log.d(APP_TAG, e.toString());
@@ -323,9 +325,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     Log.d("HomeActivity", "Create post success!");
                     Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                     startActivityForResult(i, REQUEST_CODE);
-                        }
                 }
             }
-        );
+        });
     }
 }

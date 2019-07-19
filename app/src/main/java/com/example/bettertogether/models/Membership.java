@@ -13,6 +13,7 @@ public class Membership extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String GROUP = "group";
     public static final String KEY_NUM_CHECK_INS = "numCheckIns";
+    public static final String KEY_POINTS = "points";
 
 
     public String getDate() {
@@ -57,6 +58,14 @@ public class Membership extends ParseObject {
 
     public int getNumCheckIns() {
         return getInt(KEY_NUM_CHECK_INS);
+    }
+
+    public void setPoints(int i) {
+        put(KEY_POINTS, i);
+    }
+
+    public int getPoints() {
+        return getInt(KEY_POINTS);
     }
 
 }

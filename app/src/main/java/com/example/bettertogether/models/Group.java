@@ -98,8 +98,8 @@ public class Group extends ParseObject implements Parcelable {
         put(USERS_TO_POINTS, userToPoints);
     }
 
-    public String getFrequency() {
-        return getString(FREQUENCY);
+    public int getFrequency() {
+        return getInt(FREQUENCY);
     }
 
     public void setFrequency(int frequency) {

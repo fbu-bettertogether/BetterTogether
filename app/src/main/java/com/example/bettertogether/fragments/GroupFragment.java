@@ -43,6 +43,7 @@ import org.parceler.Parcels;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -71,6 +72,8 @@ public class GroupFragment extends Fragment {
     private TextView tvEndDate;
     private TextView tvTimer;
     private int counter;
+    private int numCheckIns;
+    private Membership currMem;
 
     private RecyclerView rvTimeline;
     private PostsAdapter adapter;
@@ -145,48 +148,61 @@ public class GroupFragment extends Fragment {
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
         }
 
-        btnCheckIn.setOnClickListener(new View.OnClickListener() {
+        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+        parseQuery.whereEqualTo("user", getCurrentUser());
+        parseQuery.whereEqualTo("group", group);
+        parseQuery.include("numCheckIns");
+        parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void onClick(View view) {
-                Log.d("Check in button", "Success");
-                btnCheckIn.setVisibility(View.INVISIBLE);
-                tvTimer.setVisibility(View.VISIBLE);
-                final long timeInMillis = TimeUnit.MINUTES.toMillis(group.getInt("minTime"));
+            public void done(List<Membership> objects, ParseException e) {
+                currMem = objects.get(0);
+                numCheckIns = currMem.getNumCheckIns();
 
-                new CountDownTimer(timeInMillis, 1000) {
+                if (numCheckIns < Integer.valueOf(group.getFrequency())) {
 
-                    @Override
-                    public void onTick(long l) {
-                        long timeInS = TimeUnit.MILLISECONDS.toSeconds(timeInMillis) - counter;
-                        tvTimer.setText(String.format("%02d : %02d", TimeUnit.SECONDS.toMinutes(timeInS), timeInS - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(timeInS))));
-                        counter++;
-                    }
+                    btnCheckIn.setVisibility(View.VISIBLE);
+                    btnCheckIn.setText(String.format("%d check-ins left: check in now!", Integer.valueOf(group.getFrequency()) - numCheckIns));
+                    btnCheckIn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.d("Check in button", "Success");
+                            btnCheckIn.setVisibility(View.INVISIBLE);
+                            tvTimer.setVisibility(View.VISIBLE);
+                            final long timeInMillis = TimeUnit.MINUTES.toMillis(group.getInt("minTime"));
 
-                    @Override
-                    public void onFinish() {
-                        tvTimer.setText("Finished!");
-                        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
-                        parseQuery.whereEqualTo("user", getCurrentUser());
-                        parseQuery.whereEqualTo("group", group);
-                        parseQuery.include("numCheckIns");
-                        parseQuery.findInBackground(new FindCallback<Membership>() {
-                            @Override
-                            public void done(List<Membership> objects, ParseException e) {
-                                Membership currMem = objects.get(0);
-                                int currCheckIns = currMem.getNumCheckIns();
-                                currMem.setNumCheckIns(currCheckIns + 1);
-                                currMem.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        Log.d("checking in", "saved check in");
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }.start();
+                            new CountDownTimer(timeInMillis, 1000) {
+
+                                @Override
+                                public void onTick(long l) {
+                                    long timeInS = TimeUnit.MILLISECONDS.toSeconds(timeInMillis) - counter;
+                                    tvTimer.setText(String.format("%02d : %02d", TimeUnit.SECONDS.toMinutes(timeInS), timeInS - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(timeInS))));
+                                    counter++;
+                                }
+
+                                @Override
+                                public void onFinish() {
+                                    tvTimer.setText("Finished!");
+                                    currMem.setNumCheckIns(numCheckIns + 1);
+                                    currMem.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            Log.d("checking in", "saved check in");
+                                        }
+                                    });
+                                }
+                            }.start();
+                        }
+
+                    });
+
+                } else {
+                    btnCheckIn.setVisibility(View.INVISIBLE);
+                    tvTimer.setVisibility(View.VISIBLE);
+                    tvTimer.setText("You're done for the week!");
+                }
             }
         });
+
 
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
