@@ -88,7 +88,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         btnAddUsers = (Button) findViewById(R.id.btnAddUsers);
 
         // configuring the number picker
-        String[] npVals = new String[60];
+        final String[] npVals = new String[60];
         // setting the number picker values from 10-600 with 10 step size
         for (int i = 1; i <= 60; i++) {
             npVals[i-1] = Integer.toString(i * 10);
@@ -135,7 +135,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 final String category = spCategory.getSelectedItem().toString();
                 final int frequency = Integer.parseInt(spFrequency.getSelectedItem().toString());
                 final ParseUser user = ParseUser.getCurrentUser();
-                final int minTime = npMinTime.getValue();
+                final int minTime = Integer.parseInt(npVals[npMinTime.getValue()]);
 
                 final CalendarDay now = CalendarDay.today();
                 if (cdStartDate.getSelectedDate() == null) {
@@ -294,7 +294,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIcon(imageFile);
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
-        newGroup.setCategory(category);
+//        newGroup.setCategory(category);
         newGroup.setFrequency(frequency);
         newGroup.setStartDate(startDate);
         newGroup.setEndDate(endDate);
