@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bettertogether.GroupsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -55,21 +56,22 @@ public class GroupsFragment extends Fragment {
     }
 
     public void queryGroups() {
-        ParseQuery<ParseObject> parseQuery = getCurrentUser().getRelation("groups").getQuery();
+        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
         parseQuery.addDescendingOrder("createdAt");
-        parseQuery.findInBackground(new FindCallback<ParseObject>() {
+        parseQuery.whereEqualTo("user", getCurrentUser());
+        parseQuery.include("group");
+        parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<ParseObject> groups, ParseException e) {
+            public void done(List<Membership> memberships, ParseException e) {
                 if (e != null) {
                     Log.e("Querying groups", "error with query");
                     e.printStackTrace();
                     return;
                 }
 
-                Log.d("carmel",Integer.toString(groups.size()));
+                Log.d("carmel",Integer.toString(memberships.size()));
 
-                // add posts to list and update view with adapter
-                mGroups.addAll((List<Group>) (Object) groups);
+                mGroups.addAll(Membership.getAllGroups(memberships));
                 adapter.notifyDataSetChanged();
             }
         });

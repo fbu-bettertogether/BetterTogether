@@ -28,13 +28,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.fragments.GroupFragment;
-import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
-import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -43,11 +40,9 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "MakeNewGroupActivity";
@@ -63,7 +58,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private Boolean active;
     private NumberPicker npMinTime;
     private Button btnAddUsers;
-    ParseRelation<ParseObject> groupToCatRelation;
 
     // declaring added users fields
     private RecyclerView rvAddedMembers;
@@ -71,7 +65,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private ArrayList<ParseUser> addedMembers;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    private final int ADD_REQUEST_CODE = 30;
+    private final int ADD_REQUEST_CODE = 20;
     public String photoFileName = "photo.jpg";
     private File photoFile;
     private final int REQUEST_CODE = 20;
@@ -294,7 +288,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         return file;
     }
 
-    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, ParseUser user, int minTime) {
+    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, String category, int frequency, String startDate, String endDate, ParseUser user, int minTime) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
         newGroup.setIcon(imageFile);
@@ -308,54 +302,11 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIsActive(active);
         newGroup.setMinTime(minTime);
 
-        final ArrayList<Category> catList = new ArrayList<>();
-        final Category.Query catQuery = new Category.Query();
-        catQuery.findInBackground(new FindCallback<Category>() {
-            @Override
-            public void done(List<Category> objects, ParseException e) {
-                if (e == null) {
-                    for (int i = 0; i < objects.size(); ++i) {
-                        Log.d("DiscoveryActivity", "Category[" + i + "] = "
-                                + objects.get(i).getName());
-                    }
-                    catList.addAll(objects);
-                    //mainRecyclerAdapter.notifyDataSetChanged();
-                    Category cat = new Category();
-                    Boolean found = false;
-                    for (int i = 0; i < catList.size(); i++) {
-                        if (catList.get(i).getName().equalsIgnoreCase(category)) {
-                            cat = catList.get(i);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        cat.setName(category);
-                        cat.saveInBackground();
-                    }
-                    groupToCatRelation = cat.getRelation("groups");
-                    groupToCatRelation.add(newGroup);
-                    newGroup.setCategory(cat.getObjectId());
-                    cat.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            Log.d("HomeActivity", "Category relation works!");
-                            saveGroup(newGroup);
-                        }
-                    });
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private void saveGroup(final Group newGroup) {
         newGroup.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    Log.d("Renee", "made it this far");
+                    Log.d("Carmel", "made it this far");
                     ParseRelation<ParseUser> relation = newGroup.getRelation("users");
                     for (int i = 0; i < addedMembers.size(); i++) {
                         relation.add(addedMembers.get(i));
@@ -363,7 +314,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     newGroup.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            Log.d("HomeActivity", "Create group success!");
+                            Log.d("HomeActivity", "Create post success!");
                             Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                             startActivityForResult(i, REQUEST_CODE);
                         }

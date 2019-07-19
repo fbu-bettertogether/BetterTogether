@@ -10,6 +10,7 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.parse.LogInCallback;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
@@ -29,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
         ParseUser currentUser = ParseUser.getCurrentUser();
         if (currentUser != null) {
             Log.d("LoginActivity", "Login successful");
+            ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
+            parseACL.setPublicReadAccess(true);
+            ParseUser.getCurrentUser().setACL(parseACL);
 
             final Intent intent = new Intent(MainActivity.this, HomeActivity.class);
             startActivity(intent);
