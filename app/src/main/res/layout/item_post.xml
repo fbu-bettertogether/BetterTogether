@@ -55,7 +55,8 @@
             android:layout_marginTop="4dp"
             android:text="TextView"
             card_view:layout_constraintStart_toStartOf="@+id/tvBody"
-            card_view:layout_constraintTop_toBottomOf="@+id/tvBody" />
+            card_view:layout_constraintTop_toBottomOf="@+id/ivMedia"
+            android:layout_marginLeft="4dp" />
 
         <ImageButton
             android:id="@+id/ivReply"
@@ -64,19 +65,21 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
             card_view:layout_constraintEnd_toEndOf="parent"
-            card_view:layout_constraintTop_toBottomOf="@+id/tvBody"
+            card_view:layout_constraintTop_toBottomOf="@+id/ivMedia"
             android:background="@null"
-            card_view:srcCompat="@drawable/sharp_cake_black_18dp" />
+            card_view:srcCompat="@drawable/sharp_cake_black_18dp"
+            android:layout_marginRight="4dp" />
 
         <ImageView
             android:id="@+id/ivMedia"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            card_view:layout_constraintBottom_toTopOf="@+id/ivReply"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="@+id/ivProfileImage"
-            card_view:layout_constraintTop_toBottomOf="@+id/tvBody"
+            card_view:layout_constraintTop_toBottomOf="@+id/ivProfileImage"
             card_view:srcCompat="@android:color/background_light" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

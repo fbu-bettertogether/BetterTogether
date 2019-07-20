@@ -12,8 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bettertogether.MemberAdapter;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
+import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -52,14 +55,20 @@ public class HomeFragment extends Fragment {
     }
 
     private void queryPosts() {
-        getCurrentUser().getRelation("groups").getQuery().findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+        parseQuery.addDescendingOrder("createdAt");
+        parseQuery.whereEqualTo("user", getCurrentUser());
+        parseQuery.include("group");
+        parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<ParseObject> groups, ParseException e) {
+            public void done(List<Membership> objects, ParseException e) {
                 if (e != null) {
                     Log.e("Querying groups", "error with query");
                     e.printStackTrace();
                     return;
                 }
+
+                List<Group> groups = Membership.getAllGroups(objects);
 
                 for (int i = 0; i < groups.size(); i++) {
                     ParseQuery<Post> postQuery = new ParseQuery<Post>(Post.class);

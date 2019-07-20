@@ -55,6 +55,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     .load(profileImage.getUrl())
                     .into(holder.ivProfileImage);
         }
+
+        if (post.getMedia() != null) {
+            Glide.with(context)
+                    .load(post.getMedia().getUrl())
+                    .into(holder.ivMedia);
+        }
     }
 
     @Override
