@@ -40,12 +40,4 @@ public class Category extends ParseObject {
         put(NAME, name);
     }
 
-    public ParseRelation<ParseObject> getGroups() {
-        return getRelation(GROUPS);
-    }
-
-    public void setGroups(ParseRelation groups) {
-        put(GROUPS, groups);
-    }
-
 }

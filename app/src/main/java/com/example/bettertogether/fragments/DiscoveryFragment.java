@@ -21,6 +21,7 @@ import com.example.bettertogether.DiscoveryAdapter;
 import com.example.bettertogether.GroupsAdapter;
 import com.example.bettertogether.MakeNewGroupActivity;
 import com.example.bettertogether.R;
+import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Post;
@@ -98,21 +99,25 @@ public class DiscoveryFragment extends Fragment {
     }
 
     private void queryGroups(Category cat) {
-        cat.getRelation("groups").getQuery().include("category").findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<CatMembership> query = new ParseQuery<CatMembership>(CatMembership.class);
+        query.include("group");
+        query.whereEqualTo("category", cat);
+        query.findInBackground(new FindCallback<CatMembership>() {
             @Override
-            public void done(List<ParseObject> groups, ParseException e) {
+            public void done(List<CatMembership> objects, ParseException e) {
                 if (e != null) {
                     Log.e("Querying groups", "error with query");
                     e.printStackTrace();
                     return;
                 }
-                Log.d("number of groups",Integer.toString(groups.size()));
+                Log.d("number of groups",Integer.toString(objects.size()));
                 // add posts to list and update view with adapter
                 List<Group> mGroups = new ArrayList<>();
-                mGroups.addAll((List<Group>) (Object) groups);
+                mGroups.addAll(CatMembership.getAllGroups(objects));
                 //mainRecyclerAdapter.notifyDataSetChanged();
                 listOfListOfItems.add(mGroups);
                 display();
+
             }
         });
     }

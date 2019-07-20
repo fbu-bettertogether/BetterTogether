@@ -57,7 +57,11 @@ public class DiscoveryAdapter extends RecyclerView.Adapter<DiscoveryAdapter.View
         CategoriesAdapter rowsRecyclerAdapter = new CategoriesAdapter(mContext, RowItems);
         holder.mRecyclerViewRow.setAdapter(rowsRecyclerAdapter);
         if (RowItems != null && RowItems.size() > 0) {
-            holder.tvCatName.setText(RowItems.get(0).getCategory());
+            try {
+                holder.tvCatName.setText((String)((Category)RowItems.get(0).get("category")).fetch().get("name"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
 
         final RecyclerView finalRecyclerView = holder.mRecyclerViewRow;
