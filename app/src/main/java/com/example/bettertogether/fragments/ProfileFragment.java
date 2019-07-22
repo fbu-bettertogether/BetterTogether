@@ -239,7 +239,7 @@ public class ProfileFragment extends Fragment {
 
     public void queryAwards() {
         ParseQuery<Post> parseQuery = new ParseQuery<>("Award");
-        parseQuery.addDescendingOrder("createdAt");
+        parseQuery.addAscendingOrder("createdAt");
         parseQuery.setLimit(25);
         parseQuery.include("user");
 
