@@ -76,6 +76,7 @@ public class ProfileFragment extends Fragment {
     private List<Group> groups;
     private List<ParseUser> friends;
     private List<Award> awards;
+    private List<Award> achievedAwards;
     private PostsAdapter postsAdapter;
     private FriendAdapter friendAdapter;
     private SimpleGroupAdapter simpleGroupAdapter;
@@ -104,14 +105,16 @@ public class ProfileFragment extends Fragment {
         groups = new ArrayList<>();
         friends = new ArrayList<>();
         awards = new ArrayList<>();
+        achievedAwards = new ArrayList<>();
         postsAdapter = new PostsAdapter(getContext(), posts);
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
         simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
-        awardsAdapter = new AwardsAdapter(getContext(), awards);
+        awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards);
         queryPosts();
         queryFriends();
         queryGroups();
         queryAwards();
+        queryAchievedAwards();
     }
 
     @Override
@@ -232,7 +235,6 @@ public class ProfileFragment extends Fragment {
                 // add new posts to the list and notify adapter
                 friends.addAll((List<ParseUser>) (Object) objects);
                 friendAdapter.notifyDataSetChanged();
-
             }
         });
     }
@@ -252,8 +254,27 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
 
-                // add new posts to the list and notify adapter
+                // add new awards to the list and notify adapter
                 awards.addAll((List<Award>) (Object) objects);
+                awardsAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public void queryAchievedAwards() {
+        ParseUser user = ParseUser.getCurrentUser();
+        ParseQuery<ParseObject> query = user.getRelation("awards").getQuery();
+        query.include("awards");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null) {
+                    Log.e("Querying awards", "error with query");
+                    e.printStackTrace();
+                    return;
+                }
+                // keep track of a new list of awards that the user has achieved
+                achievedAwards.addAll((List<Award>) (Object) objects);
                 awardsAdapter.notifyDataSetChanged();
             }
         });
