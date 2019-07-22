@@ -100,67 +100,18 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                 return true;
             }
         });
-        // Set default selection
-        bottomNavigationView.setSelectedItemId(R.id.action_home);
-
-
-    }
-    public boolean checkPlace(final List<String> types)
-    {
-        final List<PlaceLikelihood> validPlaces = new ArrayList();
-        boolean inValidPlace = false;
-        // Initialize the SDK
-        Places.initialize(getApplicationContext(), getString(R.string.places_key));
-
-        // Create a new Places client instance
-        placesClient = Places.createClient(this);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS);
         }
-        // Use fields to define the data types to return.
-        List<Place.Field> placeFields = Collections.singletonList(Place.Field.TYPES);
+        // Set default selection
+        bottomNavigationView.setSelectedItemId(R.id.action_home);
 
-        // Use the builder to create a FindCurrentPlaceRequest.
-        FindCurrentPlaceRequest request =
-                FindCurrentPlaceRequest.newInstance(placeFields);
 
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
-            placeResponse.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
-                @Override
-                public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
-                    // This task finds the places and their probabilities
-                    if (task.isSuccessful()) {
-                        FindCurrentPlaceResponse response = task.getResult();
-                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                            for( Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
-                                if (types.contains(type.toString())) {
-
-                                }
-                            }
-                        }
-                    } else {
-                        Exception exception = task.getException();
-                        if (exception instanceof ApiException) {
-                            ApiException apiException = (ApiException) exception;
-                            Log.e(APP_TAG, "Place not found: " + apiException.getStatusCode());
-                        }
-                    }
-                }
-            });
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS);
-            return false;
-        }
-        // if any valid place is found near the user then the size will be greater than 0
-        return validPlaces.size() > 0;
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
