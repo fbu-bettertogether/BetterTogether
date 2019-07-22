@@ -44,12 +44,10 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
         // get award at that position
         final Award award = awards.get(position);
 
+        ParseUser user = ParseUser.getCurrentUser();
+
         // populate the award views
         holder.tvAwardName.setText(award.getString("name"));
-        SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
-        Date todayDate = new Date();
-        String date = currentDate.format(todayDate);
-        holder.tvDate.setText(date);
 
         ParseFile awardImage = (ParseFile) award.get("icon");
         if (awardImage != null) {
@@ -67,7 +65,6 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivAwardImage;
         public TextView tvAwardName;
-        public TextView tvDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -75,7 +72,6 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
             // lookup widgets
             ivAwardImage = (ImageView) itemView.findViewById(R.id.ivAwardImage);
             tvAwardName = (TextView) itemView.findViewById(R.id.tvAwardName);
-            tvDate = (TextView) itemView.findViewById(R.id.tvDate);
         }
     }
 }
