@@ -48,8 +48,13 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "MakeNewGroupActivity";
@@ -60,11 +65,11 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private Spinner spCategory;
     private Spinner spFrequency;
     private MaterialCalendarView cdStartDate;
-    private MaterialCalendarView cdEndDate;
     private Button createBtn;
     private Boolean active;
     private NumberPicker npMinTime;
     private Button btnAddUsers;
+    private NumberPicker npNumWeeks;
 
     // declaring added users fields
     private RecyclerView rvAddedMembers;
@@ -89,10 +94,11 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         spCategory = (Spinner) findViewById(R.id.spCategory);
         spFrequency = (Spinner) findViewById(R.id.spFrequency);
         cdStartDate = (MaterialCalendarView) findViewById(R.id.calStartDate);
-        cdEndDate = (MaterialCalendarView) findViewById(R.id.calEndDate);
+
         createBtn = (Button) findViewById(R.id.create_btn);
         npMinTime = (NumberPicker) findViewById(R.id.npMinTime);
         btnAddUsers = (Button) findViewById(R.id.btnAddUsers);
+        npNumWeeks = (NumberPicker) findViewById(R.id.npNumWeeks);
 
         // configuring the number picker
         final String[] npVals = new String[60];
@@ -106,6 +112,12 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         npMinTime.setWrapSelectorWheel(true);
         // preventing keyboard from popping up
         npMinTime.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+        npNumWeeks.setMaxValue(52);
+        npNumWeeks.setMinValue(1);
+        npNumWeeks.setWrapSelectorWheel(true);
+        // preventing keyboard from popping up
+        npNumWeeks.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
         ivGroupProf.setOnClickListener(new View.OnClickListener() {
 
@@ -149,13 +161,9 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     Log.e(APP_TAG, "startDate is empty.");
                     Toast.makeText(getApplicationContext(), "There needs to be a start date!", Toast.LENGTH_SHORT).show();
                     return;
-                } else if (cdEndDate.getSelectedDate() == null) {
-                    Log.e(APP_TAG, "endDate is empty.");
-                    Toast.makeText(getApplicationContext(), "There needs to be an end date!", Toast.LENGTH_SHORT).show();
-                    return;
-                } else if (cdStartDate.getSelectedDate().isAfter(now) && cdEndDate.getSelectedDate().isAfter(cdStartDate.getSelectedDate())) {
+                } else if (cdStartDate.getSelectedDate().isAfter(now)) {
                     active = true;
-                } else if (cdStartDate.getSelectedDate().isBefore(now) || cdEndDate.getSelectedDate().isBefore(cdStartDate.getSelectedDate())) {
+                } else if (cdStartDate.getSelectedDate().isBefore(now)) {
                     Log.e(APP_TAG, "Start date or end date is out of range.");
                     Toast.makeText(getApplicationContext(), "Start date or end date is out of range.", Toast.LENGTH_SHORT).show();
                     return;
@@ -163,10 +171,21 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     active = false;
                 }
 
-                String start = cdStartDate.getSelectedDate().toString();
-                final String startDate = start.substring(12, start.length() - 1);
-                String end = cdEndDate.getSelectedDate().toString();
-                final String endDate = end.substring(12, end.length() - 1);
+//                String start = cdStartDate.getSelectedDate().toString();
+//                final String startDate = start.substring(12, start.length() - 1);
+                Calendar cal =  Calendar.getInstance();
+                int day = cdStartDate.getSelectedDate().getDay();
+                int month = cdStartDate.getSelectedDate().getMonth();
+                int year = cdStartDate.getSelectedDate().getYear();
+                cal.set(Calendar.DATE, day);
+                cal.set(Calendar.MONTH, month - 1);
+                cal.set(Calendar.YEAR, year);
+                String startDateUgly = cal.getTime().toString();
+                String startDate = startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24));
+                cal.add(Calendar.WEEK_OF_YEAR, npNumWeeks.getValue());
+                Date date = cal.getTime();
+                String endDateUgly = date.toString();
+                String endDate = endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24));
 
                 if (description == null || description == "") {
                     Log.e(APP_TAG, "Description field is empty.");
