@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
+import com.parse.ParseException;
+import com.parse.ParseObject;
 
 import java.util.List;
 
@@ -77,12 +79,15 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
             tvGroupName.setText(group.getName());
 
-            // loading in the rest of the group fields if they are available
-//            if (group.getCategory() != null) {
-//                tvCategory.setText(group.getCategory());
-//            } else {
+            if (group.get("category") != null) {
+                try {
+                    tvCategory.setText((((ParseObject)group.get("category")).fetch()).getString("name"));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            } else {
                 tvCategory.setText("");
-//            }
+            }
 
             if (group.getDescription() != null) {
                 tvDescription.setText(group.getDescription());
@@ -96,7 +101,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                         .into(ivGroupProf);
             }
 
-            if(group.getIsActive()) {
+            if(!group.getIsActive()) {
                 tvDates.setText("Active: " + group.getStartDate() + " - " + group.getEndDate());
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.teal));
             } else {
