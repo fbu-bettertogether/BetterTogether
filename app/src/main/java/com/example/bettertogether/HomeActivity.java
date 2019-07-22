@@ -65,15 +65,6 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Category cat = new Category();
-        ArrayList<String> s = new ArrayList<>();
-        s.add("GYM");
-        cat.put("locationTypes", s);
-        try {
-            cat.save();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
