@@ -140,9 +140,11 @@ public class GroupFragment extends Fragment {
             Glide.with(view.getContext()).load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl()).apply(RequestOptions.circleCropTransform()).into(ivUserIcon);
         }
 
+        String startDateUgly = group.getStartDate();
+        String endDateUgly = group.getEndDate();
         tvGroupName.setText(group.getName());
-        tvStartDate.setText(group.getStartDate());
-        tvEndDate.setText(group.getEndDate());
+        tvStartDate.setText(startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24)));
+        tvEndDate.setText(endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24)));
 
         if(group.getIsActive()) {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));

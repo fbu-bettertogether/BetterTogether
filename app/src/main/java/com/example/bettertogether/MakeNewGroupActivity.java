@@ -180,12 +180,10 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 cal.set(Calendar.DATE, day);
                 cal.set(Calendar.MONTH, month - 1);
                 cal.set(Calendar.YEAR, year);
-                String startDateUgly = cal.getTime().toString();
-                String startDate = startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24));
+                String startDate = cal.getTime().toString();
                 cal.add(Calendar.WEEK_OF_YEAR, npNumWeeks.getValue());
                 Date date = cal.getTime();
-                String endDateUgly = date.toString();
-                String endDate = endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24));
+                String endDate = date.toString();
 
                 if (description == null || description == "") {
                     Log.e(APP_TAG, "Description field is empty.");

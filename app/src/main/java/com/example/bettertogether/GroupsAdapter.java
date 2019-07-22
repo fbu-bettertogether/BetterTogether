@@ -96,11 +96,16 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                         .into(ivGroupProf);
             }
 
+            String startDateUgly = group.getStartDate();
+            String endDateUgly = group.getEndDate();
+            String startDate = startDateUgly.substring(4, 10).concat(", " + startDateUgly.substring(24));
+            String endDate = endDateUgly.substring(4, 10).concat(", " + endDateUgly.substring(24));
+
             if(group.getIsActive()) {
-                tvDates.setText("Active: " + group.getStartDate() + " - " + group.getEndDate());
+                tvDates.setText("Active: " + startDate + " - " + endDate);
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.teal));
             } else {
-                tvDates.setText("Inactive: " + group.getStartDate() + " - " + group.getEndDate());
+                tvDates.setText("Inactive: " + startDate + " - " + endDate);
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             }
         }
