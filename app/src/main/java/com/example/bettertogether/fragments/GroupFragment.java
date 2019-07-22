@@ -154,8 +154,8 @@ public class GroupFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvTimeline.setLayoutManager(linearLayoutManager);
 
-        if (group.getBanner() != null) {
-            Glide.with(view.getContext()).load(group.getBanner().getUrl()).into(ivBanner);
+        if (group.getIcon() != null) {
+            Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
         }
         if (ParseUser.getCurrentUser().getParseFile("profileImage") != null) {
             Glide.with(view.getContext()).load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl()).apply(RequestOptions.circleCropTransform()).into(ivUserIcon);
