@@ -150,8 +150,8 @@
             android:id="@+id/tvWeekLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="0dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
@@ -165,10 +165,12 @@
             android:id="@+id/npMinTime"
             android:layout_width="65dp"
             android:layout_height="42dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/calEndDate"
+            app:layout_constraintBottom_toTopOf="@+id/calStartDate"
+            app:layout_constraintStart_toEndOf="@id/tvWeekLabel"
             app:layout_constraintEnd_toStartOf="@+id/tvFromLabel"
             app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel"
             app:layout_constraintVertical_bias="0.0" />
@@ -182,40 +184,54 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            app:layout_constraintEnd_toStartOf="@+id/tvToLabel"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spFrequency"
-            app:mcv_selectionColor="#00F"
-            app:mcv_showOtherDates="all" />
-
-        <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/calEndDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvToLabel"
             app:layout_constraintTop_toBottomOf="@+id/spFrequency"
             app:mcv_selectionColor="#00F"
             app:mcv_showOtherDates="all" />
 
         <TextView
-            android:id="@+id/tvToLabel"
+            android:id="@+id/tvNumWeeks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:text="to"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="for"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spFrequency" />
+            app:layout_constraintEnd_toStartOf="@id/npNumWeeks"
+            app:layout_constraintTop_toBottomOf="@+id/calStartDate" />
+
+        <NumberPicker
+            android:id="@+id/npNumWeeks"
+            android:layout_width="100dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="24dp"
+            android:entries="@array/frequency_options"
+            app:layout_constraintTop_toBottomOf="@+id/calStartDate"
+            app:layout_constraintStart_toEndOf="@id/tvNumWeeks"
+            app:layout_constraintEnd_toStartOf="@+id/tvNumWeeks2"
+            android:gravity="center_horizontal"/>
+
+        <TextView
+            android:id="@+id/tvNumWeeks2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginRight="48dp"
+            android:text="weeks!"
+            app:layout_constraintTop_toBottomOf="@id/calStartDate"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
 
         <Button
             android:id="@+id/create_btn"
@@ -240,7 +256,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="16dp"
             android:layout_marginRight="16dp"
-            android:text="minutes from"
+            android:text="minutes, starting on"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
 
@@ -256,7 +272,7 @@
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/calEndDate" />
+            app:layout_constraintTop_toBottomOf="@+id/npNumWeeks" />
 
         <Button
             android:id="@+id/btnAddUsers"
