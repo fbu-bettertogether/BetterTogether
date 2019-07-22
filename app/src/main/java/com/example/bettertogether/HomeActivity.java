@@ -1,13 +1,14 @@
 package com.example.bettertogether;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -23,6 +26,16 @@ import com.example.bettertogether.fragments.DiscoveryFragment;
 import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.GroupsFragment;
 import com.example.bettertogether.fragments.ProfileFragment;
+import com.example.bettertogether.models.Category;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -30,14 +43,20 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentInteraction {
-    public final static int PROFILE_IMAGE_ACTIVITY_REQUEST_CODE = 121;
-    private BottomNavigationView bottomNavigationView;
-    public final String APP_TAG = "BetterTogether";
 
-    public String photoFileName = "photo.jpg";
+    private static final int ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS = 36;
+    public PlacesClient placesClient;
+    public final static int PROFILE_IMAGE_ACTIVITY_REQUEST_CODE = 121;
+    public final String APP_TAG = "BetterTogether";
+    private String photoFileName = "photo.jpg";
     private File profilePhotoFile;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +65,18 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        Category cat = new Category();
+        ArrayList<String> s = new ArrayList<>();
+        s.add("GYM");
+        cat.put("locationTypes", s);
+        try {
+            cat.save();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         final FragmentManager fragmentManager = getSupportFragmentManager();
 
-
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -77,6 +102,86 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
         });
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.action_home);
+
+
+    }
+    public boolean checkPlace(final List<String> types)
+    {
+        final List<PlaceLikelihood> validPlaces = new ArrayList();
+        boolean inValidPlace = false;
+        // Initialize the SDK
+        Places.initialize(getApplicationContext(), getString(R.string.places_key));
+
+        // Create a new Places client instance
+        placesClient = Places.createClient(this);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS);
+        }
+        // Use fields to define the data types to return.
+        List<Place.Field> placeFields = Collections.singletonList(Place.Field.TYPES);
+
+        // Use the builder to create a FindCurrentPlaceRequest.
+        FindCurrentPlaceRequest request =
+                FindCurrentPlaceRequest.newInstance(placeFields);
+
+        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+            placeResponse.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
+                @Override
+                public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
+                    // This task finds the places and their probabilities
+                    if (task.isSuccessful()) {
+                        FindCurrentPlaceResponse response = task.getResult();
+                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                            for( Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
+                                if (types.contains(type.toString())) {
+
+                                }
+                            }
+                        }
+                    } else {
+                        Exception exception = task.getException();
+                        if (exception instanceof ApiException) {
+                            ApiException apiException = (ApiException) exception;
+                            Log.e(APP_TAG, "Place not found: " + apiException.getStatusCode());
+                        }
+                    }
+                }
+            });
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS);
+            return false;
+        }
+        // if any valid place is found near the user then the size will be greater than 0
+        return validPlaces.size() > 0;
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // locatinos-related task you need to do.
+                } else {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS);
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
     }
 
     @Override
