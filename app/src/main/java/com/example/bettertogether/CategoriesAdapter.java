@@ -15,9 +15,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
+import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
+
+import org.json.JSONException;
 
 import java.util.List;
+
+import static com.parse.ParseUser.getCurrentUser;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 
@@ -69,7 +76,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
 
         Group group = mItems.get(position);
         if (group.getIcon() != null) {
@@ -78,11 +85,18 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
                     .into(holder.ivGroupProf);
         }
         holder.tvGroupName.setText(group.getName());
-        try {
-            holder.tvNumMembers.setText(String.valueOf(group.getNumUsers()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+
+            ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+            parseQuery.whereEqualTo("group", group);
+            parseQuery.findInBackground(new FindCallback<Membership>() {
+                @Override
+                public void done(List<Membership> objects, ParseException e) {
+                    holder.tvNumMembers.setText(String.valueOf(objects.size()));
+                }
+                }
+            );
+
+
     }
 
     @Override

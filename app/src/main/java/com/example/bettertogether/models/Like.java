@@ -9,11 +9,6 @@ public class Like extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String POST = "post";
 
-
-    public String getDate() {
-        return String.valueOf(getCreatedAt());
-    }
-
     public ParseObject getPost() {
         return getParseObject(POST);
     }
