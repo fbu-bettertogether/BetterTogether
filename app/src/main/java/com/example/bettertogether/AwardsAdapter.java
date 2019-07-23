@@ -78,8 +78,6 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
                 Resources res = context.getResources();
                 final int goldTint = res.getColor(R.color.gold);
                 holder.ivAwardImage.setColorFilter(goldTint);
-                //ContextCompat.setTint(res.getDrawable(R.drawable.medal), goldTint);
-                //ContextCompat.setTintMode(res.getDrawable(R.drawable.medal), PorterDuff.Mode.SRC_IN);
             }
         }
         if (achievedAwards.contains(award)) {
