@@ -46,7 +46,7 @@ public class HomeFragment extends Fragment {
 
         // initializing list of posts, adapter, and attaching adapter to recyclerview
         mPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getContext(), mPosts);
+        adapter = new PostsAdapter(getContext(), mPosts, getFragmentManager());
         rvPosts.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvPosts.setLayoutManager(linearLayoutManager);

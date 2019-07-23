@@ -151,7 +151,7 @@ public class GroupFragment extends Fragment {
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getContext(), mPosts);
+        adapter = new PostsAdapter(getContext(), mPosts, getFragmentManager());
         rvTimeline.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvTimeline.setLayoutManager(linearLayoutManager);
