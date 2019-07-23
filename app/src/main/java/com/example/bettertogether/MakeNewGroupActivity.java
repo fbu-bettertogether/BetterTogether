@@ -318,6 +318,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setOwner(user);
         newGroup.setIsActive(active);
         newGroup.setMinTime(minTime);
+        newGroup.setNumWeeks(npNumWeeks.getValue());
 
         final ArrayList<Category> catList = new ArrayList<>();
         final Category.Query catQuery = new Category.Query();
@@ -356,7 +357,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                                 memberships.add( new Membership());
                                 memberships.get(i).setGroup(newGroup);
                                 memberships.get(i).setUser(addedMembers.get(i));
-                                memberships.get(i).setNumCheckIns(0);
+                                memberships.get(i).setNumCheckIns(new ArrayList<>());
                                 memberships.get(i).setPoints(0);
                                 memberships.get(i).saveInBackground(new SaveCallback() {
                                     @Override

@@ -37,6 +37,7 @@ public class Group extends ParseObject implements Parcelable {
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
     public static final String MIN_TIME = "minTime";
+    public static final String NUM_WEEKS = "numWeeks";
 
     public ParseUser getOwner() {
         return getParseUser(KEY_OWNER);
@@ -174,6 +175,14 @@ public class Group extends ParseObject implements Parcelable {
 
     public void setMinTime(int minTime) {
         put(MIN_TIME, minTime);
+    }
+
+    public int getNumWeeks() {
+        return getInt(NUM_WEEKS);
+    }
+
+    public void setNumWeeks(int weeks) {
+        put(NUM_WEEKS, weeks);
     }
 
     }

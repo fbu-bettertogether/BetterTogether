@@ -52,12 +52,12 @@ public class Membership extends ParseObject {
         return users;
     }
 
-    public void setNumCheckIns(int i) {
+    public void setNumCheckIns(List i) {
         put(KEY_NUM_CHECK_INS, i);
     }
 
-    public int getNumCheckIns() {
-        return getInt(KEY_NUM_CHECK_INS);
+    public List getNumCheckIns() {
+        return getList(KEY_NUM_CHECK_INS);
     }
 
     public void setPoints(int i) {
