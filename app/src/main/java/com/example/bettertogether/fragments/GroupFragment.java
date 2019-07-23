@@ -183,7 +183,7 @@ public class GroupFragment extends Fragment {
             group.setIsActive(false);
             Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
         }
-
+        final boolean nowBeforeStart = now.before(start);
         if (group.getIsActive()) {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
@@ -208,7 +208,7 @@ public class GroupFragment extends Fragment {
                         e1.printStackTrace();
                     }
                 } else {
-                    if (!group.getPrivacy().equals("private")) {
+                    if (!group.getPrivacy().equals("private") & nowBeforeStart) {
                         btnCheckIn.setText("Click to Join");
                         btnCheckIn.setOnClickListener(new View.OnClickListener() {
                             @Override
