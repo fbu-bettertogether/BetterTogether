@@ -287,26 +287,6 @@ public class ProfileFragment extends Fragment {
                         }
                     }
                 });
-
-//                ParseQuery<ParseObject> parseQuery = user.getRelation("awards").getQuery();
-//                parseQuery.addDescendingOrder("createdAt");
-//                parseQuery.setLimit(25);
-//                parseQuery.addDescendingOrder("createdAt");
-//
-//                parseQuery.findInBackground(new FindCallback<ParseObject>() {
-//                    @Override
-//                    public void done(List<ParseObject> achAwards, ParseException e) {
-//                        if (e != null) {
-//                            Log.e("Querying awards", "error with query");
-//                            e.printStackTrace();
-//                            return;
-//                        }
-//
-//                        // add new posts to the list and notify adapter
-//                        achievedAwards.addAll((List<Award>) (Object) achAwards);
-//                        awardsAdapter.notifyDataSetChanged();
-//                    }
-//                });
             }
         });
     }

@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.AwardFragment;
 import com.example.bettertogether.models.Award;
+import com.example.bettertogether.models.UserAward;
 import com.parse.ParseFile;
 
 import java.util.List;

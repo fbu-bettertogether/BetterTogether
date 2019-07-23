@@ -27,7 +27,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -47,12 +49,14 @@ public class AwardFragment extends Fragment {
     public final String APP_TAG = "BetterTogether";
     private static final String ARG_AWARD = "award";
     private Award award;
+    private UserAward userAward;
     private ParseUser user = getCurrentUser();
     private OnAwardFragmentInteractionListener mListener;
 
     private ImageView ivAwardImage;
     private TextView tvAwardName;
     private TextView tvAwardDescription;
+    private TextView tvAwardStatus;
     private List<Award> achievedAwards = new ArrayList<>();
 
 
@@ -74,7 +78,7 @@ public class AwardFragment extends Fragment {
         if (getArguments() != null) {
             this.award = (Award) getArguments().getParcelable(ARG_AWARD);
         }
-        findUser();
+        setAwardStatus();
     }
 
     @Override
@@ -91,6 +95,7 @@ public class AwardFragment extends Fragment {
         ivAwardImage = view.findViewById(R.id.ivAwardImage);
         tvAwardName = view.findViewById(R.id.tvAwardName);
         tvAwardDescription = view.findViewById(R.id.tvAwardDescription);
+        tvAwardStatus = view.findViewById(R.id.tvAwardStatus);
 
         if (award.getIcon() != null) {
             Glide.with(view.getContext()).load(award.getIcon().getUrl()).into(ivAwardImage);
@@ -98,6 +103,9 @@ public class AwardFragment extends Fragment {
 
         tvAwardName.setText(award.getName());
         tvAwardDescription.setText(award.getDescription());
+        if (userAward != null) {
+
+        }
 
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");
@@ -128,10 +136,11 @@ public class AwardFragment extends Fragment {
         });
     }
 
-    private void findUser() {
+    private void setAwardStatus () {
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");
         query.whereEqualTo("user", user);
+        query.whereEqualTo("award", award);
         query.findInBackground(new FindCallback<UserAward>() {
             @Override
             public void done(List<UserAward> objects, ParseException e) {
@@ -140,7 +149,25 @@ public class AwardFragment extends Fragment {
                     e.printStackTrace();
                     return;
                 }
-                user = objects.get(0).getUser();
+                if (objects != null && objects.size() != 0) {
+                    userAward = objects.get(0);
+                    if (userAward.getIfAchieved()) {
+                        SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
+                        String dateString = format.format(userAward.getDateCompleted());
+                        tvAwardStatus.setText("Completed on " + dateString);
+                    } else {
+                        tvAwardStatus.setText(userAward.getNumCompleted() + " / " + userAward.getNumRequired() + " completed.");
+                    }
+                } else {
+                    userAward = new UserAward();
+                    userAward.setAward(award);
+                    userAward.setUser(user);
+                    userAward.setIfAchieved(false);
+                    userAward.setNumCompleted(0);
+                    userAward.setNumRequired((Integer) award.get("numRequired"));
+                    tvAwardStatus.setText(userAward.getNumCompleted() + " / " + userAward.getNumRequired() + " completed.");
+                    userAward.saveInBackground();
+                }
             }
         });
     }

@@ -14,6 +14,7 @@ public class UserAward extends ParseObject {
     public static final String AWARD = "award";
     public static final String ACHIEVED = "achieved";
     public static final String NUM = "numCompleted";
+    public static final String NUM_REQ = "numRequired";
 
 
     public Award getAward() {
@@ -52,6 +53,8 @@ public class UserAward extends ParseObject {
         return getBoolean(ACHIEVED);
     }
 
+    public void setIfAchieved(Boolean ach) { put(ACHIEVED, ach); }
+
     public Date getDateCompleted() {
         if (getIfAchieved()) {
             return getUpdatedAt();
@@ -60,8 +63,18 @@ public class UserAward extends ParseObject {
         }
     }
 
+    public void setNumCompleted(int num) { put(NUM, num); }
+
     public int getNumCompleted() {
         return getInt(NUM);
+    }
+
+    public void setNumRequired(int num) {
+        put(NUM_REQ, num);
+    }
+
+    public int getNumRequired() {
+        return getInt(NUM_REQ);
     }
 }
 
