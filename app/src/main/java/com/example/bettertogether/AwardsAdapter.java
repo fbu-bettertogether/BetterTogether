@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -72,12 +73,17 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
         }
 
         // decide to tint the medal to gold or not depending on whether the user has gotten the award
-        //TODO - wrap this set color filter with an if statement to check if the user got the award or not
+        for (int i = 0; i < achievedAwards.size(); i++) {
+            if (achievedAwards.get(i).get("name").toString().equalsIgnoreCase(award.get("name").toString())) {
+                Resources res = context.getResources();
+                final int goldTint = res.getColor(R.color.gold);
+                holder.ivAwardImage.setColorFilter(goldTint);
+                //ContextCompat.setTint(res.getDrawable(R.drawable.medal), goldTint);
+                //ContextCompat.setTintMode(res.getDrawable(R.drawable.medal), PorterDuff.Mode.SRC_IN);
+            }
+        }
         if (achievedAwards.contains(award)) {
-            Resources res = context.getResources();
-            final int goldTint = res.getColor(R.color.gold);
-            DrawableCompat.setTint(res.getDrawable(R.drawable.medal), goldTint);
-            DrawableCompat.setTintMode(res.getDrawable(R.drawable.medal), PorterDuff.Mode.SRC_IN);
+
         }
     }
 

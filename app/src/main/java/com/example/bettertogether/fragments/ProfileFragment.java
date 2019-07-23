@@ -114,7 +114,6 @@ public class ProfileFragment extends Fragment {
         queryFriends();
         queryGroups();
         queryAwards();
-        queryAchievedAwards();
     }
 
     @Override
@@ -240,42 +239,42 @@ public class ProfileFragment extends Fragment {
     }
 
     public void queryAwards() {
-        ParseQuery<Post> parseQuery = new ParseQuery<>("Award");
+        ParseQuery<Award> parseQuery = new ParseQuery<>("Award");
+        parseQuery.include("awards");
         parseQuery.addAscendingOrder("createdAt");
         parseQuery.setLimit(25);
         parseQuery.include("user");
 
-        parseQuery.findInBackground(new FindCallback<Post>() {
+        parseQuery.findInBackground(new FindCallback<Award>() {
             @Override
-            public void done(List<Post> objects, ParseException e) {
+            public void done(final List<Award> objects, ParseException e) {
                 if (e != null) {
                     Log.e("Querying posts", "error with query");
                     e.printStackTrace();
                     return;
                 }
-
                 // add new awards to the list and notify adapter
                 awards.addAll((List<Award>) (Object) objects);
-                awardsAdapter.notifyDataSetChanged();
-            }
-        });
-    }
 
-    public void queryAchievedAwards() {
-        ParseUser user = ParseUser.getCurrentUser();
-        ParseQuery<ParseObject> query = user.getRelation("awards").getQuery();
-        query.include("awards");
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (e != null) {
-                    Log.e("Querying awards", "error with query");
-                    e.printStackTrace();
-                    return;
-                }
-                // keep track of a new list of awards that the user has achieved
-                achievedAwards.addAll((List<Award>) (Object) objects);
-                awardsAdapter.notifyDataSetChanged();
+                ParseQuery<ParseObject> parseQuery = user.getRelation("awards").getQuery();
+                parseQuery.addDescendingOrder("createdAt");
+                parseQuery.setLimit(25);
+                parseQuery.addDescendingOrder("createdAt");
+
+                parseQuery.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> achAwards, ParseException e) {
+                        if (e != null) {
+                            Log.e("Querying awards", "error with query");
+                            e.printStackTrace();
+                            return;
+                        }
+
+                        // add new posts to the list and notify adapter
+                        achievedAwards.addAll((List<Award>) (Object) achAwards);
+                        awardsAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
     }
