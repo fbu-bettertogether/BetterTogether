@@ -56,7 +56,7 @@ public class Membership extends ParseObject {
         put(KEY_NUM_CHECK_INS, i);
     }
 
-    public List getNumCheckIns() {
+    public List<Integer> getNumCheckIns() {
         return getList(KEY_NUM_CHECK_INS);
     }
 

@@ -161,14 +161,6 @@ public class Group extends ParseObject implements Parcelable {
         put(USERS, users);
     }
 
-    public ParseObject getNumCheckIns() {
-        return getParseObject(NUM_CHECK_INS);
-    }
-
-    public void setNumCheckIns(ParseObject numCheckIns) {
-        put(NUM_CHECK_INS, numCheckIns);
-    }
-
     public String getDate() {
         return String.valueOf(getCreatedAt());
     }

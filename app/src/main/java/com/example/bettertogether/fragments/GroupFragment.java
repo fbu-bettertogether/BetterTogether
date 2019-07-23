@@ -99,7 +99,7 @@ public class GroupFragment extends Fragment {
     private TextView tvEndDate;
     private TextView tvTimer;
     private int counter;
-    private int numCheckIns;
+    private List<Integer> numCheckIns;
     private Membership currMem;
     private Category category;
     private RecyclerView rvTimeline;
@@ -180,9 +180,15 @@ public class GroupFragment extends Fragment {
         }
 
         Date now = Calendar.getInstance().getTime();
+        // TODO -- use alarm to set activity so it does not happen here
         if (now.after(end)) {
             group.setIsActive(false);
             Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
+        } else if (now.before(start)) {
+            group.setIsActive(false);
+            btnCheckIn.setVisibility(View.INVISIBLE);
+            tvTimer.setVisibility(View.VISIBLE);
+            tvTimer.setText("Group has not started yet! Hang tight!");
         }
 
         if(group.getIsActive()) {
@@ -203,7 +209,11 @@ public class GroupFragment extends Fragment {
                 currMem = objects.get(0);
                 numCheckIns = currMem.getNumCheckIns();
                 try {
-                    checkPlace(category.getLocationTypesList());
+                    if (numCheckIns == null || numCheckIns.size() == 0) {
+                        btnCheckIn.setVisibility(View.INVISIBLE);
+                        tvTimer.setVisibility(View.VISIBLE);
+                        tvTimer.setText("Group has not started yet! Hang tight!");
+                    } else checkPlace(category.getLocationTypesList());
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                 }
@@ -219,7 +229,6 @@ public class GroupFragment extends Fragment {
                 startActivityForResult(i, REQUEST_CODE);
             }
         });
-
         queryPosts();
     }
 
@@ -310,10 +319,11 @@ public class GroupFragment extends Fragment {
     }
 
     public void drawButton() {
-        if (numCheckIns < Integer.valueOf(group.getFrequency())) {
+        if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
 
+            final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             btnCheckIn.setVisibility(View.VISIBLE);
-            btnCheckIn.setText(String.format("%d check-ins left: check in now!", Integer.valueOf(group.getFrequency()) - numCheckIns));
+            btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -334,11 +344,12 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void onFinish() {
                             tvTimer.setText("Finished!");
-                            currMem.setNumCheckIns(numCheckIns + 1);
+                            numCheckIns.remove(numCheckIns.size() - 1);
+                            numCheckIns.add(currWeekCheckIns);
+                            currMem.setNumCheckIns(numCheckIns);
                             int addedPoints = currMem.getGroup().getFrequency() / 10;
                             currMem.setPoints(currMem.getPoints() + addedPoints);
                             // TODO -- get category & switch case which category to add points to for the user
-                            // testing branches
                             currMem.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {

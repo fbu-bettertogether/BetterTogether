@@ -357,7 +357,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                                 memberships.add( new Membership());
                                 memberships.get(i).setGroup(newGroup);
                                 memberships.get(i).setUser(addedMembers.get(i));
-                                memberships.get(i).setNumCheckIns(new ArrayList<>());
+                                memberships.get(i).setNumCheckIns(new ArrayList<Integer>());
                                 memberships.get(i).setPoints(0);
                                 memberships.get(i).saveInBackground(new SaveCallback() {
                                     @Override
