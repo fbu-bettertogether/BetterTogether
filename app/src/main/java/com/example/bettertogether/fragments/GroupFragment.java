@@ -199,13 +199,39 @@ public class GroupFragment extends Fragment {
         parseQuery.include("numCheckIns");
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<Membership> objects, ParseException e) {
-                currMem = objects.get(0);
-                numCheckIns = currMem.getNumCheckIns();
-                try {
-                    checkPlace(category.getLocationTypesList());
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
+            public void done(final List<Membership> objects, ParseException e) {
+                if (objects.size() > 0) {
+                    currMem = objects.get(0);
+                    numCheckIns = currMem.getNumCheckIns();
+                    try {
+                        checkPlace(category.getLocationTypesList());
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    if (!group.getPrivacy().equals("private")) {
+                        btnCheckIn.setText("Click to Join");
+                        btnCheckIn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Membership membership = new Membership();
+                                membership.setGroup(group);
+                                membership.setUser(ParseUser.getCurrentUser());
+                                membership.saveInBackground();
+                                btnCheckIn.setOnClickListener(null);
+                                currMem = membership;
+                                numCheckIns = currMem.getNumCheckIns();
+                                try {
+                                    checkPlace(category.getLocationTypesList());
+                                } catch (JSONException e1) {
+                                    e1.printStackTrace();
+                                }
+
+                            }
+                        });
+                    } else {
+                        btnCheckIn.setText("Group is Private");
+                    }
                 }
             }
         });

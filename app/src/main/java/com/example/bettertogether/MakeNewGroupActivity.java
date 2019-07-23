@@ -89,6 +89,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
+        addedMembers = new ArrayList<>();
         groupNameInput = findViewById(R.id.tvGroupName);
         descriptionInput = findViewById(R.id.tvGroupDescription);
         ivGroupProf = findViewById(R.id.ivGroupProf);
@@ -356,8 +357,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                                 memberships.add( new Membership());
                                 memberships.get(i).setGroup(newGroup);
                                 memberships.get(i).setUser(addedMembers.get(i));
-                                memberships.get(i).setNumCheckIns(0);
-                                memberships.get(i).setPoints(0);
                                 memberships.get(i).saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
