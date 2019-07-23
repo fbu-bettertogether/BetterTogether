@@ -1,22 +1,17 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -27,8 +22,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.AwardsAdapter;
 import com.example.bettertogether.FriendAdapter;
-import com.example.bettertogether.HomeActivity;
-import com.example.bettertogether.MainActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
@@ -37,7 +30,6 @@ import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -46,8 +38,6 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.parse.ParseUser.getCurrentUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,7 +70,12 @@ public class ProfileFragment extends Fragment {
     private FriendAdapter friendAdapter;
     private SimpleGroupAdapter simpleGroupAdapter;
     private AwardsAdapter awardsAdapter;
-
+    private ImageView ivFitnessPoints;
+    private ImageView ivGetTogetherPoints;
+    private ImageView ivServicePoints;
+    private TextView tvFitnessPoints;
+    private TextView tvGetTogetherPoints;
+    private TextView tvServicePoints;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -132,6 +127,12 @@ public class ProfileFragment extends Fragment {
         rvGroups = view.findViewById(R.id.rvGroups);
         rvFriends = view.findViewById(R.id.rvFriends);
         rvAwards = view.findViewById(R.id.rvAwards);
+        ivFitnessPoints = view.findViewById(R.id.ivFitnessPoints);
+        ivGetTogetherPoints = view.findViewById(R.id.ivGetTogetherPoints);
+        ivServicePoints = view.findViewById(R.id.ivServicePoints);
+        tvFitnessPoints = view.findViewById(R.id.tvFitnessPoints);
+        tvGetTogetherPoints = view.findViewById(R.id.tvGetTogetherPoints);
+        tvServicePoints = view.findViewById(R.id.tvServicePoints);
 
         rvPosts.setAdapter(postsAdapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -158,8 +159,15 @@ public class ProfileFragment extends Fragment {
             }
             
         });
+
         tvUsername.setText(user.getUsername());
         tvDate.setText(String.format("Joined %s", Post.getRelativeTimeAgo(user.getCreatedAt())));
+        ivServicePoints.setColorFilter(Color.GREEN);
+        ivGetTogetherPoints.setColorFilter(Color.BLUE);
+        ivFitnessPoints.setColorFilter(Color.RED);
+        tvServicePoints.setText(Integer.toString(user.getInt("servicePoints")));
+        tvGetTogetherPoints.setText(Integer.toString(user.getInt("getTogetherPoints")));
+        tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
     }
 
 

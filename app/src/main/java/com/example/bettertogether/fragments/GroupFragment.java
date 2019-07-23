@@ -60,9 +60,11 @@ import org.json.JSONException;
 import org.parceler.Parcels;
 import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Objects;
@@ -166,6 +168,22 @@ public class GroupFragment extends Fragment {
         tvGroupName.setText(group.getName());
         tvStartDate.setText(startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24)));
         tvEndDate.setText(endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24)));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+        Date start = null;
+        Date end = null;
+        try {
+            start = sdf.parse(startDateUgly);
+            end = sdf.parse(endDateUgly);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+
+        Date now = Calendar.getInstance().getTime();
+        if (now.after(end)) {
+            group.setIsActive(false);
+            Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
+        }
 
         if(group.getIsActive()) {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));

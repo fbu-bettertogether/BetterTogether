@@ -1,5 +1,7 @@
 package com.example.bettertogether;
 
+import android.app.AlarmManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -171,8 +173,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     active = false;
                 }
 
-//                String start = cdStartDate.getSelectedDate().toString();
-//                final String startDate = start.substring(12, start.length() - 1);
                 Calendar cal =  Calendar.getInstance();
                 int day = cdStartDate.getSelectedDate().getDay();
                 int month = cdStartDate.getSelectedDate().getMonth();
