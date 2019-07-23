@@ -1,6 +1,7 @@
 package com.example.bettertogether;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.bettertogether.models.Like;
 import com.example.bettertogether.models.Post;
+import com.parse.DeleteCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -38,11 +45,11 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostsAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final PostsAdapter.ViewHolder holder, int position) {
         // get post at that position
         final Post post = posts.get(position);
 
-        ParseUser user = (ParseUser) post.get("user");
+        final ParseUser user = (ParseUser) post.get("user");
 
         // populate the post views
         holder.tvUsername.setText(user.getString("username"));
@@ -61,6 +68,55 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                     .load(post.getMedia().getUrl())
                     .into(holder.ivMedia);
         }
+
+        ParseQuery<Like> query = new ParseQuery<Like>(Like.class);
+        query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.whereEqualTo("post", post);
+        query.getFirstInBackground(new GetCallback<Like>() {
+                                       @Override
+                                       public void done(Like object, ParseException e) {
+                                           if (object == null) {
+                                                       holder.btnLike.setBackgroundColor(0);
+                                           } else {
+                                                       holder.btnLike.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+                                                   }
+                                               }
+
+                                           }
+                                   );
+        holder.btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ParseQuery<Like> query = new ParseQuery<Like>(Like.class);
+                query.whereEqualTo("user", ParseUser.getCurrentUser());
+                query.whereEqualTo("post", post);
+                query.getFirstInBackground(new GetCallback<Like>() {
+                    @Override
+                    public void done(Like object, ParseException e) {
+                        if (object != null) {
+                            object.deleteInBackground(new DeleteCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    holder.btnLike.setBackgroundColor(0);
+                                }
+                            });
+                        } else {
+                            Like like = new Like();
+                            like.setPost(post);
+                            like.setUser(ParseUser.getCurrentUser());
+                            like.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    holder.btnLike.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+                                }
+                            });
+
+                        }
+
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -84,7 +140,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvUsername = (TextView) itemView.findViewById(R.id.tvUsername);
             tvBody = (TextView) itemView.findViewById(R.id.tvBody);
             tvTime = (TextView) itemView.findViewById(R.id.tvTime);
-            btnLike = (ImageButton) itemView.findViewById(R.id.ivReply);
+            btnLike = (ImageButton) itemView.findViewById(R.id.ivLike);
             ivMedia = (ImageView) itemView.findViewById(R.id.ivMedia);
         }
     }
