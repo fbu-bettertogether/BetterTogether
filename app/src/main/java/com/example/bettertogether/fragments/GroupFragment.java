@@ -210,7 +210,6 @@ public class GroupFragment extends Fragment {
             }
         });
 
-
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -336,6 +335,9 @@ public class GroupFragment extends Fragment {
                         public void onFinish() {
                             tvTimer.setText("Finished!");
                             currMem.setNumCheckIns(numCheckIns + 1);
+                            int addedPoints = currMem.getGroup().getFrequency() / 10;
+                            currMem.setPoints(currMem.getPoints() + addedPoints);
+                            // TODO -- get category & switch case which category to add points to for the user
                             currMem.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
