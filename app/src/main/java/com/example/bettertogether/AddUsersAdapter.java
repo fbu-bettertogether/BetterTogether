@@ -50,18 +50,21 @@ public class AddUsersAdapter extends RecyclerView.Adapter<AddUsersAdapter.ViewHo
             holder.ivAdd.setVisibility(View.INVISIBLE);
             holder.ivOwner.setVisibility(View.VISIBLE);
         } else {
-            holder.tvUsername.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (addedMembers.contains(user)) {
-                        addedMembers.remove(user);
-                        holder.ivAdd.setVisibility(View.INVISIBLE);
-                    } else {
-                        addedMembers.add(user);
-                        holder.ivAdd.setVisibility(View.VISIBLE);
+            if (!user.getObjectId().equals(ParseUser.getCurrentUser().getObjectId())) {
+                holder.tvUsername.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (addedMembers.contains(user)) {
+                            addedMembers.remove(user);
+                            holder.ivAdd.setVisibility(View.INVISIBLE);
+                        } else {
+                            addedMembers.add(user);
+                            holder.ivAdd.setVisibility(View.VISIBLE);
+                        }
                     }
-                }
-            });
+                });
+
+            }
         }
 
         holder.tvUsername.setText( user.getString("username"));

@@ -59,7 +59,7 @@
             android:layout_marginLeft="4dp" />
 
         <ImageButton
-            android:id="@+id/ivReply"
+            android:id="@+id/ivLike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -67,7 +67,7 @@
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintTop_toBottomOf="@+id/ivMedia"
             android:background="@null"
-            card_view:srcCompat="@drawable/sharp_cake_black_18dp"
+            card_view:srcCompat="@drawable/cake"
             android:layout_marginRight="4dp" />
 
         <ImageView

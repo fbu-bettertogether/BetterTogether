@@ -20,8 +20,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
-import com.parse.ParseException;
-import com.parse.ParseObject;
 
 import java.util.List;
 
@@ -79,15 +77,12 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
             tvGroupName.setText(group.getName());
 
-            if (group.get("category") != null) {
-                try {
-                    tvCategory.setText((((ParseObject)group.get("category")).fetch()).getString("name"));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            } else {
+            // loading in the rest of the group fields if they are available
+//            if (group.getCategory() != null) {
+//                tvCategory.setText(group.getCategory());
+//            } else {
                 tvCategory.setText("");
-            }
+//            }
 
             if (group.getDescription() != null) {
                 tvDescription.setText(group.getDescription());
@@ -101,11 +96,16 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                         .into(ivGroupProf);
             }
 
-            if(!group.getIsActive()) {
-                tvDates.setText("Active: " + group.getStartDate() + " - " + group.getEndDate());
+            String startDateUgly = group.getStartDate();
+            String endDateUgly = group.getEndDate();
+            String startDate = startDateUgly.substring(4, 10).concat(", " + startDateUgly.substring(24));
+            String endDate = endDateUgly.substring(4, 10).concat(", " + endDateUgly.substring(24));
+
+            if(group.getIsActive()) {
+                tvDates.setText("Active: " + startDate + " - " + endDate);
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.teal));
             } else {
-                tvDates.setText("Inactive: " + group.getStartDate() + " - " + group.getEndDate());
+                tvDates.setText("Inactive: " + startDate + " - " + endDate);
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
             }
         }

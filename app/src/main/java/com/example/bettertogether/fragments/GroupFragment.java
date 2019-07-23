@@ -60,9 +60,11 @@ import org.json.JSONException;
 import org.parceler.Parcels;
 import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Objects;
@@ -154,16 +156,34 @@ public class GroupFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvTimeline.setLayoutManager(linearLayoutManager);
 
-        if (group.getBanner() != null) {
-            Glide.with(view.getContext()).load(group.getBanner().getUrl()).into(ivBanner);
+        if (group.getIcon() != null) {
+            Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
         }
         if (ParseUser.getCurrentUser().getParseFile("profileImage") != null) {
             Glide.with(view.getContext()).load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl()).apply(RequestOptions.circleCropTransform()).into(ivUserIcon);
         }
 
+        String startDateUgly = group.getStartDate();
+        String endDateUgly = group.getEndDate();
         tvGroupName.setText(group.getName());
-        tvStartDate.setText(group.getStartDate());
-        tvEndDate.setText(group.getEndDate());
+        tvStartDate.setText(startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24)));
+        tvEndDate.setText(endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24)));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+        Date start = null;
+        Date end = null;
+        try {
+            start = sdf.parse(startDateUgly);
+            end = sdf.parse(endDateUgly);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+
+        Date now = Calendar.getInstance().getTime();
+        if (now.after(end)) {
+            group.setIsActive(false);
+            Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
+        }
 
         if(group.getIsActive()) {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
