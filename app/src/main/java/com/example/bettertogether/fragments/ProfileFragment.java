@@ -36,7 +36,9 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +105,7 @@ public class ProfileFragment extends Fragment {
         friends = new ArrayList<>();
         awards = new ArrayList<>();
         achievedAwards = new ArrayList<>();
-        postsAdapter = new PostsAdapter(getContext(), posts);
+        postsAdapter = new PostsAdapter(getContext(), posts, getFragmentManager());
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
         simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
         awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards);
@@ -153,18 +155,42 @@ public class ProfileFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivUserIcon);
         }
+        onFriendUpdate();
         ivUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (user.getObjectId() == ParseUser.getCurrentUser().getObjectId()){
+                if (user.getObjectId() == ParseUser.getCurrentUser().getObjectId()) {
                     Toast.makeText(view.getContext(), "Is current user", Toast.LENGTH_SHORT).show();
                     mListener.createProfilePicture(view);
+                } else {
+                    final ParseUser currentUser = ParseUser.getCurrentUser();
+                    final ParseRelation<ParseUser> relation = currentUser.getRelation("friends");
+                    ParseQuery<ParseUser> query = relation.getQuery();
+                    query.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> objects, ParseException e) {
+                            boolean found = false;
+                            for (int i = 0; i < objects.size(); i++) {
+                                if (objects.get(i).getObjectId().equals(user.getObjectId())) {
+                                    found = true;
+                                }
+                            }
+                            if (found) {
+                                relation.remove(user);
+                            } else {
+                                relation.add(user);
+                            }
+                            currentUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                onFriendUpdate();
+                                }
+                            });
+                        }
+                    });
                 }
             }
-            
         });
-
-        tvUsername.setText(user.getUsername());
         tvDate.setText(String.format("Joined %s", Post.getRelativeTimeAgo(user.getCreatedAt())));
         ivServicePoints.setColorFilter(Color.GREEN);
         ivGetTogetherPoints.setColorFilter(Color.BLUE);
@@ -174,6 +200,24 @@ public class ProfileFragment extends Fragment {
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
     }
 
+    public void onFriendUpdate() {
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseRelation<ParseUser> relation = currentUser.getRelation("friends");
+        ParseQuery<ParseUser> query = relation.getQuery();
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                for (int i = 0; i < objects.size(); i++) {
+                    if (objects.get(i).getObjectId().equals(user.getObjectId())) {
+                        tvUsername.setText(String.format("☺️%s", user.getUsername()));
+                        return;
+                    }
+                }
+                tvUsername.setText(user.getUsername());
+                ivUserIcon.setBackground(null);
+            }
+        });
+    }
 
     @Override
     public void onAttach(Context context) {

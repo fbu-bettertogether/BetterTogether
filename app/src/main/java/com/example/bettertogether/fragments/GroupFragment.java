@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,10 +25,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
-import com.example.bettertogether.HomeActivity;
+import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.CatMembership;
@@ -48,9 +45,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -58,19 +53,16 @@ import com.parse.SaveCallback;
 
 import org.json.JSONException;
 import org.parceler.Parcels;
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static android.app.Activity.RESULT_OK;
 import static com.parse.ParseUser.getCurrentUser;
 
 /**
@@ -100,10 +92,13 @@ public class GroupFragment extends Fragment {
     private TextView tvTimer;
     private int counter;
     private int numCheckIns;
+    private List<ParseUser> users;
     private Membership currMem;
     private Category category;
     private RecyclerView rvTimeline;
-    private PostsAdapter adapter;
+    private RecyclerView rvMembers;
+    private PostsAdapter postsAdapter;
+    private FriendAdapter friendAdapter;
     private List<Post> mPosts;
 
 
@@ -147,14 +142,18 @@ public class GroupFragment extends Fragment {
         tvStartDate = view.findViewById(R.id.tvStartDate);
         tvEndDate = view.findViewById(R.id.tvEndDate);
         tvTimer = view.findViewById(R.id.tvTimer);
-
+        rvMembers = view.findViewById(R.id.rvMembers);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
-        adapter = new PostsAdapter(getContext(), mPosts);
-        rvTimeline.setAdapter(adapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        rvTimeline.setLayoutManager(linearLayoutManager);
+        postsAdapter = new PostsAdapter(getContext(), mPosts, getFragmentManager());
+        rvTimeline.setAdapter(postsAdapter);
+        rvTimeline.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        users = new ArrayList<>();
+        friendAdapter = new FriendAdapter(users, getFragmentManager());
+        rvMembers.setAdapter(friendAdapter);
+        rvMembers.setLayoutManager(new LinearLayoutManager(getContext()));
 
         if (group.getIcon() != null) {
             Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
@@ -184,8 +183,8 @@ public class GroupFragment extends Fragment {
             group.setIsActive(false);
             Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
         }
-
-        if(group.getIsActive()) {
+        final boolean nowBeforeStart = now.before(start);
+        if (group.getIsActive()) {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
         } else {
@@ -199,13 +198,39 @@ public class GroupFragment extends Fragment {
         parseQuery.include("numCheckIns");
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<Membership> objects, ParseException e) {
-                currMem = objects.get(0);
-                numCheckIns = currMem.getNumCheckIns();
-                try {
-                    checkPlace(category.getLocationTypesList());
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
+            public void done(final List<Membership> objects, ParseException e) {
+                if (objects.size() > 0) {
+                    currMem = objects.get(0);
+                    numCheckIns = currMem.getNumCheckIns();
+                    try {
+                        checkPlace(category.getLocationTypesList());
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    if (!group.getPrivacy().equals("private") & nowBeforeStart) {
+                        btnCheckIn.setText("Click to Join");
+                        btnCheckIn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Membership membership = new Membership();
+                                membership.setGroup(group);
+                                membership.setUser(ParseUser.getCurrentUser());
+                                membership.saveInBackground();
+                                btnCheckIn.setOnClickListener(null);
+                                currMem = membership;
+                                numCheckIns = currMem.getNumCheckIns();
+                                try {
+                                    checkPlace(category.getLocationTypesList());
+                                } catch (JSONException e1) {
+                                    e1.printStackTrace();
+                                }
+
+                            }
+                        });
+                    } else {
+                        btnCheckIn.setText("Group is Private");
+                    }
                 }
             }
         });
@@ -220,6 +245,7 @@ public class GroupFragment extends Fragment {
             }
         });
 
+        queryMembers();
         queryPosts();
     }
 
@@ -230,7 +256,24 @@ public class GroupFragment extends Fragment {
         mPosts.clear();
         queryPosts();
     }
-
+    private void queryMembers() {
+            ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+            parseQuery.addDescendingOrder("updatedAt");
+            parseQuery.whereEqualTo("group", group);
+            parseQuery.include("user");
+            parseQuery.findInBackground(new FindCallback<Membership>() {
+                @Override
+                public void done(List<Membership> objects, ParseException e) {
+                    if (e != null) {
+                        Log.e("Querying groups", "error with query");
+                        e.printStackTrace();
+                        return;
+                    }
+                    users.addAll(Membership.getAllUsers(objects));
+                    friendAdapter.notifyDataSetChanged();
+                }
+            });
+    }
     private void queryPosts() {
         ParseQuery<ParseObject> parseQuery = group.getRelation("posts").getQuery();
         parseQuery.addDescendingOrder("createdAt");
@@ -247,14 +290,14 @@ public class GroupFragment extends Fragment {
                     return;
                 }
 
-                // add new posts to the list and notify adapter
+                // add new posts to the list and notify postsAdapter
                 mPosts.addAll((List<Post>) (Object) posts);
-                adapter.notifyDataSetChanged();
+                postsAdapter.notifyDataSetChanged();
             }
         });
     }
-    public void checkPlace(final List<String> types)
-    {
+
+    public void checkPlace(final List<String> types) {
         final List<PlaceLikelihood> validPlaces = new ArrayList();
         boolean inValidPlace = false;
         // Initialize the SDK
@@ -285,7 +328,7 @@ public class GroupFragment extends Fragment {
                     if (task.isSuccessful()) {
                         FindCurrentPlaceResponse response = task.getResult();
                         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                            for( Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
+                            for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
                                 if (types.contains(type.toString())) {
                                     drawButton();
                                     return;
@@ -358,6 +401,7 @@ public class GroupFragment extends Fragment {
         }
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
