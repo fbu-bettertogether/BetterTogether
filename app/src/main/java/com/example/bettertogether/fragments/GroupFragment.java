@@ -338,6 +338,7 @@ public class GroupFragment extends Fragment {
                             int addedPoints = currMem.getGroup().getFrequency() / 10;
                             currMem.setPoints(currMem.getPoints() + addedPoints);
                             // TODO -- get category & switch case which category to add points to for the user
+                            // testing branches
                             currMem.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
@@ -366,7 +367,7 @@ public class GroupFragment extends Fragment {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
-                    // locatinos-related task you need to do.
+                    // locations-related task you need to do.
                 } else {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
