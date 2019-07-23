@@ -2,33 +2,23 @@ package com.example.bettertogether;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.bettertogether.fragments.AwardFragment;
 import com.example.bettertogether.models.Award;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder> {
@@ -36,7 +26,6 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
     private Context context;
     private List<Award> awards;
     private List<Award> achievedAwards;
-    private Boolean achieved = false;
 
     public AwardsAdapter(Context context, List<Award> awards, List<Award> achievedAwards) {
         this.context = context;
@@ -80,9 +69,6 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
                 holder.ivAwardImage.setColorFilter(goldTint);
             }
         }
-        if (achievedAwards.contains(award)) {
-
-        }
     }
 
     @Override
@@ -90,7 +76,7 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
         return awards.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView ivAwardImage;
         public TextView tvAwardName;
 
@@ -100,6 +86,20 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
             // lookup widgets
             tvAwardName = (TextView) itemView.findViewById(R.id.tvAwardName);
             ivAwardImage = (ImageView) itemView.findViewById(R.id.ivAwardImage);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Award award = awards.get(position);
+                // switch to award-detail view fragment
+                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+                AwardFragment fragment = AwardFragment.newInstance(award);
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+            }
         }
     }
 }

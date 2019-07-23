@@ -26,9 +26,11 @@ import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
 import com.example.bettertogether.models.Award;
+import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
+import com.example.bettertogether.models.UserAward;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -257,32 +259,54 @@ public class ProfileFragment extends Fragment {
             @Override
             public void done(final List<Award> objects, ParseException e) {
                 if (e != null) {
-                    Log.e("Querying posts", "error with query");
+                    Log.e("Querying awards", "error with query");
                     e.printStackTrace();
                     return;
                 }
                 // add new awards to the list and notify adapter
                 awards.addAll((List<Award>) (Object) objects);
 
-                ParseQuery<ParseObject> parseQuery = user.getRelation("awards").getQuery();
-                parseQuery.addDescendingOrder("createdAt");
-                parseQuery.setLimit(25);
-                parseQuery.addDescendingOrder("createdAt");
-
-                parseQuery.findInBackground(new FindCallback<ParseObject>() {
+                ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
+                query.include("award");
+                query.whereEqualTo("user", user);
+                query.findInBackground(new FindCallback<UserAward>() {
                     @Override
-                    public void done(List<ParseObject> achAwards, ParseException e) {
+                    public void done(List<UserAward> objects, ParseException e) {
                         if (e != null) {
-                            Log.e("Querying awards", "error with query");
+                            Log.e("Querying groups", "error with query");
                             e.printStackTrace();
                             return;
                         }
-
-                        // add new posts to the list and notify adapter
-                        achievedAwards.addAll((List<Award>) (Object) achAwards);
-                        awardsAdapter.notifyDataSetChanged();
+                        if (objects != null) {
+                            for (int i = 0; i < objects.size(); i++) {
+                                if (objects.get(i).getIfAchieved()) {
+                                    achievedAwards.add(objects.get(i).getAward());
+                                }
+                            }
+                            awardsAdapter.notifyDataSetChanged();
+                        }
                     }
                 });
+
+//                ParseQuery<ParseObject> parseQuery = user.getRelation("awards").getQuery();
+//                parseQuery.addDescendingOrder("createdAt");
+//                parseQuery.setLimit(25);
+//                parseQuery.addDescendingOrder("createdAt");
+//
+//                parseQuery.findInBackground(new FindCallback<ParseObject>() {
+//                    @Override
+//                    public void done(List<ParseObject> achAwards, ParseException e) {
+//                        if (e != null) {
+//                            Log.e("Querying awards", "error with query");
+//                            e.printStackTrace();
+//                            return;
+//                        }
+//
+//                        // add new posts to the list and notify adapter
+//                        achievedAwards.addAll((List<Award>) (Object) achAwards);
+//                        awardsAdapter.notifyDataSetChanged();
+//                    }
+//                });
             }
         });
     }
