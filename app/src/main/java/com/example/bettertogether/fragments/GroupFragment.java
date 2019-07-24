@@ -106,6 +106,7 @@ public class GroupFragment extends Fragment {
     private Award first = new Award();
     private Award oneWeek = new Award();
     private Award tenacity = new Award();
+    private AwardFragment af = new AwardFragment();
 
 
     public GroupFragment() {
@@ -394,38 +395,37 @@ public class GroupFragment extends Fragment {
                                     Log.d("checking in", "saved check in");
                                 }
                             });
-                            AwardFragment af = new AwardFragment();
-                            ParseQuery<ParseObject> query = ParseQuery.getQuery("UserAward");
+                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                             query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
                                 public void done(ParseObject object, ParseException e) {
                                     if (e == null) {
                                         first = (Award) object;
+                                        af.queryAward(first, false, true, getContext());
                                     } else {
                                         e.printStackTrace();
                                     }
                                 }
                             });
-                            af.checkAward(first);
                             query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
                                 public void done(ParseObject object, ParseException e) {
                                     if (e == null) {
                                         oneWeek = (Award) object;
+                                        af.queryAward(oneWeek, false, true, getContext());
                                     } else {
                                         e.printStackTrace();
                                     }
                                 }
                             });
-                            af.checkAward(oneWeek);
                             query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
                                 public void done(ParseObject object, ParseException e) {
                                     if (e == null) {
                                         tenacity = (Award) object;
+                                        af.queryAward(tenacity, false, true, getContext());
                                     } else {
                                         e.printStackTrace();
                                     }
                                 }
                             });
-                            af.checkAward(tenacity);
                         }
                     }.start();
                 }

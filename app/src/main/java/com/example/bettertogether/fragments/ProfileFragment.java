@@ -32,6 +32,7 @@ import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.example.bettertogether.models.UserAward;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -57,6 +58,7 @@ public class ProfileFragment extends Fragment {
     public final String APP_TAG = "BetterTogether";
 
     private ParseUser user;
+    private Award friendshipGoals;
     private OnProfileFragmentInteraction mListener;
 
     private ImageView ivUserIcon;
@@ -66,6 +68,13 @@ public class ProfileFragment extends Fragment {
     private RecyclerView rvGroups;
     private RecyclerView rvFriends;
     private RecyclerView rvAwards;
+    private ImageView ivFitnessPoints;
+    private ImageView ivGetTogetherPoints;
+    private ImageView ivServicePoints;
+    private TextView tvFitnessPoints;
+    private TextView tvGetTogetherPoints;
+    private TextView tvServicePoints;
+
     private List<Post> posts;
     private List<Group> groups;
     private List<ParseUser> friends;
@@ -75,12 +84,7 @@ public class ProfileFragment extends Fragment {
     private FriendAdapter friendAdapter;
     private SimpleGroupAdapter simpleGroupAdapter;
     private AwardsAdapter awardsAdapter;
-    private ImageView ivFitnessPoints;
-    private ImageView ivGetTogetherPoints;
-    private ImageView ivServicePoints;
-    private TextView tvFitnessPoints;
-    private TextView tvGetTogetherPoints;
-    private TextView tvServicePoints;
+    private AwardFragment af;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -109,6 +113,7 @@ public class ProfileFragment extends Fragment {
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
         simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
         awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards);
+        af = new AwardFragment();
         queryPosts();
         queryFriends();
         queryGroups();
@@ -177,8 +182,20 @@ public class ProfileFragment extends Fragment {
                             }
                             if (found) {
                                 relation.remove(user);
+
                             } else {
                                 relation.add(user);
+                                ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                                query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
+                                    public void done(ParseObject object, ParseException e) {
+                                        if (e == null) {
+                                            friendshipGoals = (Award) object;
+                                            af.queryAward(friendshipGoals, false, true, getContext());
+                                        } else {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
                             }
                             currentUser.saveInBackground(new SaveCallback() {
                                 @Override

@@ -46,6 +46,7 @@ public class AwardFragment extends Fragment {
     public final String APP_TAG = "BetterTogether";
     private static final String ARG_AWARD = "award";
     private Award award;
+    private Award newAward = new Award();
     private UserAward userAward;
     private ParseUser user = getCurrentUser();
     private OnAwardFragmentInteractionListener mListener;
@@ -76,7 +77,7 @@ public class AwardFragment extends Fragment {
         if (getArguments() != null) {
             this.award = (Award) getArguments().getParcelable(ARG_AWARD);
         }
-        queryAward(award);
+        queryAward(award, true, false, getContext());
     }
 
     @Override
@@ -156,11 +157,12 @@ public class AwardFragment extends Fragment {
         }
     }
 
-    private void queryAward (Award awd) {
+    public void queryAward (Award awd, final Boolean setStatus, final Boolean checkAward, final Context con) {
+        newAward = awd;
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");
         query.whereEqualTo("user", user);
-        query.whereEqualTo("award", awd);
+        query.whereEqualTo("award", newAward);
         query.findInBackground(new FindCallback<UserAward>() {
             @Override
             public void done(List<UserAward> objects, ParseException e) {
@@ -171,13 +173,17 @@ public class AwardFragment extends Fragment {
                 }
                 userAwards = new ArrayList<>();
                 userAwards.addAll(objects);
-                setAwardStatus(objects);
+                if (setStatus) {
+                    setAwardStatus(objects);
+                }
+                if (checkAward) {
+                    checkAward(newAward, con);
+                }
             }
         });
     }
 
-    public void checkAward(Award awd) {
-        queryAward(awd);
+    public void checkAward(Award awd, Context context) {
         String objId = awd.getObjectId();
         if (userAwards != null && userAwards.size() != 0) {
             userAward = userAwards.get(0);
@@ -195,31 +201,32 @@ public class AwardFragment extends Fragment {
         userAward.setNumCompleted(userAward.getNumCompleted() + 1);
         if (userAward.getNumCompleted() == userAward.getNumRequired()) {
             userAward.setIfAchieved(true);
-            showAlert("Congrats!", "You have received a new award: "+ awd.get("name") + ". Please check your trophy case on profile page.");
+            showAlert("Congrats!", "You have received a new award: "+ awd.get("name") + ". Please check your trophy case on profile page.", context);
             return;
         }
+        userAward.saveInBackground();
 
-        if (objId.equalsIgnoreCase(getString(R.string.flakiest_award))) {
-            showAlert("Attention!", "Seems like you have been a bit flaky recently, you're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Flakiest Award!");
-        } else if (objId.equalsIgnoreCase(getString(R.string.social_butterfly_award))){
-            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Social Butterfly Award!");
-        } else if (objId.equalsIgnoreCase(getString(R.string.angel_award))){
-            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Angel Award!");
-        } else if (objId.equalsIgnoreCase(getString(R.string.swole_award))){
-            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Swole Award!");
-        } else if (objId.equalsIgnoreCase(getString(R.string.tenacity_guru_award))){
-            showAlert("Thanks for checking in!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " check-ins away from unlocking the Tenacity Guru Award!");
-        } else if (objId.equalsIgnoreCase(getString(R.string.friendship_goals_award))){
-            showAlert("Congrats on adding a new friend!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " friends away from unlocking the Friendship Goals Award!");
-        } else if (objId.equalsIgnoreCase(getString(R.string.one_week_streak_award))){
-            showAlert("Thanks for checking in!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " check-ins away from unlocking the One Week Streak Award!");
-        } else if (objId.equalsIgnoreCase(getString(R.string.first_complete_award))){
-            showAlert("Congrats on your first check-in!", "You have received a new award: First Complete. Please check your trophy case on profile page.");
+        if (objId.equalsIgnoreCase(context.getResources().getString(R.string.flakiest_award))) {
+            showAlert("Attention!", "Seems like you have been a bit flaky recently, you're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Flakiest Award!", context);
+        } else if (objId.equalsIgnoreCase(context.getResources().getString(R.string.social_butterfly_award))){
+            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Social Butterfly Award!", context);
+        } else if (objId.equalsIgnoreCase(context.getResources().getString(R.string.angel_award))){
+            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Angel Award!", context);
+        } else if (objId.equalsIgnoreCase(context.getResources().getString(R.string.swole_award))){
+            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Swole Award!", context);
+        } else if (objId.equalsIgnoreCase(context.getResources().getString(R.string.tenacity_guru_award))){
+            showAlert("Thanks for checking in!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " check-ins away from unlocking the Tenacity Guru Award!", context);
+        } else if (objId.equalsIgnoreCase(context.getResources().getString(R.string.friendship_goals_award))){
+            showAlert("Congrats on adding a new friend!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " friends away from unlocking the Friendship Goals Award!", context);
+        } else if (objId.equalsIgnoreCase(context.getResources().getString(R.string.one_week_streak_award))){
+            showAlert("Thanks for checking in!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " check-ins away from unlocking the One Week Streak Award!", context);
+        } else if (objId.equalsIgnoreCase(context.getResources().getString(R.string.first_complete_award))){
+            showAlert("Congrats on your first check-in!", "You have received a new award: First Complete. Please check your trophy case on profile page.", context);
         } else return;
     }
 
-    public void showAlert(String title, String message) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+    public void showAlert(String title, String message, Context con) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(con);
         alert.setTitle(title);
         alert.setMessage(message);
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
