@@ -119,20 +119,22 @@ public class SimpleGroupAdapter extends RecyclerView.Adapter<SimpleGroupAdapter.
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
+            boolean found = false;
                 if (position != RecyclerView.NO_POSITION) {
-                    for (int i = 0; i < userGroups.size(); i++) {
-                        if (!userGroups.get(i).getObjectId().equals(groups.get(i).getObjectId())) {
-                            return;
+                    for (int i = 0; i < userGroups.size() - 1; i++)
+                        if (userGroups.get(i).getObjectId().equals(groups.get(position).getObjectId())) {
+                            found = true;
                         }
                     }
+                    if (found) {
                         // get the clicked-on group
                         Group group = groups.get(position);
                         // switch to group-detail view fragment
                         FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
                         GroupFragment fragment = GroupFragment.newInstance(group);
                         fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                    }
 
             }
         }
     }
-}
