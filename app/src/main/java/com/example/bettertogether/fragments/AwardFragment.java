@@ -173,11 +173,11 @@ public class AwardFragment extends Fragment {
                 }
                 userAwards = new ArrayList<>();
                 userAwards.addAll(objects);
-                if (setStatus) {
-                    setAwardStatus(objects);
-                }
                 if (checkAward) {
                     checkAward(newAward, con);
+                }
+                if (setStatus) {
+                    setAwardStatus(userAwards);
                 }
             }
         });
@@ -197,6 +197,7 @@ public class AwardFragment extends Fragment {
             userAward.setNumCompleted(0);
             userAward.setNumRequired((Integer) awd.get("numRequired"));
             userAward.saveInBackground();
+            userAwards.add(userAward);
         }
         userAward.setNumCompleted(userAward.getNumCompleted() + 1);
         if (userAward.getNumCompleted() == userAward.getNumRequired()) {

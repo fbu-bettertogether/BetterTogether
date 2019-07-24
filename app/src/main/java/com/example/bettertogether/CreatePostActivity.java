@@ -2,14 +2,24 @@ package com.example.bettertogether;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.FileProvider;
 
+import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -23,6 +33,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Post;
 import com.google.android.material.textfield.TextInputEditText;
@@ -157,6 +168,17 @@ public class CreatePostActivity extends AppCompatActivity {
                         if (e != null) {
                             e.printStackTrace();
                         } else {
+                            //sendNotification();
+                            String title = "BetterTogether";
+                            String content = "Check out " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
+                            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                            NotificationManager notif=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+                            Notification notify=new Notification.Builder
+                                    (getApplicationContext()).setContentTitle(title).setContentText(content).
+                                    setContentTitle(title).setSmallIcon(R.drawable.handshake).build();
+
+                            notify.flags |= Notification.FLAG_AUTO_CANCEL;
+                            notif.notify(0, notify);
                             finish();
                         }
                     }
@@ -203,6 +225,7 @@ public class CreatePostActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -219,10 +242,45 @@ public class CreatePostActivity extends AppCompatActivity {
                 for (int i = 0; i < taggedUsers.size(); i++) {
                     tagText = tagText + "@" + taggedUsers.get(i).getUsername() + ",";
                 }
-                tagText = tagText.substring(0, tagText.length() - 1);
+                if (tagText.length() > 0) {
+                    tagText = tagText.substring(0, tagText.length() - 1);
+                }
                 tvTag.setText(tagText);
                 etPost.setText(etPost.getText() + " " + tagText);
             }
         }
     }
+
+    private void sendNotification() {
+        createNotificationChannel();
+//        Intent intent = new Intent(this, HomeFragment.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL_ID")
+                .setSmallIcon(R.drawable.handshake)
+                .setContentTitle("My notification")
+                .setContentText("Much longer text that cannot fit one line...")
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText("Much longer text that cannot fit one line..."))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // Set the intent that will fire when the user taps the notification
+                //.setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+        builder.build();
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String title = "BetterTogether";
+            String content = "Check out " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("CHANNEL_ID", title, importance);
+            channel.setDescription(content);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
 }
