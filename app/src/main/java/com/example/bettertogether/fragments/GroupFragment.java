@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +31,7 @@ import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
+import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
@@ -45,6 +47,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -100,6 +103,9 @@ public class GroupFragment extends Fragment {
     private PostsAdapter postsAdapter;
     private FriendAdapter friendAdapter;
     private List<Post> mPosts;
+    private Award first = new Award();
+    private Award oneWeek = new Award();
+    private Award tenacity = new Award();
 
 
     public GroupFragment() {
@@ -388,6 +394,38 @@ public class GroupFragment extends Fragment {
                                     Log.d("checking in", "saved check in");
                                 }
                             });
+                            AwardFragment af = new AwardFragment();
+                            ParseQuery<ParseObject> query = ParseQuery.getQuery("UserAward");
+                            query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        first = (Award) object;
+                                    } else {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            af.checkAward(first);
+                            query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        oneWeek = (Award) object;
+                                    } else {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            af.checkAward(oneWeek);
+                            query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        tenacity = (Award) object;
+                                    } else {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            af.checkAward(tenacity);
                         }
                     }.start();
                 }

@@ -1,6 +1,8 @@
 package com.example.bettertogether.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,19 +19,14 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.UserAward;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -58,6 +55,7 @@ public class AwardFragment extends Fragment {
     private TextView tvAwardDescription;
     private TextView tvAwardStatus;
     private List<Award> achievedAwards = new ArrayList<>();
+    private List<UserAward> userAwards = new ArrayList<UserAward>();
 
 
     public AwardFragment() {
@@ -78,7 +76,7 @@ public class AwardFragment extends Fragment {
         if (getArguments() != null) {
             this.award = (Award) getArguments().getParcelable(ARG_AWARD);
         }
-        setAwardStatus();
+        queryAward(award);
     }
 
     @Override
@@ -136,11 +134,33 @@ public class AwardFragment extends Fragment {
         });
     }
 
-    private void setAwardStatus () {
+    private void setAwardStatus(List<UserAward> objects) {
+        if (objects != null && objects.size() != 0) {
+            userAward = objects.get(0);
+            if (userAward.getIfAchieved()) {
+                SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
+                String dateString = format.format(userAward.getDateCompleted());
+                tvAwardStatus.setText("Completed on " + dateString);
+            } else {
+                tvAwardStatus.setText(userAward.getNumCompleted() + " / " + userAward.getNumRequired() + " completed.");
+            }
+        } else {
+            userAward = new UserAward();
+            userAward.setAward(award);
+            userAward.setUser(user);
+            userAward.setIfAchieved(false);
+            userAward.setNumCompleted(0);
+            userAward.setNumRequired((Integer) award.get("numRequired"));
+            tvAwardStatus.setText(userAward.getNumCompleted() + " / " + userAward.getNumRequired() + " completed.");
+            userAward.saveInBackground();
+        }
+    }
+
+    private void queryAward (Award awd) {
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");
         query.whereEqualTo("user", user);
-        query.whereEqualTo("award", award);
+        query.whereEqualTo("award", awd);
         query.findInBackground(new FindCallback<UserAward>() {
             @Override
             public void done(List<UserAward> objects, ParseException e) {
@@ -149,27 +169,71 @@ public class AwardFragment extends Fragment {
                     e.printStackTrace();
                     return;
                 }
-                if (objects != null && objects.size() != 0) {
-                    userAward = objects.get(0);
-                    if (userAward.getIfAchieved()) {
-                        SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
-                        String dateString = format.format(userAward.getDateCompleted());
-                        tvAwardStatus.setText("Completed on " + dateString);
-                    } else {
-                        tvAwardStatus.setText(userAward.getNumCompleted() + " / " + userAward.getNumRequired() + " completed.");
-                    }
-                } else {
-                    userAward = new UserAward();
-                    userAward.setAward(award);
-                    userAward.setUser(user);
-                    userAward.setIfAchieved(false);
-                    userAward.setNumCompleted(0);
-                    userAward.setNumRequired((Integer) award.get("numRequired"));
-                    tvAwardStatus.setText(userAward.getNumCompleted() + " / " + userAward.getNumRequired() + " completed.");
-                    userAward.saveInBackground();
-                }
+                userAwards = new ArrayList<>();
+                userAwards.addAll(objects);
+                setAwardStatus(objects);
             }
         });
+    }
+
+    public void checkAward(Award awd) {
+        queryAward(awd);
+        String objId = awd.getObjectId();
+        if (userAwards != null && userAwards.size() != 0) {
+            userAward = userAwards.get(0);
+            if (userAward.getIfAchieved())
+                return;
+        } else {
+            userAward = new UserAward();
+            userAward.setAward(awd);
+            userAward.setUser(user);
+            userAward.setIfAchieved(false);
+            userAward.setNumCompleted(0);
+            userAward.setNumRequired((Integer) awd.get("numRequired"));
+            userAward.saveInBackground();
+        }
+        userAward.setNumCompleted(userAward.getNumCompleted() + 1);
+        if (userAward.getNumCompleted() == userAward.getNumRequired()) {
+            userAward.setIfAchieved(true);
+            showAlert("Congrats!", "You have received a new award: "+ awd.get("name") + ". Please check your trophy case on profile page.");
+            return;
+        }
+
+        if (objId.equalsIgnoreCase(getString(R.string.flakiest_award))) {
+            showAlert("Attention!", "Seems like you have been a bit flaky recently, you're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Flakiest Award!");
+        } else if (objId.equalsIgnoreCase(getString(R.string.social_butterfly_award))){
+            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Social Butterfly Award!");
+        } else if (objId.equalsIgnoreCase(getString(R.string.angel_award))){
+            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Angel Award!");
+        } else if (objId.equalsIgnoreCase(getString(R.string.swole_award))){
+            showAlert("Congrats on joining a new group!", "You're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Swole Award!");
+        } else if (objId.equalsIgnoreCase(getString(R.string.tenacity_guru_award))){
+            showAlert("Thanks for checking in!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " check-ins away from unlocking the Tenacity Guru Award!");
+        } else if (objId.equalsIgnoreCase(getString(R.string.friendship_goals_award))){
+            showAlert("Congrats on adding a new friend!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " friends away from unlocking the Friendship Goals Award!");
+        } else if (objId.equalsIgnoreCase(getString(R.string.one_week_streak_award))){
+            showAlert("Thanks for checking in!", "You are " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " check-ins away from unlocking the One Week Streak Award!");
+        } else if (objId.equalsIgnoreCase(getString(R.string.first_complete_award))){
+            showAlert("Congrats on your first check-in!", "You have received a new award: First Complete. Please check your trophy case on profile page.");
+        } else return;
+    }
+
+    public void showAlert(String title, String message) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+        alert.setTitle(title);
+        alert.setMessage(message);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+        alert.show();
     }
 
     @Override
