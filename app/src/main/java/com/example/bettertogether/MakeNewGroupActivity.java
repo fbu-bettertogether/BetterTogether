@@ -362,36 +362,35 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     newGroup.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
+                            catMembership.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+
                             List<Membership> memberships = new ArrayList<>();
                             for (int i = 0; i < addedMembers.size(); i++) {
                                 memberships.add( new Membership());
                                 memberships.get(i).setGroup(newGroup);
                                 memberships.get(i).setUser(addedMembers.get(i));
-                                memberships.get(i).setNumCheckIns(new ArrayList<Integer>());
+                                ArrayList<Integer> numCheckIns = new ArrayList<Integer>();
+//                                numCheckIns.add(0);
+                                memberships.get(i).setNumCheckIns(numCheckIns);
                                 memberships.get(i).setPoints(0);
+                                final int finalI = i;
                                 memberships.get(i).saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
+                                        if (finalI == addedMembers.size() - 1) {
+                                            scheduleAlarm(newGroup);
+                                            Log.d("pls", "work");
+                                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                                            startActivityForResult(i, REQUEST_CODE);
+                                        }
                                         Log.d("HomeActivity", "Category relation works!");
-                                        catMembership.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                if (e == null) {
-                                                    newGroup.saveInBackground(new SaveCallback() {
-                                                        @Override
-                                                        public void done(ParseException e) {
-                                                            scheduleAlarm(newGroup);
-                                                            Log.d("HomeActivity", "Create group success!");
-//                                                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-//                                                            startActivityForResult(i, REQUEST_CODE);
-                                                        }
-                                                    });
-                                                } else {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        });
-
                                     }
                                 });
                             }
@@ -422,6 +421,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         // setup periodic alarm every week from the start day onwards
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
 //        alarm.setInexactRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_DAY * 7, pIntent);
-        alarm.setRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_DAY * 7, pIntent);
     }
 }

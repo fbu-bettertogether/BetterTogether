@@ -16,6 +16,7 @@ import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public class WeeklyIntentService extends IntentService {
 
-    List<Membership> memberships;
+    List<Membership> memberships = new ArrayList<Membership>();
     int numWeeks;
 
     public WeeklyIntentService() {
@@ -56,44 +57,43 @@ public class WeeklyIntentService extends IntentService {
 
                     memberships.addAll(objects);
                     numWeeks = objects.get(0).getGroup().getNumWeeks();
-                }
-            });
-
-            if (memberships.size() == 0 || memberships.size() < numWeeks) {
-                for (int i = 0; i < memberships.size(); i++) {
-                    final Membership currMember = memberships.get(i);
-                    List<Integer> numCheckIns = currMember.getNumCheckIns();
-                    numCheckIns.add(0);
-                    currMember.setNumCheckIns(numCheckIns);
-                    currMember.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e != null) {
-                                e.printStackTrace();
-                            } else {
-                                Log.d("alarm", "refreshing numCheckIns for " + currMember.getUser().getUsername());
-                            }
+                    if (memberships.size() == 0 || memberships.size() < numWeeks) {
+                        for (int i = 0; i < memberships.size(); i++) {
+                            final Membership currMember = memberships.get(i);
+                            List<Integer> numCheckIns = currMember.getNumCheckIns();
+                            numCheckIns.add(0);
+                            currMember.setNumCheckIns(numCheckIns);
+                            currMember.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        e.printStackTrace();
+                                    } else {
+                                        Log.d("alarm", "refreshing numCheckIns for " + currMember.getUser().getUsername());
+                                    }
+                                }
+                            });
                         }
-                    });
-                }
-            } else {
-                ParseQuery<Group> groupQuery = new ParseQuery<Group>(Group.class);
-                groupQuery.whereEqualTo("group", group);
-                groupQuery.findInBackground(new FindCallback<Group>() {
-                    @Override
-                    public void done(List<Group> objects, ParseException e) {
-                        Group group = objects.get(0);
-                        group.setIsActive(false);
-                        group.saveInBackground(new SaveCallback() {
+                    } else {
+                        ParseQuery<Group> groupQuery = new ParseQuery<Group>(Group.class);
+                        groupQuery.whereEqualTo("group", group);
+                        groupQuery.findInBackground(new FindCallback<Group>() {
                             @Override
-                            public void done(ParseException e) {
-                                Log.d("alarm", "changing activity of group");
+                            public void done(List<Group> objects, ParseException e) {
+                                Group group = objects.get(0);
+                                group.setIsActive(false);
+                                group.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("alarm", "changing activity of group");
+                                    }
+                                });
                             }
                         });
+                        //TODO -- figure out how to cancel the alarms from within the service
                     }
-                });
-                //TODO -- figure out how to cancel the alarms from within the service
-            }
+                }
+            });
         }
     }
 }
