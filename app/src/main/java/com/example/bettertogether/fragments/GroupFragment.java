@@ -88,7 +88,6 @@ public class GroupFragment extends Fragment {
     private ImageView ivBanner;
     private ImageView ivUserIcon;
     private TextView tvGroupName;
-    private TextView tvCreatePost;
     private Button btnCheckIn;
     private TextView tvStartDate;
     private TextView tvEndDate;
@@ -99,7 +98,6 @@ public class GroupFragment extends Fragment {
     private Membership currMem;
     private Category category;
     private RecyclerView rvTimeline;
-    private RecyclerView rvMembers;
     private PostsAdapter postsAdapter;
     private FriendAdapter friendAdapter;
     private List<Post> mPosts;
@@ -142,14 +140,11 @@ public class GroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ivBanner = view.findViewById(R.id.ivBanner);
-        ivUserIcon = view.findViewById(R.id.ivUserIcon);
         tvGroupName = view.findViewById(R.id.tvGroupName);
-        tvCreatePost = view.findViewById(R.id.tvCreatePost);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         tvStartDate = view.findViewById(R.id.tvStartDate);
         tvEndDate = view.findViewById(R.id.tvEndDate);
         tvTimer = view.findViewById(R.id.tvTimer);
-        rvMembers = view.findViewById(R.id.rvMembers);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -159,19 +154,14 @@ public class GroupFragment extends Fragment {
 
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
-        rvMembers.setAdapter(friendAdapter);
-        rvMembers.setLayoutManager(new LinearLayoutManager(getContext()));
 
         if (group.getIcon() != null) {
             Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
         }
-        if (ParseUser.getCurrentUser().getParseFile("profileImage") != null) {
-            Glide.with(view.getContext()).load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl()).apply(RequestOptions.circleCropTransform()).into(ivUserIcon);
-        }
+
 
         String startDateUgly = group.getStartDate();
         String endDateUgly = group.getEndDate();
-        tvGroupName.setText(group.getName());
         tvStartDate.setText(startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24)));
         tvEndDate.setText(endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24)));
 
@@ -192,8 +182,8 @@ public class GroupFragment extends Fragment {
         }
         final boolean nowBeforeStart = now.before(start);
         if (group.getIsActive()) {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.design_default_color_on_secondary));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.design_default_color_on_secondary));
         } else {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
@@ -242,15 +232,6 @@ public class GroupFragment extends Fragment {
             }
         });
 
-        tvCreatePost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "text view clicked", Toast.LENGTH_LONG).show();
-                Intent i = new Intent(getContext(), CreatePostActivity.class);
-                i.putExtra("group", Parcels.wrap(group));
-                startActivityForResult(i, REQUEST_CODE);
-            }
-        });
 
         queryMembers();
         queryPosts();
