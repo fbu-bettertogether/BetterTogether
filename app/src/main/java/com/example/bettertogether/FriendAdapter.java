@@ -35,7 +35,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     public FriendAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View itemView = inflater.inflate(R.layout.member_layout, parent, false);
+        View itemView = inflater.inflate(R.layout.friend_layout, parent, false);
         viewHolder = new FriendAdapter.ViewHolder(itemView);
         return viewHolder;
     }
@@ -45,13 +45,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
         // get the data according to position
 
         final ParseUser user = users.get(position);
-        holder.tvUsername.setOnClickListener(new View.OnClickListener() {
-                                                 @Override
-                                                 public void onClick(View view) {
-                                                     fragmentManager.beginTransaction().replace(R.id.flContainer, ProfileFragment.newInstance(user)).commit();
-                                                 }
-                                             }
-        );
+
         holder.ivUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,7 +53,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
             }
         }
         );
-        holder.tvUsername.setText( user.getString("username"));
         if ((user.get("profileImage") != null)) {
             Glide.with(context).load(((ParseFile) user.get("profileImage")).getUrl()).apply(RequestOptions.circleCropTransform()).into(holder.ivUserIcon);
         }
@@ -74,13 +67,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         public ImageView ivUserIcon;
-        public TextView tvUsername;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ivUserIcon = itemView.findViewById(R.id.ivUserIcon);
-            tvUsername = itemView.findViewById(R.id.tvUsername);
-
         }
 
     }

@@ -86,10 +86,4 @@
         app:layout_constraintStart_toStartOf="@+id/btnCheckIn"
         app:layout_constraintTop_toTopOf="@+id/btnCheckIn" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvMembers"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
