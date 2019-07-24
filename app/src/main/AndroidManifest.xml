@@ -16,7 +16,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".AddUsersActivity"></activity>
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote"></receiver>
+
+        <service
+            android:name=".WeeklyIntentService"
+            android:exported="false" />
+
+        <activity android:name=".AddUsersActivity" />
         <activity android:name=".TagActivity" />
         <activity android:name=".CreatePostActivity" />
 
@@ -32,20 +42,19 @@
 
         <activity
             android:name=".HomeActivity"
-            android:label="" >
-        </activity>
+            android:label="" />
         <activity
             android:name=".MakeNewGroupActivity"
-            android:label="">
-        </activity>
+            android:label="" />
         <activity
             android:name=".MainActivity"
             android:label="">
             <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN" />
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter></activity>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

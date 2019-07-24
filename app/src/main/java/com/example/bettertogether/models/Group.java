@@ -13,13 +13,14 @@ import com.parse.ParseUser;
 
 import org.xml.sax.Parser;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 
 @ParseClassName("Group")
-public class Group extends ParseObject implements Parcelable {
+public class Group extends ParseObject implements Serializable {
     public static final String KEY_OWNER = "owner";
     public static final String KEY_DESCRIPTION = "description";
     public static final String BANNER = "banner";
@@ -37,6 +38,7 @@ public class Group extends ParseObject implements Parcelable {
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
     public static final String MIN_TIME = "minTime";
+    public static final String NUM_WEEKS = "numWeeks";
 
     public ParseUser getOwner() {
         return getParseUser(KEY_OWNER);
@@ -160,20 +162,20 @@ public class Group extends ParseObject implements Parcelable {
         put(USERS, users);
     }
 
-    public ParseObject getNumCheckIns() {
-        return getParseObject(NUM_CHECK_INS);
-    }
-
-    public void setNumCheckIns(ParseObject numCheckIns) {
-        put(NUM_CHECK_INS, numCheckIns);
-    }
-
     public String getDate() {
         return String.valueOf(getCreatedAt());
     }
 
     public void setMinTime(int minTime) {
         put(MIN_TIME, minTime);
+    }
+
+    public int getNumWeeks() {
+        return getInt(NUM_WEEKS);
+    }
+
+    public void setNumWeeks(int weeks) {
+        put(NUM_WEEKS, weeks);
     }
 
     }
