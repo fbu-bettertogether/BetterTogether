@@ -344,10 +344,8 @@ public class GroupFragment extends Fragment {
                         }
                     } else {
                         Exception exception = task.getException();
-                        if (exception instanceof ApiException) {
                             ApiException apiException = (ApiException) exception;
                             Log.e(APP_TAG, "Place not found: " + apiException.getStatusCode());
-                        }
                     }
                 }
             });
