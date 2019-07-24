@@ -26,15 +26,20 @@ import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
 import com.example.bettertogether.models.Award;
+import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
+import com.example.bettertogether.models.UserAward;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +58,7 @@ public class ProfileFragment extends Fragment {
     public final String APP_TAG = "BetterTogether";
 
     private ParseUser user;
+    private Award friendshipGoals;
     private OnProfileFragmentInteraction mListener;
 
     private ImageView ivUserIcon;
@@ -62,6 +68,13 @@ public class ProfileFragment extends Fragment {
     private RecyclerView rvGroups;
     private RecyclerView rvFriends;
     private RecyclerView rvAwards;
+    private ImageView ivFitnessPoints;
+    private ImageView ivGetTogetherPoints;
+    private ImageView ivServicePoints;
+    private TextView tvFitnessPoints;
+    private TextView tvGetTogetherPoints;
+    private TextView tvServicePoints;
+
     private List<Post> posts;
     private List<Group> groups;
     private List<ParseUser> friends;
@@ -71,12 +84,7 @@ public class ProfileFragment extends Fragment {
     private FriendAdapter friendAdapter;
     private SimpleGroupAdapter simpleGroupAdapter;
     private AwardsAdapter awardsAdapter;
-    private ImageView ivFitnessPoints;
-    private ImageView ivGetTogetherPoints;
-    private ImageView ivServicePoints;
-    private TextView tvFitnessPoints;
-    private TextView tvGetTogetherPoints;
-    private TextView tvServicePoints;
+    private AwardFragment af;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -101,10 +109,11 @@ public class ProfileFragment extends Fragment {
         friends = new ArrayList<>();
         awards = new ArrayList<>();
         achievedAwards = new ArrayList<>();
-        postsAdapter = new PostsAdapter(getContext(), posts);
+        postsAdapter = new PostsAdapter(getContext(), posts, getFragmentManager());
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
         simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
         awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards);
+        af = new AwardFragment();
         queryPosts();
         queryFriends();
         queryGroups();
@@ -151,18 +160,54 @@ public class ProfileFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivUserIcon);
         }
+        onFriendUpdate();
         ivUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (user.getObjectId() == ParseUser.getCurrentUser().getObjectId()){
+                if (user.getObjectId() == ParseUser.getCurrentUser().getObjectId()) {
                     Toast.makeText(view.getContext(), "Is current user", Toast.LENGTH_SHORT).show();
                     mListener.createProfilePicture(view);
+                } else {
+                    final ParseUser currentUser = ParseUser.getCurrentUser();
+                    final ParseRelation<ParseUser> relation = currentUser.getRelation("friends");
+                    ParseQuery<ParseUser> query = relation.getQuery();
+                    query.findInBackground(new FindCallback<ParseUser>() {
+                        @Override
+                        public void done(List<ParseUser> objects, ParseException e) {
+                            boolean found = false;
+                            for (int i = 0; i < objects.size(); i++) {
+                                if (objects.get(i).getObjectId().equals(user.getObjectId())) {
+                                    found = true;
+                                }
+                            }
+                            if (found) {
+                                relation.remove(user);
+
+                            } else {
+                                relation.add(user);
+                                ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                                query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
+                                    public void done(ParseObject object, ParseException e) {
+                                        if (e == null) {
+                                            friendshipGoals = (Award) object;
+                                            af.queryAward(friendshipGoals, false, true, getContext());
+                                        } else {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                            }
+                            currentUser.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                onFriendUpdate();
+                                }
+                            });
+                        }
+                    });
                 }
             }
-            
         });
-
-        tvUsername.setText(user.getUsername());
         tvDate.setText(String.format("Joined %s", Post.getRelativeTimeAgo(user.getCreatedAt())));
         ivServicePoints.setColorFilter(Color.GREEN);
         ivGetTogetherPoints.setColorFilter(Color.BLUE);
@@ -172,6 +217,24 @@ public class ProfileFragment extends Fragment {
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
     }
 
+    public void onFriendUpdate() {
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseRelation<ParseUser> relation = currentUser.getRelation("friends");
+        ParseQuery<ParseUser> query = relation.getQuery();
+        query.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                for (int i = 0; i < objects.size(); i++) {
+                    if (objects.get(i).getObjectId().equals(user.getObjectId())) {
+                        tvUsername.setText(String.format("☺️%s", user.getUsername()));
+                        return;
+                    }
+                }
+                tvUsername.setText(user.getUsername());
+                ivUserIcon.setBackground(null);
+            }
+        });
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -257,30 +320,32 @@ public class ProfileFragment extends Fragment {
             @Override
             public void done(final List<Award> objects, ParseException e) {
                 if (e != null) {
-                    Log.e("Querying posts", "error with query");
+                    Log.e("Querying awards", "error with query");
                     e.printStackTrace();
                     return;
                 }
                 // add new awards to the list and notify adapter
                 awards.addAll((List<Award>) (Object) objects);
 
-                ParseQuery<ParseObject> parseQuery = user.getRelation("awards").getQuery();
-                parseQuery.addDescendingOrder("createdAt");
-                parseQuery.setLimit(25);
-                parseQuery.addDescendingOrder("createdAt");
-
-                parseQuery.findInBackground(new FindCallback<ParseObject>() {
+                ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
+                query.include("award");
+                query.whereEqualTo("user", user);
+                query.findInBackground(new FindCallback<UserAward>() {
                     @Override
-                    public void done(List<ParseObject> achAwards, ParseException e) {
+                    public void done(List<UserAward> objects, ParseException e) {
                         if (e != null) {
-                            Log.e("Querying awards", "error with query");
+                            Log.e("Querying groups", "error with query");
                             e.printStackTrace();
                             return;
                         }
-
-                        // add new posts to the list and notify adapter
-                        achievedAwards.addAll((List<Award>) (Object) achAwards);
-                        awardsAdapter.notifyDataSetChanged();
+                        if (objects != null) {
+                            for (int i = 0; i < objects.size(); i++) {
+                                if (objects.get(i).getIfAchieved()) {
+                                    achievedAwards.add(objects.get(i).getAward());
+                                }
+                            }
+                            awardsAdapter.notifyDataSetChanged();
+                        }
                     }
                 });
             }

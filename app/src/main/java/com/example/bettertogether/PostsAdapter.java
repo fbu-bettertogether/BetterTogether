@@ -1,6 +1,7 @@
 package com.example.bettertogether;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.bettertogether.fragments.ProfileFragment;
 import com.example.bettertogether.models.Like;
 import com.example.bettertogether.models.Post;
 import com.parse.DeleteCallback;
@@ -29,10 +33,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
     private Context context;
     private List<Post> posts;
+    private FragmentManager fragmentManager;
 
-    public PostsAdapter(Context context, List<Post> posts) {
+    public PostsAdapter(Context context, List<Post> posts, FragmentManager fragmentManager) {
         this.context = context;
         this.posts = posts;
+        this.fragmentManager = fragmentManager;
     }
 
     @NonNull
@@ -60,8 +66,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         if (profileImage != null) {
             Glide.with(context)
                     .load(profileImage.getUrl())
+                    .apply(RequestOptions.circleCropTransform())
                     .into(holder.ivProfileImage);
         }
+        holder.ivProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragmentManager.beginTransaction().replace(R.id.flContainer, ProfileFragment.newInstance(user)).commit();
+            }
+        });
+        holder.tvUsername.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fragmentManager.beginTransaction().replace(R.id.flContainer, ProfileFragment.newInstance(user)).commit();
+            }
+        });
 
         if (post.getMedia() != null) {
             Glide.with(context)

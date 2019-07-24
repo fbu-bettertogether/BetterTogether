@@ -2,4 +2,13 @@
     <string name="app_name">BetterTogether</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="flakiest_award">FhQ8WPuHTB</string>
+    <string name="social_butterfly_award">SgkT5swhwY</string>
+    <string name="angel_award">7lnwOWqMvr</string>
+    <string name="swole_award">JETUkNQ8ni</string>
+    <string name="tenacity_guru_award">4r7mE5BZp4</string>
+    <string name="friendship_goals_award">ARaQjCqMVa</string>
+    <string name="one_week_streak_award">5BbbXUZn1B</string>
+    <string name="first_complete_award">9qgMgRKb7l</string>
 </resources>

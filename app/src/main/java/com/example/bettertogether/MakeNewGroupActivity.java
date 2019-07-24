@@ -93,6 +93,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_group);
+        addedMembers = new ArrayList<>();
         groupNameInput = findViewById(R.id.tvGroupName);
         descriptionInput = findViewById(R.id.tvGroupDescription);
         ivGroupProf = findViewById(R.id.ivGroupProf);
