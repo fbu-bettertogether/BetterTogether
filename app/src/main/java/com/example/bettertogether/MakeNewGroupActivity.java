@@ -1,6 +1,7 @@
 package com.example.bettertogether;
 
 import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -45,6 +46,8 @@ import com.parse.SaveCallback;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
+import org.parceler.Parcels;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -72,6 +75,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private NumberPicker npMinTime;
     private Button btnAddUsers;
     private NumberPicker npNumWeeks;
+    private Date start;
 
     // declaring added users fields
     private RecyclerView rvAddedMembers;
@@ -164,13 +168,13 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "There needs to be a start date!", Toast.LENGTH_SHORT).show();
                     return;
                 } else if (cdStartDate.getSelectedDate().isAfter(now)) {
-                    active = true;
+                    active = false;
                 } else if (cdStartDate.getSelectedDate().isBefore(now)) {
                     Log.e(APP_TAG, "Start date or end date is out of range.");
                     Toast.makeText(getApplicationContext(), "Start date or end date is out of range.", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
-                    active = false;
+                    active = true;
                 }
 
                 Calendar cal =  Calendar.getInstance();
@@ -180,6 +184,11 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 cal.set(Calendar.DATE, day);
                 cal.set(Calendar.MONTH, month - 1);
                 cal.set(Calendar.YEAR, year);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                start = cal.getTime();
                 String startDate = cal.getTime().toString();
                 cal.add(Calendar.WEEK_OF_YEAR, npNumWeeks.getValue());
                 Date date = cal.getTime();
@@ -370,9 +379,10 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                                                     newGroup.saveInBackground(new SaveCallback() {
                                                         @Override
                                                         public void done(ParseException e) {
+                                                            scheduleAlarm(newGroup);
                                                             Log.d("HomeActivity", "Create group success!");
-                                                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                                                            startActivityForResult(i, REQUEST_CODE);
+//                                                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+//                                                            startActivityForResult(i, REQUEST_CODE);
                                                         }
                                                     });
                                                 } else {
@@ -394,6 +404,23 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         });
     }
 
-    private void saveGroup(final Group newGroup) {
+    // set up recurring alarm so that numCheckIns gets moved to new entry each week
+    // will also check if group is active
+    public void scheduleAlarm(Group group) {
+        // construct an intent to execute the AlarmReceiver
+        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("group", group);
+        intent.putExtra("bundle", bundle);
+        // create a pending intent to be triggered when the alarm goes off
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // time in millis from now till the start date
+//        final long startMillis = start.getTime() - System.currentTimeMillis();
+        final long startMillis = System.currentTimeMillis();
+        // setup periodic alarm every week from the start day onwards
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+//        alarm.setInexactRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_DAY * 7, pIntent);
+        alarm.setRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pIntent);
     }
 }

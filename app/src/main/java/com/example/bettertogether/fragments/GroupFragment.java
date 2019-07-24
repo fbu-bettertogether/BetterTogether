@@ -209,11 +209,13 @@ public class GroupFragment extends Fragment {
                 currMem = objects.get(0);
                 numCheckIns = currMem.getNumCheckIns();
                 try {
-                    if (numCheckIns == null || numCheckIns.size() == 0) {
-                        btnCheckIn.setVisibility(View.INVISIBLE);
-                        tvTimer.setVisibility(View.VISIBLE);
-                        tvTimer.setText("Group has not started yet! Hang tight!");
-                    } else checkPlace(category.getLocationTypesList());
+//                    if (numCheckIns == null || numCheckIns.size() == 0) {
+//                        btnCheckIn.setVisibility(View.INVISIBLE);
+//                        tvTimer.setVisibility(View.VISIBLE);
+//                        tvTimer.setText("Group has not started yet! Hang tight!");
+//                    } else {
+                        checkPlace(category.getLocationTypesList());
+//                    }
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                 }

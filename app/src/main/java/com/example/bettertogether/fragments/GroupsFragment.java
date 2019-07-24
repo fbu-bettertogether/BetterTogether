@@ -69,8 +69,6 @@ public class GroupsFragment extends Fragment {
                     return;
                 }
 
-                Log.d("carmel",Integer.toString(memberships.size()));
-
                 mGroups.addAll(Membership.getAllGroups(memberships));
                 adapter.notifyDataSetChanged();
             }

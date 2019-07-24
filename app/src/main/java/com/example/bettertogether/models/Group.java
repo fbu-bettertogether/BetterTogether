@@ -13,13 +13,14 @@ import com.parse.ParseUser;
 
 import org.xml.sax.Parser;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
 
 @ParseClassName("Group")
-public class Group extends ParseObject implements Parcelable {
+public class Group extends ParseObject implements Serializable {
     public static final String KEY_OWNER = "owner";
     public static final String KEY_DESCRIPTION = "description";
     public static final String BANNER = "banner";
