@@ -36,6 +36,7 @@ import com.parse.SaveCallback;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class CreatePostActivity extends AppCompatActivity {
@@ -100,7 +101,7 @@ public class CreatePostActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(CreatePostActivity.this, TagActivity.class);
-                intent.putExtra("group", group);
+                intent.putExtra("group", (Serializable) group);
                 startActivityForResult(intent, TAG_REQUEST_CODE);
             }
         });

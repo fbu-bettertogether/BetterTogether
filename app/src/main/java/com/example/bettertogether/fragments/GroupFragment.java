@@ -93,14 +93,14 @@ public class GroupFragment extends Fragment {
     private TextView tvEndDate;
     private TextView tvTimer;
     private int counter;
-    private int numCheckIns;
-    private List<ParseUser> users;
+    private List<Integer> numCheckIns;
     private Membership currMem;
     private Category category;
     private RecyclerView rvTimeline;
     private PostsAdapter postsAdapter;
     private FriendAdapter friendAdapter;
     private List<Post> mPosts;
+    private List<ParseUser> users;
     private Award first = new Award();
     private Award oneWeek = new Award();
     private Award tenacity = new Award();
@@ -176,9 +176,15 @@ public class GroupFragment extends Fragment {
         }
 
         Date now = Calendar.getInstance().getTime();
+        // TODO -- use alarm to set activity so it does not happen here
         if (now.after(end)) {
             group.setIsActive(false);
             Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
+        } else if (now.before(start)) {
+            group.setIsActive(false);
+            btnCheckIn.setVisibility(View.INVISIBLE);
+            tvTimer.setVisibility(View.VISIBLE);
+            tvTimer.setText("Group has not started yet! Hang tight!");
         }
         final boolean nowBeforeStart = now.before(start);
         if (group.getIsActive()) {
@@ -193,17 +199,20 @@ public class GroupFragment extends Fragment {
         parseQuery.whereEqualTo("user", getCurrentUser());
         parseQuery.whereEqualTo("group", group);
         parseQuery.include("numCheckIns");
+        parseQuery.include("group");
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
                 if (objects.size() > 0) {
                     currMem = objects.get(0);
                     numCheckIns = currMem.getNumCheckIns();
-                    try {
-                        checkPlace(category.getLocationTypesList());
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
+//                    try {
+////                        checkPlace(category.getLocationTypesList());
+//                        drawButton(); // TODO -- figure out why nothing is showing as a valid location
+//                    } catch (JSONException e1) {
+//                        e1.printStackTrace();
+//                    }
+                    drawButton();
                 } else {
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
                         btnCheckIn.setText("Click to Join");
@@ -339,10 +348,11 @@ public class GroupFragment extends Fragment {
     }
 
     public void drawButton() {
-        if (numCheckIns < Integer.valueOf(group.getFrequency())) {
+        if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
 
+            int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             btnCheckIn.setVisibility(View.VISIBLE);
-            btnCheckIn.setText(String.format("%d check-ins left: check in now!", Integer.valueOf(group.getFrequency()) - numCheckIns));
+            btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -363,46 +373,47 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void onFinish() {
                             tvTimer.setText("Finished!");
-                            currMem.setNumCheckIns(numCheckIns + 1);
+                            int currNum = numCheckIns.remove(numCheckIns.size() - 1);
+                            numCheckIns.add(currNum + 1);
+                            currMem.setNumCheckIns(numCheckIns);
                             int addedPoints = currMem.getGroup().getFrequency() / 10;
                             currMem.setPoints(currMem.getPoints() + addedPoints);
                             // TODO -- get category & switch case which category to add points to for the user
-                            // testing branches
                             currMem.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
                                     Log.d("checking in", "saved check in");
-                                }
-                            });
-                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
-                            query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
-                                public void done(ParseObject object, ParseException e) {
-                                    if (e == null) {
-                                        first = (Award) object;
-                                        af.queryAward(first, false, true, getContext());
-                                    } else {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                            query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
-                                public void done(ParseObject object, ParseException e) {
-                                    if (e == null) {
-                                        oneWeek = (Award) object;
-                                        af.queryAward(oneWeek, false, true, getContext());
-                                    } else {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                            query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
-                                public void done(ParseObject object, ParseException e) {
-                                    if (e == null) {
-                                        tenacity = (Award) object;
-                                        af.queryAward(tenacity, false, true, getContext());
-                                    } else {
-                                        e.printStackTrace();
-                                    }
+                                    ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                                    query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
+                                        public void done(ParseObject object, ParseException e) {
+                                            if (e == null) {
+                                                first = (Award) object;
+                                                af.queryAward(first, false, true, getContext());
+                                            } else {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                                    query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+                                        public void done(ParseObject object, ParseException e) {
+                                            if (e == null) {
+                                                oneWeek = (Award) object;
+                                                af.queryAward(oneWeek, false, true, getContext());
+                                            } else {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                                    query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
+                                        public void done(ParseObject object, ParseException e) {
+                                            if (e == null) {
+                                                tenacity = (Award) object;
+                                                af.queryAward(tenacity, false, true, getContext());
+                                            } else {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
                                 }
                             });
                         }
