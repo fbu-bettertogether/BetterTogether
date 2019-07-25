@@ -453,7 +453,7 @@ public class GroupFragment extends Fragment {
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                             numCheckIns.add(currNum + 1);
                             currMem.setNumCheckIns(numCheckIns);
-                            final int addedPoints = currMem.getGroup().getMinTime() / 10;
+                            final int addedPoints = currMem.getGroup().getMinTime();
                             currMem.setPoints(currMem.getPoints() + addedPoints);
                             ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
                             groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
