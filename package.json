@@ -1,0 +1,22 @@
+{
+  "name": "com.example.bettertogether",
+  "version": "0.5.0",
+  "description": "An app to incentivize groups to do things together.",
+  "main": "app",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fbu-bettertogether/BetterTogether.git"
+  },
+  "keywords": [
+    "group"
+  ],
+  "author": "carmel chibu renee",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fbu-bettertogether/BetterTogether/issues"
+  },
+  "homepage": "https://github.com/fbu-bettertogether/BetterTogether#readme"
+}
