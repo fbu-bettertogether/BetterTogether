@@ -30,6 +30,12 @@ import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -39,6 +45,11 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -163,6 +174,48 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      * Create and show a simple notification containing the received FCM message.
      *
      */
+    public static void sendPushToSingleInstance(final Context activity, final HashMap dataValue /*your data from the activity*/, final String instanceIdToken /*firebase instance token you will find in documentation that how to get this*/ ) {
+
+        final String url = "https://fcm.googleapis.com/fcm/send";
+        StringRequest myReq = new StringRequest(Request.Method.POST,url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Toast.makeText(activity, "Bingo Success", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(activity, "Oops error", Toast.LENGTH_SHORT).show();
+                        Log.e("The exact error is ", String.valueOf(error));
+                    }
+                }) {
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                Map<String,String> rawParameters = new Hashtable<String, String>();
+                rawParameters.put("data", new JSONObject(dataValue).toString());
+                rawParameters.put("to", instanceIdToken);
+                return new JSONObject(rawParameters).toString().getBytes();
+            };
+
+            public String getBodyContentType()
+            {
+                return "application/json; charset=utf-8";
+            }
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", "key=" + "AIzaSyAyPxNYSjjRwlTqbd8GzEKBCK76XRUTzKg");
+                return headers;
+            }
+
+        };
+
+        Volley.newRequestQueue(activity).add(myReq);
+    }
+
     public void sendNotification(String token, Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -180,7 +233,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setContentText(content)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
-                        .addPerson(token)
                         .setContentIntent(pendingIntent);
         AtomicInteger msgId = new AtomicInteger();
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
@@ -212,6 +264,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                         // Get new Instance ID token
                         String token = task.getResult().getToken();
+                        sendRegistrationToServer(token);
                         // Log and toast
                         Log.d(TAG, token);
                         Toast.makeText(context, token, Toast.LENGTH_SHORT).show();

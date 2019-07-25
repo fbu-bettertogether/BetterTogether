@@ -1,20 +1,8 @@
 package com.example.bettertogether;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.FileProvider;
-
-import android.app.Application;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -31,15 +21,31 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.FileProvider;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Post;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -49,6 +55,9 @@ import org.parceler.Parcels;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class CreatePostActivity extends AppCompatActivity {
     private final int TAG_REQUEST_CODE = 20;
@@ -72,6 +81,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private TextInputEditText etPost;
     private Toolbar toolbar;
     private ArrayList<ParseUser> taggedUsers;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,8 +182,29 @@ public class CreatePostActivity extends AppCompatActivity {
                         } else {
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put("message", "New Notification from Your Friend.");
+                            hashMap.put("notification_key", (String) taggedUsers.get(0).get("deviceId"));
+                            mfms.sendPushToSingleInstance(getApplicationContext(), hashMap, (String) taggedUsers.get(0).get("deviceId"));
+                            //mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
                             //sendNotification();
+//                            ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+//                            installation.put("device_id", (String) taggedUsers.get(0).get("deviceId"));
+//                            installation.saveInBackground();
+//
+//                            ParseQuery query = ParseInstallation.getQuery();
+//                            query.whereEqualTo("device_id", (String) taggedUsers.get(0).get("deviceId"));
+//                            ParsePush push = new ParsePush();
+//                            push.setMessage("Better Together");
+//                            push.setQuery(query);
+//                            push.sendInBackground();
+//
+//                            final String currUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//                            String content = "You were tagged in " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
+//                            sendMessage(currUser, (String) taggedUsers.get(0).get("deviceId"), content);
+//                            ParsePush push = new ParsePush();
+//                            push.setMessage("Better Together");
+//                            push.sendInBackground();
                             finish();
                         }
                     }
@@ -243,6 +274,16 @@ public class CreatePostActivity extends AppCompatActivity {
                 etPost.setText(etPost.getText() + " " + tagText);
             }
         }
+    }
+
+    private void sendMessage(String sender, String receiver, String message) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("sender", sender);
+        hashMap.put("receiver", receiver);
+        hashMap.put("message", message);
+
+        reference.child("Chats").push().setValue(hashMap);
     }
 
     private void sendNotification() {
