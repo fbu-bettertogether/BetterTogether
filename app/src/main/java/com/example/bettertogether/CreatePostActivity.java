@@ -164,22 +164,16 @@ public class CreatePostActivity extends AppCompatActivity {
                 groupRelation.add(post);
 
                 group.saveInBackground(new SaveCallback() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
                             e.printStackTrace();
                         } else {
+                            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+                            mfms.logToken(getApplicationContext());
+                            mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
                             //sendNotification();
-                            String title = "BetterTogether";
-                            String content = "Check out " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
-                            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-                            NotificationManager notif=(NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-                            Notification notify=new Notification.Builder
-                                    (getApplicationContext()).setContentTitle(title).setContentText(content).
-                                    setContentTitle(title).setSmallIcon(R.drawable.handshake).build();
-
-                            notify.flags |= Notification.FLAG_AUTO_CANCEL;
-                            notif.notify(0, notify);
                             finish();
                         }
                     }
@@ -226,7 +220,6 @@ public class CreatePostActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -253,26 +246,33 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     private void sendNotification() {
+        MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+        mfms.logToken(getApplicationContext());
         createNotificationChannel();
-//        Intent intent = new Intent(this, HomeFragment.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        Intent intent = new Intent(this, HomeFragment.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        String title = "BetterTogether";
+        String content = "You were tagged in " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
+        int importance = NotificationManagerCompat.IMPORTANCE_DEFAULT;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL_ID")
                 .setSmallIcon(R.drawable.handshake)
-                .setContentTitle("My notification")
-                .setContentText("Much longer text that cannot fit one line...")
+                .setContentTitle(title)
+                .setContentText(content)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText("Much longer text that cannot fit one line..."))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .bigText(content))
+                .setPriority(importance)
                 // Set the intent that will fire when the user taps the notification
-                //.setContentIntent(pendingIntent)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
-        builder.build();
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(1100, builder.build());
     }
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String title = "BetterTogether";
-            String content = "Check out " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
+            String content = "BetterTogether's Channel";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel("CHANNEL_ID", title, importance);
             channel.setDescription(content);

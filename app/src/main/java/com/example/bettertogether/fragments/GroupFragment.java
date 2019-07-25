@@ -368,7 +368,6 @@ public class GroupFragment extends Fragment {
 
     public void drawButton() {
         if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
-
             int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
