@@ -36,6 +36,7 @@ import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Post;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -185,9 +186,7 @@ public class CreatePostActivity extends AppCompatActivity {
                             HashMap<String, Object> hashMap = new HashMap<>();
                             hashMap.put("message", "New Notification from Your Friend.");
                             hashMap.put("notification_key", (String) taggedUsers.get(0).get("deviceId"));
-                            mfms.sendPushToSingleInstance(getApplicationContext(), hashMap, (String) taggedUsers.get(0).get("deviceId"));
-                            //mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
-                            //sendNotification();
+                            mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
 //                            ParseInstallation installation = ParseInstallation.getCurrentInstallation();
 //                            installation.put("device_id", (String) taggedUsers.get(0).get("deviceId"));
 //                            installation.saveInBackground();

@@ -174,47 +174,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      * Create and show a simple notification containing the received FCM message.
      *
      */
-    public static void sendPushToSingleInstance(final Context activity, final HashMap dataValue /*your data from the activity*/, final String instanceIdToken /*firebase instance token you will find in documentation that how to get this*/ ) {
-
-        final String url = "https://fcm.googleapis.com/fcm/send";
-        StringRequest myReq = new StringRequest(Request.Method.POST,url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Toast.makeText(activity, "Bingo Success", Toast.LENGTH_SHORT).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(activity, "Oops error", Toast.LENGTH_SHORT).show();
-                        Log.e("The exact error is ", String.valueOf(error));
-                    }
-                }) {
-
-            @Override
-            public byte[] getBody() throws com.android.volley.AuthFailureError {
-                Map<String,String> rawParameters = new Hashtable<String, String>();
-                rawParameters.put("data", new JSONObject(dataValue).toString());
-                rawParameters.put("to", instanceIdToken);
-                return new JSONObject(rawParameters).toString().getBytes();
-            };
-
-            public String getBodyContentType()
-            {
-                return "application/json; charset=utf-8";
-            }
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "key=" + "AIzaSyAyPxNYSjjRwlTqbd8GzEKBCK76XRUTzKg");
-                return headers;
-            }
-
-        };
-
-        Volley.newRequestQueue(activity).add(myReq);
-    }
 
     public void sendNotification(String token, Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
