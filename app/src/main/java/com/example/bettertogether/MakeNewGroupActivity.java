@@ -50,6 +50,7 @@ import org.parceler.Parcels;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -385,7 +386,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                                     @Override
                                     public void done(ParseException e) {
                                         if (finalI == addedMembers.size() - 1) {
-                                            scheduleAlarm(newGroup);
+//                                            scheduleAlarm(newGroup);
                                             Log.d("pls", "work");
                                             Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                                             startActivityForResult(i, REQUEST_CODE);
@@ -410,7 +411,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         // construct an intent to execute the AlarmReceiver
         Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("group", group);
+        bundle.putSerializable("group", (Serializable) group);
         intent.putExtra("bundle", bundle);
         // create a pending intent to be triggered when the alarm goes off
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,

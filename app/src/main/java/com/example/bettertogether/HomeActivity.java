@@ -28,6 +28,7 @@ import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.GroupsFragment;
 import com.example.bettertogether.fragments.ProfileFragment;
 import com.example.bettertogether.models.Category;
+import com.example.bettertogether.models.Membership;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,8 +39,10 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -73,16 +76,20 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_home:
+                        deleteLocation();
                         fragment = new HomeFragment();
                         break;
                     case R.id.action_discovery:
+                        deleteLocation();
                         fragment = new DiscoveryFragment();
                         break;
                     case R.id.action_groups:
+                        deleteLocation();
                         fragment = new GroupsFragment();
                         break;
                     case R.id.action_profile:
                     default:
+                        deleteLocation();
                         fragment = ProfileFragment.newInstance(ParseUser.getCurrentUser());
                         break;
                 }
@@ -124,7 +131,26 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
             // permissions this app might request.
         }
     }
-
+    public void deleteLocation(){
+            ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+            parseQuery.addDescendingOrder("updatedAt");
+            parseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+            parseQuery.include("location");
+            parseQuery.findInBackground(new FindCallback<Membership>() {
+        @Override
+        public void done(List<Membership> objects, ParseException e) {
+            if (e != null) {
+                Log.e("Querying groups", "error with query");
+                e.printStackTrace();
+                return;
+            }
+            for (int i = 0; i < objects.size(); i++) {
+                objects.get(i).remove("location");
+                objects.get(i).saveInBackground();
+            }
+        }
+    });
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
