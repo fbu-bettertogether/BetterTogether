@@ -237,13 +237,13 @@ public class GroupFragment extends Fragment {
                         saveCurrentUserLocation();
                         checkProximity();
                      } else {
-//                        try {
-//                            checkPlace(category.getLocationTypesList());
-//                            drawButton();
-//                        } catch (JSONException e1) {
-//                            e1.printStackTrace();
-//                        }
-                        drawButton();
+                        try {
+                            checkPlace(category.getLocationTypesList());
+                            drawButton();
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+//                        drawButton();
                     }
                 } else {
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {

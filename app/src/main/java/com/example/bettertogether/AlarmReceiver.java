@@ -15,15 +15,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
-        // an Intent broadcast.
         Bundle bundle = intent.getBundleExtra("bundle");
         if (bundle != null) {
             Group group = (Group) bundle.getSerializable("group");
             Intent i = new Intent(context, WeeklyIntentService.class);
             i.putExtra("bundle", bundle);
             WeeklyIntentService.enqueueWork(context, i);
-//            context.startService(i);
         } else {
             Log.e("alarmReceiver", "group was null");
             return;
