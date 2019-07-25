@@ -389,7 +389,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                                             e.printStackTrace();
                                         }
                                         if (finalI == addedMembers.size() - 1) {
-//                                            scheduleAlarm(newGroup);
+                                            scheduleAlarm(newGroup);
                                             Log.d("pls", "work");
                                             Intent i = new Intent(getApplicationContext(), HomeActivity.class);
                                             startActivityForResult(i, REQUEST_CODE);

@@ -226,6 +226,7 @@ public class GroupFragment extends Fragment {
         parseQuery.whereEqualTo("group", group);
         parseQuery.include("numCheckIns");
         parseQuery.include("group");
+        parseQuery.include("user");
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
@@ -236,12 +237,13 @@ public class GroupFragment extends Fragment {
                         saveCurrentUserLocation();
                         checkProximity();
                      } else {
-                        try {
-                            checkPlace(category.getLocationTypesList());
-                            drawButton();
-                        } catch (JSONException e1) {
-                            e1.printStackTrace();
-                        }
+//                        try {
+//                            checkPlace(category.getLocationTypesList());
+//                            drawButton();
+//                        } catch (JSONException e1) {
+//                            e1.printStackTrace();
+//                        }
+                        drawButton();
                     }
                 } else {
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
@@ -451,9 +453,48 @@ public class GroupFragment extends Fragment {
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                             numCheckIns.add(currNum + 1);
                             currMem.setNumCheckIns(numCheckIns);
-                            int addedPoints = currMem.getGroup().getFrequency() / 10;
+                            final int addedPoints = currMem.getGroup().getMinTime() / 10;
                             currMem.setPoints(currMem.getPoints() + addedPoints);
-                            // TODO -- get category & switch case which category to add points to for the user
+                            ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
+                            groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
+                            groupQuery.include("category");
+                            groupQuery.findInBackground(new FindCallback<Group>() {
+                                @Override
+                                public void done(List<Group> objects, ParseException e) {
+                                    if (e != null) {
+                                        e.printStackTrace();
+                                        return;
+                                    } else {
+                                        Group g = objects.get(0);
+                                        String cat = g.getCategory();
+                                        String basePoints = "";
+                                        // updating the appropriate points category of the user based on the category
+                                        switch(cat) {
+                                            case "Fitness":
+                                                basePoints = "fitness";
+                                                break;
+                                            case "Get-Togethers":
+                                                basePoints = "getTogether";
+                                                break;
+                                            case "Service":
+                                                basePoints = "service";
+                                                break;
+                                        }
+
+                                        String pointsKey = basePoints + "Points";
+                                        ParseUser user = currMem.getUser();
+                                        int currPoints = user.getInt(pointsKey);
+                                        user.put(pointsKey, currPoints + addedPoints);
+                                        user.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                Log.d("points", "user points updated");
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
                             currMem.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {

@@ -22,7 +22,8 @@ public class AlarmReceiver extends BroadcastReceiver {
             Group group = (Group) bundle.getSerializable("group");
             Intent i = new Intent(context, WeeklyIntentService.class);
             i.putExtra("bundle", bundle);
-            context.startService(i);
+            WeeklyIntentService.enqueueWork(context, i);
+//            context.startService(i);
         } else {
             Log.e("alarmReceiver", "group was null");
             return;
