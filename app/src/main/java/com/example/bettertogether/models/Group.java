@@ -185,6 +185,10 @@ public class Group extends ParseObject implements Serializable {
         put(MIN_TIME, minTime);
     }
 
+    public int getMinTime() {
+        return getInt(MIN_TIME);
+    }
+
     public int getNumWeeks() {
         return getInt(NUM_WEEKS);
     }

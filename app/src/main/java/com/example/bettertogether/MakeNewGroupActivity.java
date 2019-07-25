@@ -331,81 +331,84 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setMinTime(minTime);
         newGroup.setNumWeeks(npNumWeeks.getValue());
 
-        final ArrayList<Category> catList = new ArrayList<>();
         final Category.Query catQuery = new Category.Query();
         catQuery.findInBackground(new FindCallback<Category>() {
             @Override
             public void done(List<Category> objects, ParseException e) {
                 if (e == null) {
-                    for (int i = 0; i < objects.size(); ++i) {
-                        Log.d("DiscoveryActivity", "Category[" + i + "] = "
-                                + objects.get(i).getName());
-                    }
-                    catList.addAll(objects);
-                    //mainRecyclerAdapter.notifyDataSetChanged();
-                    Category cat = new Category();
-                    Boolean found = false;
-                    for (int i = 0; i < catList.size(); i++) {
-                        if (catList.get(i).getName().equalsIgnoreCase(category)) {
-                            cat = catList.get(i);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        cat.setName(category);
-                        cat.saveInBackground();
-                    }
-                    final CatMembership catMembership = new CatMembership();
-                    catMembership.setGroup(newGroup);
-                    catMembership.setCategory(cat);
-                    newGroup.setCategory(cat.getObjectId());
-                    newGroup.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            catMembership.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if (e != null) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-
-                            List<Membership> memberships = new ArrayList<>();
-                            for (int i = 0; i < addedMembers.size(); i++) {
-                                memberships.add( new Membership());
-                                memberships.get(i).setGroup(newGroup);
-                                memberships.get(i).setUser(addedMembers.get(i));
-                                ArrayList<Integer> numCheckIns = new ArrayList<Integer>();
-//                                numCheckIns.add(0);
-                                memberships.get(i).setNumCheckIns(numCheckIns);
-                                memberships.get(i).setPoints(0);
-                                final int finalI = i;
-                                memberships.get(i).saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e != null) {
-                                            e.printStackTrace();
-                                        }
-                                        if (finalI == addedMembers.size() - 1) {
-                                            scheduleAlarm(newGroup);
-                                            Log.d("pls", "work");
-                                            Intent i = new Intent(getApplicationContext(), HomeActivity.class);
-                                            startActivityForResult(i, REQUEST_CODE);
-                                        }
-                                        Log.d("HomeActivity", "Category relation works!");
-                                    }
-                                });
-                            }
-
-                        }
-                    });
+                    saveCat(objects, addedMembers, newGroup, category);
                 } else {
                     e.printStackTrace();
                 }
             }
         });
+    }
+
+    private void saveCat(List<Category> objects, final ArrayList<ParseUser> addedMembers, final Group newGroup, String category) {
+        final ArrayList<Category> catList = new ArrayList<>();
+        for (int i = 0; i < objects.size(); ++i) {
+            Log.d("DiscoveryActivity", "Category[" + i + "] = "
+                    + objects.get(i).getName());
+        }
+        catList.addAll(objects);
+        //mainRecyclerAdapter.notifyDataSetChanged();
+        Category cat = new Category();
+        Boolean found = false;
+        for (int i = 0; i < catList.size(); i++) {
+            if (catList.get(i).getName().equalsIgnoreCase(category)) {
+                cat = catList.get(i);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            cat.setName(category);
+            cat.saveInBackground();
+        }
+        final CatMembership catMembership = new CatMembership();
+        catMembership.setGroup(newGroup);
+        catMembership.setCategory(cat);
+        newGroup.setCategory(cat.getObjectId());
+        newGroup.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                catMembership.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                saveMemberships(addedMembers, newGroup);
+            }
+        });
+    }
+
+    private void saveMemberships(final ArrayList<ParseUser> addedMembers, final Group newGroup) {
+        List<Membership> memberships = new ArrayList<>();
+        for (int i = 0; i < addedMembers.size(); i++) {
+            memberships.add( new Membership());
+            memberships.get(i).setGroup(newGroup);
+            memberships.get(i).setUser(addedMembers.get(i));
+            ArrayList<Integer> numCheckIns = new ArrayList<Integer>();
+            memberships.get(i).setNumCheckIns(numCheckIns);
+            memberships.get(i).setPoints(0);
+            final int finalI = i;
+            memberships.get(i).saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        e.printStackTrace();
+                    }
+                    if (finalI == addedMembers.size() - 1) {
+                        scheduleAlarm(newGroup);
+                        Intent i = new Intent(getApplicationContext(), HomeActivity.class);
+                        startActivityForResult(i, REQUEST_CODE);
+                    }
+                }
+            });
+        }
     }
 
     // set up recurring alarm so that numCheckIns gets moved to new entry each week
@@ -421,10 +424,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         // time in millis from now till the start date
         final long startMillis = start.getTime() - System.currentTimeMillis();
-//        final long startMillis = System.currentTimeMillis();
         // setup periodic alarm every week from the start day onwards
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-//        alarm.setInexactRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_DAY * 7, pIntent);
         alarm.setInexactRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_DAY * 7, pIntent);
     }
 }
