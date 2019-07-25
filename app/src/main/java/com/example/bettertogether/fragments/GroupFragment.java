@@ -214,8 +214,8 @@ public class GroupFragment extends Fragment {
         }
 
         if (group.getIsActive()) {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.design_default_color_on_secondary));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.design_default_color_on_secondary));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         } else {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
