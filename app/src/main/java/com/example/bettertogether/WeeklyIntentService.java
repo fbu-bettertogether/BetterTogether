@@ -76,7 +76,7 @@ public class WeeklyIntentService extends IntentService {
                         }
                     } else {
                         ParseQuery<Group> groupQuery = new ParseQuery<Group>(Group.class);
-                        groupQuery.whereEqualTo("group", group);
+                        groupQuery.whereEqualTo("objectId", group.getObjectId());
                         groupQuery.findInBackground(new FindCallback<Group>() {
                             @Override
                             public void done(List<Group> objects, ParseException e) {

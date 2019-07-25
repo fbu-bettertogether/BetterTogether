@@ -203,18 +203,16 @@ public class GroupFragment extends Fragment {
         }
 
         Date now = Calendar.getInstance().getTime();
-        // TODO -- use alarm to set activity so it does not happen here
+        final boolean nowBeforeStart = now.before(start);
+
         if (now.after(end)) {
-            group.setIsActive(false);
             Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
-        }
-        else if (now.before(start)) {
-            group.setIsActive(false);
+        } else if (nowBeforeStart) {
             btnCheckIn.setVisibility(View.INVISIBLE);
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("Group has not started yet! Hang tight!");
         }
-        final boolean nowBeforeStart = now.before(start);
+
         if (group.getIsActive()) {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.design_default_color_on_secondary));
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.design_default_color_on_secondary));
