@@ -229,9 +229,15 @@ public class GroupFragment extends Fragment {
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
-                if (objects.size() > 0) {
+                if (objects.size() > 0 & group.getIsActive()) {
                     currMem = objects.get(0);
                     numCheckIns = currMem.getNumCheckIns();
+                    if (numCheckIns == null) {
+                        numCheckIns = new ArrayList<>();
+                        numCheckIns.add(0);
+                    } else if (numCheckIns.size() == 0) {
+                        numCheckIns.add(0);
+                    }
                     if (category.getName().equals("Get-Togethers")) {
                         saveCurrentUserLocation();
                         checkProximity();
@@ -256,6 +262,10 @@ public class GroupFragment extends Fragment {
                                 btnCheckIn.setOnClickListener(null);
                                 currMem = membership;
                                 numCheckIns = currMem.getNumCheckIns();
+                                if (numCheckIns == null) {
+                                    numCheckIns = new ArrayList<>();
+                                    numCheckIns.add(0);
+                                }
                                 try {
                                     checkPlace(category.getLocationTypesList());
                                 } catch (JSONException e1) {
@@ -423,8 +433,14 @@ public class GroupFragment extends Fragment {
     }
 
     public void drawButton() {
-        if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+        boolean hasCheckInLeft = false;
 
+        if (numCheckIns.isEmpty()) {
+            hasCheckInLeft = true;
+        } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+            hasCheckInLeft = true;
+        }
+        if (hasCheckInLeft) {
             int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
@@ -502,7 +518,6 @@ public class GroupFragment extends Fragment {
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("You're done for the week!");
         }
-
     }
 
     @Override

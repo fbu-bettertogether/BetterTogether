@@ -15,6 +15,7 @@ import org.xml.sax.Parser;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
@@ -134,8 +135,22 @@ public class Group extends ParseObject implements Serializable {
         put(END_DATE, endDate);
     }
 
+//    public Boolean getIsActive() {
+//        return getBoolean(IS_ACTIVE);
+//    }
+
     public Boolean getIsActive() {
-        return getBoolean(IS_ACTIVE);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+        Date start = null;
+        Calendar cal = Calendar.getInstance();
+        try {
+            start = sdf.parse(getStartDate());
+            cal.add(Calendar.DATE, getNumWeeks() * 7);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        Date currentDate = Calendar.getInstance().getTime();
+        return (currentDate.after(start) & currentDate.before(cal.getTime()));
     }
 
     public void setIsActive(boolean isActive) {
