@@ -1,6 +1,7 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -71,6 +72,7 @@ public class ProfileFragment extends Fragment {
     private ImageView ivFitnessPoints;
     private ImageView ivGetTogetherPoints;
     private ImageView ivServicePoints;
+    private ImageView ivSettings;
     private TextView tvFitnessPoints;
     private TextView tvGetTogetherPoints;
     private TextView tvServicePoints;
@@ -133,6 +135,7 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ivUserIcon = view.findViewById(R.id.ivUserIcon);
         tvUsername = view.findViewById(R.id.tvUsername);
+        ivSettings = view.findViewById(R.id.ivSettings);
         tvDate = view.findViewById(R.id.tvDate);
         rvPosts = view.findViewById(R.id.rvPosts);
         rvGroups = view.findViewById(R.id.rvGroups);
@@ -153,6 +156,8 @@ public class ProfileFragment extends Fragment {
         rvGroups.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvAwards.setAdapter(awardsAdapter);
         rvAwards.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        drawSettings();
 
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
@@ -217,6 +222,17 @@ public class ProfileFragment extends Fragment {
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
     }
 
+    public void drawSettings() {
+        if (user.hasSameId(ParseUser.getCurrentUser())) {
+            ivSettings.setVisibility(View.VISIBLE);
+            ivSettings.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getFragmentManager().beginTransaction().replace(R.id.flContainer, ProfileDetailFragment.newInstance(user)).commit();
+                }
+            });
+        }
+    }
     public void onFriendUpdate() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
         final ParseRelation<ParseUser> relation = currentUser.getRelation("friends");
