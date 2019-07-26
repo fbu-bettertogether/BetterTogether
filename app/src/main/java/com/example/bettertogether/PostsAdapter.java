@@ -95,9 +95,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                        @Override
                                        public void done(Like object, ParseException e) {
                                            if (object == null) {
-                                                       holder.btnLike.setBackgroundColor(0);
+                                                       holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
                                            } else {
-                                                       holder.btnLike.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+                                               holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
                                                    }
                                                }
 
@@ -116,7 +116,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                             object.deleteInBackground(new DeleteCallback() {
                                 @Override
                                 public void done(ParseException e) {
-                                    holder.btnLike.setBackgroundColor(0);
+                                    holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
                                 }
                             });
                         } else {
@@ -126,7 +126,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                             like.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
-                                    holder.btnLike.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+                                    holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
                                 }
                             });
 

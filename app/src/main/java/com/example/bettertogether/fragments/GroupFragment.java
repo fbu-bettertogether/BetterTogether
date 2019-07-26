@@ -10,14 +10,15 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
+import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
@@ -39,6 +41,12 @@ import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
+import com.github.jinatonic.confetti.CommonConfetti;
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -50,28 +58,13 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 import org.parceler.Parcels;
@@ -85,7 +78,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static androidx.core.content.ContextCompat.getSystemService;
 import static com.parse.ParseUser.getCurrentUser;
 
 /**
@@ -127,6 +119,11 @@ public class GroupFragment extends Fragment {
     private Award oneWeek = new Award();
     private Award tenacity = new Award();
     private AwardFragment af = new AwardFragment();
+    private PieChart chart;
+    private ConstraintLayout constraintLayout;
+    private Context mcontext;
+    private TextView tvCreatePost;
+    private ImageView ivProfPic;
 
 
     public GroupFragment() {
@@ -172,6 +169,11 @@ public class GroupFragment extends Fragment {
         tvStartDate = view.findViewById(R.id.tvStartDate);
         tvEndDate = view.findViewById(R.id.tvEndDate);
         tvTimer = view.findViewById(R.id.tvTimer);
+        chart = view.findViewById(R.id.chart);
+        chart.setVisibility(View.INVISIBLE);
+        constraintLayout = view.findViewById(R.id.constraintLayout);
+        tvCreatePost = view.findViewById(R.id.tvCreatePost);
+        ivProfPic = view.findViewById(R.id.ivProfPic);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -185,6 +187,21 @@ public class GroupFragment extends Fragment {
         if (group.getIcon() != null) {
             Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
         }
+
+        if (getCurrentUser().getParseFile("profileImage") != null) {
+            Glide.with(view.getContext())
+                    .load(((ParseFile) getCurrentUser().get("profileImage")).getUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivProfPic);
+        }
+
+        tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
+        tvCreatePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkInPost();
+            }
+        });
 
 
         String startDateUgly = group.getStartDate();
@@ -214,11 +231,11 @@ public class GroupFragment extends Fragment {
         }
 
         if (group.getIsActive()) {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o7));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o7));
         } else {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o9));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o9));
         }
 
         ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
@@ -249,7 +266,6 @@ public class GroupFragment extends Fragment {
                         } catch (JSONException e1) {
                             e1.printStackTrace();
                         }
-//                        drawButton();
                     }
                 } else {
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
@@ -284,7 +300,9 @@ public class GroupFragment extends Fragment {
         });
         queryMembers();
         queryPosts();
+        configChart(false);
     }
+
     private void checkProximity() {
         ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
         query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
@@ -332,6 +350,86 @@ public class GroupFragment extends Fragment {
                 // if it is null, do something like displaying error and coming back to the menu activity
             }
         }
+    }
+
+    public void configChart(final boolean checkingIn) {
+
+        if (!group.getIsActive()) {
+//            chart.setVisibility(View.INVISIBLE);
+            return;
+        }
+
+        // query for membership objects with this group
+        ParseQuery<Membership> membershipQuery = ParseQuery.getQuery(Membership.class);
+        membershipQuery.whereEqualTo("group", group);
+        membershipQuery.include("numCheckIns");
+        membershipQuery.include("user");
+        membershipQuery.include("group");
+        membershipQuery.findInBackground(new FindCallback<Membership>() {
+            @Override
+            public void done(List<Membership> objects, ParseException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                } else {
+                    int weekNumber = 0;
+                    List<PieEntry> entries = new ArrayList<>();
+                    int totalCheckIns = 0;
+                    // get last int of each numCheckIn, add to entries & keep track of sum
+                    for (int i = 0; i < objects.size(); i++) {
+                        Membership currMem = objects.get(i);
+                        List<Integer> numCheckIns = currMem.getNumCheckIns();
+                        if (numCheckIns.isEmpty()) {
+                            numCheckIns.add(0);
+                        }
+                        // numCheckIns should not have size 0 because will not draw chart if inactive
+                        int currWeek = numCheckIns.get(numCheckIns.size() - 1);
+                        weekNumber = numCheckIns.size();
+                        if (currWeek > 0) {
+                            totalCheckIns += currWeek;
+                            String currUser = currMem.getUser().getUsername();
+                            PieEntry newEntry = new PieEntry(currWeek, currUser);
+                            entries.add(newEntry);
+                        }
+                    }
+                    // calculate total weekly check ins using frequency and the number of members
+                    int expectedCheckIns = group.getFrequency() * objects.size();
+                    int remainingCheckIns = expectedCheckIns - totalCheckIns;
+                    PieEntry remaining = new PieEntry(remainingCheckIns, "Remaining");
+                    entries.add(remaining);
+
+                    // add to pie chart
+                    PieDataSet dataSet = new PieDataSet(entries, "group stats");
+                    List<Integer> colors = new ArrayList<>();
+                    colors.add(getResources().getColor(R.color.colorPrimary));
+                    colors.add(getResources().getColor(R.color.o4));
+                    colors.add(getResources().getColor(R.color.o8));
+                    colors.add(getResources().getColor(R.color.colorPrimaryDark));
+                    dataSet.setValueLineColor(R.color.colorPrimary);
+                    dataSet.setColors(colors);
+                    dataSet.setDrawValues(true);
+                    dataSet.setSliceSpace(3);
+
+                    PieData data = new PieData(dataSet);
+                    data.setValueTextSize(30f);
+                    data.setValueFormatter(new Formatter());
+                    chart.setData(data);
+                    chart.setCenterText("Week " + Integer.toString(weekNumber));
+                    chart.getDescription().setEnabled(false);
+                    chart.getLegend().setEnabled(false);
+//                chart.spin(500, 0, 360f, Easing.EaseInQuad);
+                    if (checkingIn) {
+                        chart.spin(3000, 0, 360f, Easing.EaseInQuad);
+                    } else {
+                        chart.animateY(1500, Easing.EaseInOutQuad);
+                    }
+
+                    chart.invalidate();
+                    chart.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -385,10 +483,10 @@ public class GroupFragment extends Fragment {
         final List<PlaceLikelihood> validPlaces = new ArrayList();
         boolean inValidPlace = false;
         // Initialize the SDK
-        Places.initialize(getContext(), getString(R.string.places_key));
+        Places.initialize(mcontext, getString(R.string.places_key));
 
         // Create a new Places client instance
-        placesClient = Places.createClient(getContext());
+        placesClient = Places.createClient(mcontext);
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
@@ -466,6 +564,7 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void onFinish() {
                             tvTimer.setText("Finished!");
+                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                             numCheckIns.add(currNum + 1);
                             currMem.setNumCheckIns(numCheckIns);
@@ -515,6 +614,15 @@ public class GroupFragment extends Fragment {
                                 @Override
                                 public void done(ParseException e) {
                                     Log.d("checking in", "saved check in");
+                                    configChart(true);
+                                    final Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            checkInPost();
+                                        }
+                                    }, 6000);
+
                                     ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                                     query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
                                         public void done(ParseObject object, ParseException e) {
@@ -559,6 +667,12 @@ public class GroupFragment extends Fragment {
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("You're done for the week!");
         }
+    }
+
+    private void checkInPost() {
+        Intent i = new Intent(getContext(), CreatePostActivity.class);
+        i.putExtra("group", Parcels.wrap(group));
+        startActivityForResult(i, REQUEST_CODE);
     }
 
     @Override
@@ -607,6 +721,7 @@ public class GroupFragment extends Fragment {
         if (context instanceof OnGroupFragmentInteractionListener) {
             mListener = (OnGroupFragmentInteractionListener) context;
         }
+        mcontext = context;
     }
 
     @Override

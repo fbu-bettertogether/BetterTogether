@@ -2,6 +2,18 @@
 <resources>
     <color name="pink">#ba274a</color>
     <color name="colorPrimary">#FF7F34</color>
+    <color name="o1">#ff8842</color>
+    <color name="o2">#ff9151</color>
+    <color name="o3">#ff9a5f</color>
+    <color name="o4">#ffa26e</color>
+    <color name="o5">#ffab7c</color>
+    <color name="o6">#ffb48b</color>
+    <color name="o7">#ffbd99</color>
+    <color name="o8">#ffc6a7</color>
+    <color name="o9">#ffceb6</color>
+    <color name="o10">#ffd7c4</color>
+    <color name="o11">#ffe0d3</color>
+    <color name="o12">#ff8842</color>
     <color name="colorPrimaryDark">#FFE9E1</color>
     <color name="colorAccent">#FF9533</color>
     <color name="rose">#FFE9E1</color>

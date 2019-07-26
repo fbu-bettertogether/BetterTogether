@@ -99,8 +99,8 @@ public class CreatePostActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
         // The Group needs to be passed to this activity through an intent
         group = (Group) Parcels.unwrap(getIntent().getParcelableExtra("group"));
 

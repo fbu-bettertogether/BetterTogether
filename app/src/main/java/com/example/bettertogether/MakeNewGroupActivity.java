@@ -336,7 +336,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, ParseUser user, int minTime) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
-//        newGroup.setIcon(imageFile);
+        newGroup.setIcon(imageFile);
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
         newGroup.setCategory(category);
@@ -497,10 +497,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         // create a pending intent to be triggered when the alarm goes off
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // time in millis from now till the start date
-        final long startMillis = start.getTime() - System.currentTimeMillis();
         // setup periodic alarm every week from the start day onwards
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_DAY * 7, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC, start.getTime(), AlarmManager.INTERVAL_DAY * 7, pIntent);
     }
 }

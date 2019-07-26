@@ -61,5 +61,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:18.0.1'
     implementation 'com.google.firebase:firebase-auth:18.1.0'
     implementation 'com.android.volley:volley:1.1.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha02'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.github.jinatonic.confetti:confetti:1.1.2'
 }
 apply plugin: 'com.google.gms.google-services'

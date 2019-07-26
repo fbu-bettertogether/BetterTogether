@@ -64,11 +64,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="4dp"
+            android:background="@null"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintTop_toBottomOf="@+id/ivMedia"
-            android:background="@null"
-            card_view:srcCompat="@drawable/cake"
-            android:layout_marginRight="4dp" />
+            card_view:srcCompat="@drawable/thumb_up_outline" />
 
         <ImageView
             android:id="@+id/ivMedia"
