@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -48,11 +50,28 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 import org.parceler.Parcels;
@@ -66,6 +85,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static androidx.core.content.ContextCompat.getSystemService;
 import static com.parse.ParseUser.getCurrentUser;
 
 /**
@@ -78,17 +98,18 @@ import static com.parse.ParseUser.getCurrentUser;
  */
 public class GroupFragment extends Fragment {
     private static final int ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS = 36;
+    private static final int REQUEST_LOCATION = 1;
+    LocationManager locationManager;
     public PlacesClient placesClient;
     public final String APP_TAG = "BetterTogether";
     private static final String ARG_GROUP = "group";
     private Group group;
     private OnGroupFragmentInteractionListener mListener;
     public static final int REQUEST_CODE = 45;
-
+    private ParseGeoPoint location;
     private ImageView ivBanner;
     private ImageView ivUserIcon;
     private TextView tvGroupName;
-    private TextView tvCreatePost;
     private Button btnCheckIn;
     private TextView tvStartDate;
     private TextView tvEndDate;
@@ -98,7 +119,6 @@ public class GroupFragment extends Fragment {
     private Membership currMem;
     private Category category;
     private RecyclerView rvTimeline;
-    private RecyclerView rvMembers;
     private PostsAdapter postsAdapter;
     private FriendAdapter friendAdapter;
     private List<Post> mPosts;
@@ -127,7 +147,12 @@ public class GroupFragment extends Fragment {
         if (getArguments() != null) {
             this.group = (Group) getArguments().getParcelable(ARG_GROUP);
         }
-        findCategory();
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        try {
+            category = group.getParseObject("category").fetch();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -142,14 +167,11 @@ public class GroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ivBanner = view.findViewById(R.id.ivBanner);
-        ivUserIcon = view.findViewById(R.id.ivUserIcon);
         tvGroupName = view.findViewById(R.id.tvGroupName);
-        tvCreatePost = view.findViewById(R.id.tvCreatePost);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         tvStartDate = view.findViewById(R.id.tvStartDate);
         tvEndDate = view.findViewById(R.id.tvEndDate);
         tvTimer = view.findViewById(R.id.tvTimer);
-        rvMembers = view.findViewById(R.id.rvMembers);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -159,19 +181,14 @@ public class GroupFragment extends Fragment {
 
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
-        rvMembers.setAdapter(friendAdapter);
-        rvMembers.setLayoutManager(new LinearLayoutManager(getContext()));
 
         if (group.getIcon() != null) {
             Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
         }
-        if (ParseUser.getCurrentUser().getParseFile("profileImage") != null) {
-            Glide.with(view.getContext()).load(ParseUser.getCurrentUser().getParseFile("profileImage").getUrl()).apply(RequestOptions.circleCropTransform()).into(ivUserIcon);
-        }
+
 
         String startDateUgly = group.getStartDate();
         String endDateUgly = group.getEndDate();
-        tvGroupName.setText(group.getName());
         tvStartDate.setText(startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24)));
         tvEndDate.setText(endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24)));
 
@@ -186,20 +203,19 @@ public class GroupFragment extends Fragment {
         }
 
         Date now = Calendar.getInstance().getTime();
-        // TODO -- use alarm to set activity so it does not happen here
+        final boolean nowBeforeStart = now.before(start);
+
         if (now.after(end)) {
-            group.setIsActive(false);
             Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
-        } else if (now.before(start)) {
-            group.setIsActive(false);
+        } else if (nowBeforeStart) {
             btnCheckIn.setVisibility(View.INVISIBLE);
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("Group has not started yet! Hang tight!");
         }
-        final boolean nowBeforeStart = now.before(start);
+
         if (group.getIsActive()) {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.teal));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
         } else {
             tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
             tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
@@ -210,19 +226,31 @@ public class GroupFragment extends Fragment {
         parseQuery.whereEqualTo("group", group);
         parseQuery.include("numCheckIns");
         parseQuery.include("group");
+        parseQuery.include("user");
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
-                if (objects.size() > 0) {
+                if (objects.size() > 0 & group.getIsActive()) {
                     currMem = objects.get(0);
                     numCheckIns = currMem.getNumCheckIns();
-//                    try {
-////                        checkPlace(category.getLocationTypesList());
-//                        drawButton(); // TODO -- figure out why nothing is showing as a valid location
-//                    } catch (JSONException e1) {
-//                        e1.printStackTrace();
-//                    }
-                    drawButton();
+                    if (numCheckIns == null) {
+                        numCheckIns = new ArrayList<>();
+                        numCheckIns.add(0);
+                    } else if (numCheckIns.size() == 0) {
+                        numCheckIns.add(0);
+                    }
+                    if (category.getName().equals("Get-Togethers")) {
+                        saveCurrentUserLocation();
+                        checkProximity();
+                     } else {
+                        try {
+                            checkPlace(category.getLocationTypesList());
+                            drawButton();
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+//                        drawButton();
+                    }
                 } else {
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
                         btnCheckIn.setText("Click to Join");
@@ -236,6 +264,10 @@ public class GroupFragment extends Fragment {
                                 btnCheckIn.setOnClickListener(null);
                                 currMem = membership;
                                 numCheckIns = currMem.getNumCheckIns();
+                                if (numCheckIns == null) {
+                                    numCheckIns = new ArrayList<>();
+                                    numCheckIns.add(0);
+                                }
                                 try {
                                     checkPlace(category.getLocationTypesList());
                                 } catch (JSONException e1) {
@@ -250,21 +282,57 @@ public class GroupFragment extends Fragment {
                 }
             }
         });
-
-        tvCreatePost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "text view clicked", Toast.LENGTH_LONG).show();
-                Intent i = new Intent(getContext(), CreatePostActivity.class);
-                i.putExtra("group", Parcels.wrap(group));
-                startActivityForResult(i, REQUEST_CODE);
-            }
-        });
-
         queryMembers();
         queryPosts();
     }
+    private void checkProximity() {
+        ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
+        query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
+        query.whereEqualTo("group", group);
+        query.whereNotEqualTo("user", getCurrentUser());
+        query.findInBackground(new FindCallback<Membership>() {
+            @Override
+            public void done(List<Membership> objects, ParseException e) {
+                if (objects.isEmpty()) {
+                    btnCheckIn.setVisibility(View.VISIBLE);
+                    btnCheckIn.setText("Click to search for a group member");
+                    btnCheckIn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            saveCurrentUserLocation();
+                            checkProximity();
+                        }
+                    });
+                } else {
+                    drawButton();
+                }
+            }
+        });
+    }
+    private void saveCurrentUserLocation() {
+        // requesting permission to get user's location
+        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+        }
+        else {
+            // getting last know user's location
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
+            // checking if the location is null
+            if(location != null){
+                // if it isn't, save it to Back4App Dashboard
+                ParseGeoPoint currentUserLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+
+                if (currMem != null) {
+                    currMem.put("location", currentUserLocation);
+                    currMem.saveInBackground();
+                }
+            }
+            else {
+                // if it is null, do something like displaying error and coming back to the menu activity
+            }
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -367,7 +435,14 @@ public class GroupFragment extends Fragment {
     }
 
     public void drawButton() {
-        if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+        boolean hasCheckInLeft = false;
+
+        if (numCheckIns.isEmpty()) {
+            hasCheckInLeft = true;
+        } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+            hasCheckInLeft = true;
+        }
+        if (hasCheckInLeft) {
             int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
@@ -394,9 +469,48 @@ public class GroupFragment extends Fragment {
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                             numCheckIns.add(currNum + 1);
                             currMem.setNumCheckIns(numCheckIns);
-                            int addedPoints = currMem.getGroup().getFrequency() / 10;
+                            final int addedPoints = currMem.getGroup().getMinTime();
                             currMem.setPoints(currMem.getPoints() + addedPoints);
-                            // TODO -- get category & switch case which category to add points to for the user
+                            ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
+                            groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
+                            groupQuery.include("category");
+                            groupQuery.findInBackground(new FindCallback<Group>() {
+                                @Override
+                                public void done(List<Group> objects, ParseException e) {
+                                    if (e != null) {
+                                        e.printStackTrace();
+                                        return;
+                                    } else {
+                                        Group g = objects.get(0);
+                                        String cat = g.getCategory();
+                                        String basePoints = "";
+                                        // updating the appropriate points category of the user based on the category
+                                        switch(cat) {
+                                            case "Fitness":
+                                                basePoints = "fitness";
+                                                break;
+                                            case "Get-Togethers":
+                                                basePoints = "getTogether";
+                                                break;
+                                            case "Service":
+                                                basePoints = "service";
+                                                break;
+                                        }
+
+                                        String pointsKey = basePoints + "Points";
+                                        ParseUser user = currMem.getUser();
+                                        int currPoints = user.getInt(pointsKey);
+                                        user.put(pointsKey, currPoints + addedPoints);
+                                        user.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+                                                Log.d("points", "user points updated");
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
                             currMem.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
@@ -445,7 +559,6 @@ public class GroupFragment extends Fragment {
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("You're done for the week!");
         }
-
     }
 
     @Override
