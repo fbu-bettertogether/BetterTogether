@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -118,6 +119,7 @@ public class GroupFragment extends Fragment {
     private AwardFragment af = new AwardFragment();
     private PieChart chart;
     private ConstraintLayout constraintLayout;
+    private Context mcontext;
 
 
     public GroupFragment() {
@@ -391,7 +393,7 @@ public class GroupFragment extends Fragment {
                 chart.getLegend().setEnabled(false);
 //                chart.spin(500, 0, 360f, Easing.EaseInQuad);
                 if (checkingIn) {
-                    chart.spin(500, 0, 360f, Easing.EaseInQuad);
+                    chart.spin(3000, 0, 360f, Easing.EaseInQuad);
                 } else {
                     chart.animateY(1500, Easing.EaseInOutQuad);
                 }
@@ -453,10 +455,10 @@ public class GroupFragment extends Fragment {
         final List<PlaceLikelihood> validPlaces = new ArrayList();
         boolean inValidPlace = false;
         // Initialize the SDK
-        Places.initialize(getContext(), getString(R.string.places_key));
+        Places.initialize(mcontext, getString(R.string.places_key));
 
         // Create a new Places client instance
-        placesClient = Places.createClient(getContext());
+        placesClient = Places.createClient(mcontext);
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
@@ -585,6 +587,14 @@ public class GroupFragment extends Fragment {
                                 public void done(ParseException e) {
                                     Log.d("checking in", "saved check in");
                                     configChart(true);
+                                    final Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            checkInPost();
+                                        }
+                                    }, 6000);
+
                                     ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                                     query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
                                         public void done(ParseObject object, ParseException e) {
@@ -683,6 +693,7 @@ public class GroupFragment extends Fragment {
         if (context instanceof OnGroupFragmentInteractionListener) {
             mListener = (OnGroupFragmentInteractionListener) context;
         }
+        mcontext = context;
     }
 
     @Override

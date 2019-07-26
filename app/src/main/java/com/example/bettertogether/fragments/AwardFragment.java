@@ -3,8 +3,10 @@ package com.example.bettertogether.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.UserAward;
@@ -25,11 +28,14 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import org.parceler.Parcels;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 
+import static com.example.bettertogether.fragments.GroupFragment.REQUEST_CODE;
 import static com.parse.ParseUser.getCurrentUser;
 
 
@@ -227,7 +233,7 @@ public class AwardFragment extends Fragment {
     }
 
     public void showAlert(String title, String message, Context con) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(con);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(con);
         alert.setTitle(title);
         alert.setMessage(message);
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -241,7 +247,15 @@ public class AwardFragment extends Fragment {
                 dialog.dismiss();
             }
         });
-        alert.show();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                alert.show();
+            }
+        }, 3000);
+//        alert.show();
     }
 
     @Override
