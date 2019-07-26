@@ -356,16 +356,18 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     saveCat(objects, addedMembers, newGroup, category);
 
                     JSONObject notification = new JSONObject();
-                    JSONObject notifcationBody = new JSONObject();
+                    JSONObject notificationBody = new JSONObject();
                     try {
-                        notifcationBody.put("title", "Better Together");
-                        notifcationBody.put("message", "A new group was created. Check it out!");
+                        notificationBody.put("title", "Better Together");
+                        notificationBody.put("message", "A new group was created. Check it out!");
 
-                        notification.put("to", addedMembers.get(0).get("deviceId"));
-                        notification.put("data", notifcationBody);
+                        notification.put("to", "/topics/userABC");
+                        notification.put("data", notificationBody);
                     } catch (JSONException error) {
                         Log.e(TAG, "onCreate: " + error.getMessage() );
                     }
+                    MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+                    mfms.logToken(getApplicationContext());
                     sendNotification(notification);
 //                    Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
 //                    int notificationId = 31;
