@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
@@ -58,6 +59,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -120,6 +122,8 @@ public class GroupFragment extends Fragment {
     private PieChart chart;
     private ConstraintLayout constraintLayout;
     private Context mcontext;
+    private TextView tvCreatePost;
+    private ImageView ivProfPic;
 
 
     public GroupFragment() {
@@ -166,7 +170,10 @@ public class GroupFragment extends Fragment {
         tvEndDate = view.findViewById(R.id.tvEndDate);
         tvTimer = view.findViewById(R.id.tvTimer);
         chart = view.findViewById(R.id.chart);
+        chart.setVisibility(View.INVISIBLE);
         constraintLayout = view.findViewById(R.id.constraintLayout);
+        tvCreatePost = view.findViewById(R.id.tvCreatePost);
+        ivProfPic = view.findViewById(R.id.ivProfPic);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -180,6 +187,21 @@ public class GroupFragment extends Fragment {
         if (group.getIcon() != null) {
             Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
         }
+
+        if (getCurrentUser().getParseFile("profileImage") != null) {
+            Glide.with(view.getContext())
+                    .load(((ParseFile) getCurrentUser().get("profileImage")).getUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivProfPic);
+        }
+
+        tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
+        tvCreatePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkInPost();
+            }
+        });
 
 
         String startDateUgly = group.getStartDate();
@@ -209,11 +231,11 @@ public class GroupFragment extends Fragment {
         }
 
         if (group.getIsActive()) {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o7));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o7));
         } else {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o9));
+            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o9));
         }
 
         ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
@@ -333,11 +355,10 @@ public class GroupFragment extends Fragment {
     public void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
-            chart.setVisibility(View.INVISIBLE);
+//            chart.setVisibility(View.INVISIBLE);
             return;
         }
 
-        chart.setVisibility(View.VISIBLE);
         // query for membership objects with this group
         ParseQuery<Membership> membershipQuery = ParseQuery.getQuery(Membership.class);
         membershipQuery.whereEqualTo("group", group);
@@ -352,6 +373,7 @@ public class GroupFragment extends Fragment {
                     return;
                 }
 
+                int weekNumber = 0;
                 List<PieEntry> entries = new ArrayList<>();
                 int totalCheckIns = 0;
                 // get last int of each numCheckIn, add to entries & keep track of sum
@@ -360,6 +382,7 @@ public class GroupFragment extends Fragment {
                     List<Integer> numCheckIns = currMem.getNumCheckIns();
                     // numCheckIns should not have size 0 because will not draw chart if inactive
                     int currWeek = numCheckIns.get(numCheckIns.size() - 1);
+                    weekNumber = numCheckIns.size();
                     if (currWeek > 0) {
                         totalCheckIns += currWeek;
                         String currUser = currMem.getUser().getUsername();
@@ -389,6 +412,7 @@ public class GroupFragment extends Fragment {
                 data.setValueTextSize(30f);
                 data.setValueFormatter(new Formatter());
                 chart.setData(data);
+                chart.setCenterText("Week " + Integer.toString(weekNumber));
                 chart.getDescription().setEnabled(false);
                 chart.getLegend().setEnabled(false);
 //                chart.spin(500, 0, 360f, Easing.EaseInQuad);
@@ -399,6 +423,7 @@ public class GroupFragment extends Fragment {
                 }
 
                 chart.invalidate();
+                chart.setVisibility(View.VISIBLE);
             }
         });
 

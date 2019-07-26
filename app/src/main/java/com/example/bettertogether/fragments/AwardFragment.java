@@ -255,7 +255,6 @@ public class AwardFragment extends Fragment {
                 alert.show();
             }
         }, 3000);
-//        alert.show();
     }
 
     @Override
