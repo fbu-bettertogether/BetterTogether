@@ -156,17 +156,26 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == PROFILE_IMAGE_ACTIVITY_REQUEST_CODE) {
-                ParseFile parseFile = new ParseFile(profilePhotoFile);
-                ParseUser user = ParseUser.getCurrentUser();
-                user.put("profileImage", parseFile);
-                user.saveInBackground(new SaveCallback() {
+                final ParseFile parseFile = new ParseFile(profilePhotoFile);
+                parseFile.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
                             e.printStackTrace();
-                        } else {
-                            Log.d(APP_TAG, "Successful Profile Picture");
                         }
+                        ParseUser user = ParseUser.getCurrentUser();
+                        user.put("profileImage", parseFile);
+                        user.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    e.printStackTrace();
+                                } else {
+                                    Log.d(APP_TAG, "Successful Profile Picture");
+                                }
+                            }
+                        });
+
                     }
                 });
             }

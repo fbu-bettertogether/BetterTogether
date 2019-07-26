@@ -371,59 +371,62 @@ public class GroupFragment extends Fragment {
                 if (e != null) {
                     e.printStackTrace();
                     return;
-                }
-
-                int weekNumber = 0;
-                List<PieEntry> entries = new ArrayList<>();
-                int totalCheckIns = 0;
-                // get last int of each numCheckIn, add to entries & keep track of sum
-                for (int i = 0; i < objects.size(); i++) {
-                    Membership currMem = objects.get(i);
-                    List<Integer> numCheckIns = currMem.getNumCheckIns();
-                    // numCheckIns should not have size 0 because will not draw chart if inactive
-                    int currWeek = numCheckIns.get(numCheckIns.size() - 1);
-                    weekNumber = numCheckIns.size();
-                    if (currWeek > 0) {
-                        totalCheckIns += currWeek;
-                        String currUser = currMem.getUser().getUsername();
-                        PieEntry newEntry = new PieEntry(currWeek, currUser);
-                        entries.add(newEntry);
-                    }
-                }
-                // calculate total weekly check ins using frequency and the number of members
-                int expectedCheckIns = group.getFrequency() * objects.size();
-                int remainingCheckIns = expectedCheckIns - totalCheckIns;
-                PieEntry remaining = new PieEntry(remainingCheckIns, "Remaining");
-                entries.add(remaining);
-
-                // add to pie chart
-                PieDataSet dataSet = new PieDataSet(entries, "group stats");
-                List<Integer> colors = new ArrayList<>();
-                colors.add(getResources().getColor(R.color.colorPrimary));
-                colors.add(getResources().getColor(R.color.o4));
-                colors.add(getResources().getColor(R.color.o8));
-                colors.add(getResources().getColor(R.color.colorPrimaryDark));
-                dataSet.setValueLineColor(R.color.colorPrimary);
-                dataSet.setColors(colors);
-                dataSet.setDrawValues(true);
-                dataSet.setSliceSpace(3);
-
-                PieData data = new PieData(dataSet);
-                data.setValueTextSize(30f);
-                data.setValueFormatter(new Formatter());
-                chart.setData(data);
-                chart.setCenterText("Week " + Integer.toString(weekNumber));
-                chart.getDescription().setEnabled(false);
-                chart.getLegend().setEnabled(false);
-//                chart.spin(500, 0, 360f, Easing.EaseInQuad);
-                if (checkingIn) {
-                    chart.spin(3000, 0, 360f, Easing.EaseInQuad);
                 } else {
-                    chart.animateY(1500, Easing.EaseInOutQuad);
-                }
+                    int weekNumber = 0;
+                    List<PieEntry> entries = new ArrayList<>();
+                    int totalCheckIns = 0;
+                    // get last int of each numCheckIn, add to entries & keep track of sum
+                    for (int i = 0; i < objects.size(); i++) {
+                        Membership currMem = objects.get(i);
+                        List<Integer> numCheckIns = currMem.getNumCheckIns();
+                        if (numCheckIns.isEmpty()) {
+                            numCheckIns.add(0);
+                        }
+                        // numCheckIns should not have size 0 because will not draw chart if inactive
+                        int currWeek = numCheckIns.get(numCheckIns.size() - 1);
+                        weekNumber = numCheckIns.size();
+                        if (currWeek > 0) {
+                            totalCheckIns += currWeek;
+                            String currUser = currMem.getUser().getUsername();
+                            PieEntry newEntry = new PieEntry(currWeek, currUser);
+                            entries.add(newEntry);
+                        }
+                    }
+                    // calculate total weekly check ins using frequency and the number of members
+                    int expectedCheckIns = group.getFrequency() * objects.size();
+                    int remainingCheckIns = expectedCheckIns - totalCheckIns;
+                    PieEntry remaining = new PieEntry(remainingCheckIns, "Remaining");
+                    entries.add(remaining);
 
-                chart.invalidate();
-                chart.setVisibility(View.VISIBLE);
+                    // add to pie chart
+                    PieDataSet dataSet = new PieDataSet(entries, "group stats");
+                    List<Integer> colors = new ArrayList<>();
+                    colors.add(getResources().getColor(R.color.colorPrimary));
+                    colors.add(getResources().getColor(R.color.o4));
+                    colors.add(getResources().getColor(R.color.o8));
+                    colors.add(getResources().getColor(R.color.colorPrimaryDark));
+                    dataSet.setValueLineColor(R.color.colorPrimary);
+                    dataSet.setColors(colors);
+                    dataSet.setDrawValues(true);
+                    dataSet.setSliceSpace(3);
+
+                    PieData data = new PieData(dataSet);
+                    data.setValueTextSize(30f);
+                    data.setValueFormatter(new Formatter());
+                    chart.setData(data);
+                    chart.setCenterText("Week " + Integer.toString(weekNumber));
+                    chart.getDescription().setEnabled(false);
+                    chart.getLegend().setEnabled(false);
+//                chart.spin(500, 0, 360f, Easing.EaseInQuad);
+                    if (checkingIn) {
+                        chart.spin(3000, 0, 360f, Easing.EaseInQuad);
+                    } else {
+                        chart.animateY(1500, Easing.EaseInOutQuad);
+                    }
+
+                    chart.invalidate();
+                    chart.setVisibility(View.VISIBLE);
+                }
             }
         });
 

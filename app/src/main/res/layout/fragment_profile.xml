@@ -99,7 +99,7 @@
         android:id="@+id/tvFitnessPoints"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="100"
+        android:text="0"
         android:textSize="24dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/ivUserIcon"
@@ -124,7 +124,7 @@
         android:id="@+id/tvGetTogetherPoints"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="100"
+        android:text="0"
         android:textSize="24dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/tvFitnessPoints"
@@ -146,15 +146,26 @@
     <TextView
         android:id="@+id/tvServicePoints"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="100"
+        android:layout_height="32dp"
+        android:text="0"
         android:textSize="24dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/tvGetTogetherPoints"
         app:layout_constraintEnd_toEndOf="@+id/ivServicePoints"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/ivServicePoints"
-        app:layout_constraintTop_toTopOf="@+id/tvGetTogetherPoints"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="@+id/tvGetTogetherPoints" />
+
+    <ImageView
+        android:id="@+id/ivSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/settings"
+        android:tint="@color/colorPrimary"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
