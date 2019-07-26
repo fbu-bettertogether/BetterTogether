@@ -422,10 +422,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         // create a pending intent to be triggered when the alarm goes off
         final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // time in millis from now till the start date
-        final long startMillis = start.getTime() - System.currentTimeMillis();
         // setup periodic alarm every week from the start day onwards
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC, startMillis, AlarmManager.INTERVAL_DAY * 7, pIntent);
+        alarm.setInexactRepeating(AlarmManager.RTC, start.getTime(), AlarmManager.INTERVAL_DAY * 7, pIntent);
     }
 }

@@ -59,7 +59,7 @@ public class WeeklyIntentService extends JobIntentService {
 
                     memberships.addAll(objects);
                     numWeeks = objects.get(0).getGroup().getNumWeeks();
-                    if (memberships.size() == 0 || memberships.size() < numWeeks) {
+                    if (memberships.get(0).getNumCheckIns().size() < numWeeks) {
                         for (int i = 0; i < memberships.size(); i++) {
                             final Membership currMember = memberships.get(i);
                             List<Integer> numCheckIns = currMember.getNumCheckIns();
@@ -71,7 +71,7 @@ public class WeeklyIntentService extends JobIntentService {
                                     if (e != null) {
                                         e.printStackTrace();
                                     } else {
-                                        Log.d("alarm", "refreshing numCheckIns for " + currMember.getUser().getUsername());
+                                        Log.d("alarm", "refreshing numCheckIns for " + currMember.getUser().getUsername() + ", " + currMember.getGroup().getName());
                                     }
                                 }
                             });

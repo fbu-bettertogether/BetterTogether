@@ -49,7 +49,7 @@ public class GroupsFragment extends Fragment {
         adapter = new GroupsAdapter(getContext(), mGroups);
         // set the adapter on the recycler view
         rvGroups.setAdapter(adapter);
-        // set the layout manager on the recyler view
+        // set the layout manager on the recycler view
         rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
 
         queryGroups();

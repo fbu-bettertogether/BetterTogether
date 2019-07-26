@@ -54,5 +54,14 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.0.0"
     implementation 'com.github.prolificinteractive:material-calendarview:2.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.gms:google-services:4.2.0'
+    implementation 'com.google.firebase:firebase-core:17.0.1'
+    implementation 'com.google.firebase:firebase-messaging:19.0.1'
+    implementation 'android.arch.work:work-runtime:1.0.1'
+    implementation 'com.google.firebase:firebase-database:18.0.1'
+    implementation 'com.google.firebase:firebase-auth:18.1.0'
+    implementation 'com.android.volley:volley:1.1.0'
     implementation 'com.google.android.material:material:1.1.0-alpha02'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }
+apply plugin: 'com.google.gms.google-services'
