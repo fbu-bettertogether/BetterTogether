@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "744369321904",
+    "firebase_url": "https://better-together-2019-f9c73.firebaseio.com",
+    "project_id": "better-together-2019-f9c73",
+    "storage_bucket": "better-together-2019-f9c73.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744369321904:android:01bd108580db1dc3",
+        "android_client_info": {
+          "package_name": "com.example.bettertogether"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "744369321904-ru57ovtid7k0ill2oqq5lg3p66uinto1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6I7U6wvKKO0NEj1uGe630mB24Xma4jbQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "744369321904-ru57ovtid7k0ill2oqq5lg3p66uinto1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

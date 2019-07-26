@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -38,6 +39,8 @@ import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
+import com.github.jinatonic.confetti.CommonConfetti;
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -114,6 +117,7 @@ public class GroupFragment extends Fragment {
     private Award tenacity = new Award();
     private AwardFragment af = new AwardFragment();
     private PieChart chart;
+    private ConstraintLayout constraintLayout;
 
 
     public GroupFragment() {
@@ -160,6 +164,7 @@ public class GroupFragment extends Fragment {
         tvEndDate = view.findViewById(R.id.tvEndDate);
         tvTimer = view.findViewById(R.id.tvTimer);
         chart = view.findViewById(R.id.chart);
+        constraintLayout = view.findViewById(R.id.constraintLayout);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -271,7 +276,7 @@ public class GroupFragment extends Fragment {
         });
         queryMembers();
         queryPosts();
-        configChart();
+        configChart(false);
     }
 
     private void checkProximity() {
@@ -323,7 +328,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    public void configChart() {
+    public void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
             chart.setVisibility(View.INVISIBLE);
@@ -361,7 +366,7 @@ public class GroupFragment extends Fragment {
                     }
                 }
                 // calculate total weekly check ins using frequency and the number of members
-                int expectedCheckIns = currMem.getGroup().getFrequency() * objects.size();
+                int expectedCheckIns = group.getFrequency() * objects.size();
                 int remainingCheckIns = expectedCheckIns - totalCheckIns;
                 PieEntry remaining = new PieEntry(remainingCheckIns, "Remaining");
                 entries.add(remaining);
@@ -384,6 +389,13 @@ public class GroupFragment extends Fragment {
                 chart.setData(data);
                 chart.getDescription().setEnabled(false);
                 chart.getLegend().setEnabled(false);
+//                chart.spin(500, 0, 360f, Easing.EaseInQuad);
+                if (checkingIn) {
+                    chart.spin(500, 0, 360f, Easing.EaseInQuad);
+                } else {
+                    chart.animateY(1500, Easing.EaseInOutQuad);
+                }
+
                 chart.invalidate();
             }
         });
@@ -522,6 +534,7 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void onFinish() {
                             tvTimer.setText("Finished!");
+                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                             numCheckIns.add(currNum + 1);
                             currMem.setNumCheckIns(numCheckIns);
@@ -571,8 +584,7 @@ public class GroupFragment extends Fragment {
                                 @Override
                                 public void done(ParseException e) {
                                     Log.d("checking in", "saved check in");
-                                    configChart();
-                                    checkInPost();
+                                    configChart(true);
                                     ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                                     query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
                                         public void done(ParseObject object, ParseException e) {
