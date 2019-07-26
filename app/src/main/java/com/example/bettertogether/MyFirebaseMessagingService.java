@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -45,11 +46,13 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.parse.ParseUser;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -66,6 +69,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private static final String TAG = "MyFirebaseMsgService";
+    private final String ADMIN_CHANNEL_ID ="admin_channel";
 
     /**
      * Called when message is received.
@@ -92,6 +96,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // [END_EXCLUDE]
 
         // TODO(developer): Handle FCM messages here.
+        final Intent intent = new Intent(this, MainActivity.class);
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        int notificationID = new Random().nextInt(3000);
+
+      /*
+        Apps targeting SDK 26 or above (Android O) must implement notification channels and add its notifications
+        to at least one of them. Therefore, confirm if version is Oreo or higher, then setup notification channel
+      */
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            setupChannels(notificationManager);
+        }
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this , 0, intent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        Uri notificationSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
+                .setSmallIcon(R.drawable.handshake)
+                .setContentTitle(remoteMessage.getData().get("title"))
+                .setContentText(remoteMessage.getData().get("message"))
+                .setAutoCancel(true)
+                .setSound(notificationSoundUri)
+                .setContentIntent(pendingIntent);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            notificationBuilder.setColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+        notificationManager.notify(notificationID, notificationBuilder.build());
+
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
@@ -106,7 +140,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 // Handle message within 10 seconds
                 handleNow();
             }
-
         }
 
         // Check if message contains a notification payload.
@@ -119,6 +152,35 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
     // [END receive_message]
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setupChannels(NotificationManager notificationManager){
+        CharSequence adminChannelName = "New notification";
+        String adminChannelDescription = "Device to device notification";
+
+        NotificationChannel adminChannel;
+        adminChannel = new NotificationChannel(ADMIN_CHANNEL_ID, adminChannelName, NotificationManager.IMPORTANCE_HIGH);
+        adminChannel.setDescription(adminChannelDescription);
+        adminChannel.enableLights(true);
+        adminChannel.setLightColor(R.color.colorPrimary);
+        adminChannel.enableVibration(true);
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(adminChannel);
+        }
+    }
+
+    private String getData(String jsonData) {
+        // Parse JSON Data
+        try {
+            System.out.println("JSON Data [" + jsonData + "]");
+            JSONObject obj = new JSONObject(jsonData);
+
+            return obj.getString("message");
+        } catch (JSONException jse) {
+            jse.printStackTrace();
+        }
+
+        return "";
+    }
 
     // [START on_new_token]
 
@@ -194,10 +256,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
         AtomicInteger msgId = new AtomicInteger();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("message", "New Notification from Your Friend.");
+        hashMap.put("notification_key", (String) ParseUser.getCurrentUser().get("deviceId"));
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
                 .setMessageId(String.valueOf(msgId.get()))
-                .addData("hello", "world")
-                .build());
+                .addData("message", "Check out this new group!").build());
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
