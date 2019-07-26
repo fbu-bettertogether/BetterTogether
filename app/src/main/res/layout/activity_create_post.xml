@@ -98,12 +98,10 @@
         android:layout_height="50dp"
         android:layout_below="@+id/ivCamera"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="350dp"
         android:theme="@style/AppTheme"
         android:tint="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivIcon"
+        app:layout_constraintTop_toBottomOf="@+id/tilPost"
         app:srcCompat="@drawable/tag" />
 
     <TextView
@@ -111,28 +109,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:text="Add a picture!"
         android:textSize="28sp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivCamera"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivCamera"
-        app:layout_constraintTop_toTopOf="@+id/ivCamera" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTag" />
 
     <TextView
         android:id="@+id/tvTag"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:text="Tag a groupie!"
         android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="@+id/ivAdd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivAdd"
-        app:layout_constraintTop_toTopOf="@+id/ivAdd" />
+        app:layout_constraintTop_toBottomOf="@+id/tilPost" />
 </androidx.constraintlayout.widget.ConstraintLayout>
