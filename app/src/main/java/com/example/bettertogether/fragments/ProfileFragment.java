@@ -209,9 +209,9 @@ public class ProfileFragment extends Fragment {
             }
         });
         tvDate.setText(String.format("Joined %s", Post.getRelativeTimeAgo(user.getCreatedAt())));
-        ivServicePoints.setColorFilter(Color.GREEN);
-        ivGetTogetherPoints.setColorFilter(Color.BLUE);
-        ivFitnessPoints.setColorFilter(Color.RED);
+        ivServicePoints.setColorFilter(getResources().getColor(R.color.o9));
+        ivGetTogetherPoints.setColorFilter(getResources().getColor(R.color.o4));
+        ivFitnessPoints.setColorFilter(getResources().getColor(R.color.colorPrimary));
         tvServicePoints.setText(Integer.toString(user.getInt("servicePoints")));
         tvGetTogetherPoints.setText(Integer.toString(user.getInt("getTogetherPoints")));
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
