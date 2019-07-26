@@ -10,14 +10,11 @@
         android:id="@+id/ivUserIcon"
         android:layout_width="130dp"
         android:layout_height="130dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/tvUsername"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@tools:sample/avatars" />
@@ -26,17 +23,12 @@
         android:id="@+id/tvUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginTop="16dp"
         android:text="Username"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/tvDate"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.048"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivUserIcon" />
 
@@ -44,39 +36,28 @@
         android:id="@+id/tvDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:text="Joined _ days ago"
+        app:layout_constraintBottom_toBottomOf="@+id/tvUsername"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
+        app:layout_constraintStart_toEndOf="@+id/tvUsername"
+        app:layout_constraintTop_toTopOf="@+id/tvUsername" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvAwards"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="24dp"
         android:scrollbars="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvFitnessPoints" />
+        app:layout_constraintTop_toBottomOf="@+id/rvFriends" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPosts"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -85,90 +66,95 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvGroups"
-        android:layout_width="132dp"
-        android:layout_height="196dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/ivUserIcon"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFriends"
-        android:layout_width="125dp"
-        android:layout_height="196dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivUserIcon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvGroups" />
 
     <ImageView
         android:id="@+id/ivFitnessPoints"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="60dp"
         android:src="@drawable/sharp_fitness_center_black_18dp"
-        app:layout_constraintBottom_toTopOf="@+id/rvAwards"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/ivUserIcon"
+        app:layout_constraintStart_toEndOf="@+id/ivUserIcon"
+        app:layout_constraintTop_toTopOf="@+id/ivUserIcon"
+        app:layout_constraintVertical_bias="0.25" />
 
     <TextView
         android:id="@+id/tvFitnessPoints"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="100"
         android:textSize="24dp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/ivFitnessPoints"
-        app:layout_constraintTop_toBottomOf="@+id/rvGroups" />
+        app:layout_constraintBottom_toBottomOf="@+id/ivUserIcon"
+        app:layout_constraintEnd_toEndOf="@+id/ivFitnessPoints"
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintStart_toStartOf="@+id/ivFitnessPoints"
+        app:layout_constraintTop_toBottomOf="@+id/ivFitnessPoints"
+        app:layout_constraintVertical_bias="0.465" />
 
     <ImageView
         android:id="@+id/ivGetTogetherPoints"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="36dp"
         android:src="@drawable/sharp_people_black_18dp"
-        app:layout_constraintBottom_toTopOf="@+id/rvAwards"
-        app:layout_constraintStart_toEndOf="@+id/tvFitnessPoints" />
+        app:layout_constraintBottom_toBottomOf="@+id/ivFitnessPoints"
+        app:layout_constraintStart_toEndOf="@+id/tvFitnessPoints"
+        app:layout_constraintTop_toTopOf="@+id/ivFitnessPoints"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/tvGetTogetherPoints"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
         android:text="100"
         android:textSize="24dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/rvAwards"
-        app:layout_constraintStart_toEndOf="@+id/ivGetTogetherPoints" />
+        app:layout_constraintBottom_toBottomOf="@+id/tvFitnessPoints"
+        app:layout_constraintEnd_toEndOf="@+id/ivGetTogetherPoints"
+        app:layout_constraintStart_toStartOf="@+id/ivGetTogetherPoints"
+        app:layout_constraintTop_toTopOf="@+id/tvFitnessPoints" />
 
     <ImageView
         android:id="@+id/ivServicePoints"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="36dp"
         android:src="@drawable/sharp_local_florist_black_18dp"
-        app:layout_constraintBottom_toTopOf="@+id/rvAwards"
-        app:layout_constraintStart_toEndOf="@+id/tvGetTogetherPoints" />
+        app:layout_constraintBottom_toBottomOf="@+id/ivGetTogetherPoints"
+        app:layout_constraintStart_toEndOf="@+id/ivGetTogetherPoints"
+        app:layout_constraintTop_toTopOf="@+id/ivGetTogetherPoints"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/tvServicePoints"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="100"
         android:textSize="24dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/rvAwards"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ivServicePoints" />
+        app:layout_constraintBottom_toBottomOf="@+id/tvGetTogetherPoints"
+        app:layout_constraintEnd_toEndOf="@+id/ivServicePoints"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/ivServicePoints"
+        app:layout_constraintTop_toTopOf="@+id/tvGetTogetherPoints"
+        app:layout_constraintVertical_bias="0.0" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

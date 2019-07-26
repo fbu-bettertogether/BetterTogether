@@ -148,9 +148,9 @@ public class ProfileFragment extends Fragment {
         rvPosts.setAdapter(postsAdapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         rvFriends.setAdapter(friendAdapter);
-        rvFriends.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvFriends.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvGroups.setAdapter(simpleGroupAdapter);
-        rvGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvGroups.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvAwards.setAdapter(awardsAdapter);
         rvAwards.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 

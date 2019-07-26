@@ -6,6 +6,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.core.app.JobIntentService;
+
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.parse.FindCallback;
@@ -26,17 +28,17 @@ import java.util.List;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class WeeklyIntentService extends IntentService {
+public class WeeklyIntentService extends JobIntentService {
 
     List<Membership> memberships = new ArrayList<Membership>();
     int numWeeks;
 
-    public WeeklyIntentService() {
-        super("WeeklyIntentService");
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, WeeklyIntentService.class, 1, work);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleWork(Intent intent) {
         if (intent != null) {
             Bundle bundle = intent.getBundleExtra("bundle");
             final Group group = (Group) bundle.getSerializable("group");
@@ -76,7 +78,7 @@ public class WeeklyIntentService extends IntentService {
                         }
                     } else {
                         ParseQuery<Group> groupQuery = new ParseQuery<Group>(Group.class);
-                        groupQuery.whereEqualTo("group", group);
+                        groupQuery.whereEqualTo("objectId", group.getObjectId());
                         groupQuery.findInBackground(new FindCallback<Group>() {
                             @Override
                             public void done(List<Group> objects, ParseException e) {

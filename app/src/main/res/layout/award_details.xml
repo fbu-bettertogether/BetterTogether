@@ -42,7 +42,7 @@
         android:paddingTop="8dp"
         android:paddingRight="4dp"
         android:text="Award"
-        android:textColor="@color/teal"
+        android:textColor="@color/colorPrimary"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textStyle="bold|italic"
         app:layout_constraintEnd_toEndOf="@+id/ivAwardImage"
