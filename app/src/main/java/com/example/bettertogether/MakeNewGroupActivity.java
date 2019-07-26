@@ -319,7 +319,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, ParseUser user, int minTime) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
-//        newGroup.setIcon(imageFile);
+        newGroup.setIcon(imageFile);
         newGroup.setName(groupName);
         newGroup.setPrivacy(privacy);
         newGroup.setCategory(category);

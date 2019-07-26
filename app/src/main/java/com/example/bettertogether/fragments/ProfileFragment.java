@@ -222,7 +222,7 @@ public class ProfileFragment extends Fragment {
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
     }
 
-    public void drawSettings() {
+    private void drawSettings() {
         if (user.hasSameId(ParseUser.getCurrentUser())) {
             ivSettings.setVisibility(View.VISIBLE);
             ivSettings.setOnClickListener(new View.OnClickListener() {
