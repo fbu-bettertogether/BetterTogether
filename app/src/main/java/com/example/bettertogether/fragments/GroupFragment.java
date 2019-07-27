@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +81,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
+
 import static com.parse.ParseUser.getCurrentUser;
 
 /**
@@ -124,6 +131,8 @@ public class GroupFragment extends Fragment {
     private Context mcontext;
     private TextView tvCreatePost;
     private ImageView ivProfPic;
+    private ScrollView scrollView;
+    private KonfettiView viewKonfetti;
 
 
     public GroupFragment() {
@@ -172,8 +181,10 @@ public class GroupFragment extends Fragment {
         chart = view.findViewById(R.id.chart);
         chart.setVisibility(View.INVISIBLE);
         constraintLayout = view.findViewById(R.id.constraintLayout);
+        scrollView = view.findViewById(R.id.scrollView);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
+        viewKonfetti = view.findViewById(R.id.viewKonfetti);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -564,7 +575,18 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void onFinish() {
                             tvTimer.setText("Finished!");
-                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
+//                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
+                            viewKonfetti.build()
+                                    .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                                    .setDirection(0.0, 359.0)
+                                    .setSpeed(1f, 5f)
+                                    .setFadeOutEnabled(true)
+                                    .setTimeToLive(2000L)
+                                    .addShapes(Shape.RECT, Shape.CIRCLE)
+                                    .addSizes(new Size(12, 5))
+                                    .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                                    .streamFor(300, 5000L);
+
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                             numCheckIns.add(currNum + 1);
                             currMem.setNumCheckIns(numCheckIns);
