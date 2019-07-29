@@ -477,7 +477,6 @@ public class GroupFragment extends Fragment {
         parseQuery.addDescendingOrder("createdAt");
         parseQuery.include("user");
         parseQuery.setLimit(25);
-        parseQuery.addDescendingOrder("createdAt");
 
         parseQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -489,6 +488,7 @@ public class GroupFragment extends Fragment {
                 }
 
                 // add new posts to the list and notify postsAdapter
+                mPosts.clear();
                 mPosts.addAll((List<Post>) (Object) posts);
                 postsAdapter.notifyDataSetChanged();
             }
@@ -647,71 +647,7 @@ public class GroupFragment extends Fragment {
                                         @Override
                                         public void run() {
 //                                            checkInPost();
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                            builder.setTitle("You've checked in!");
-                                            builder.setMessage("What do you want to do next?");
-                                            builder.setPositiveButton("keep it simple", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(final DialogInterface dialog, int i) {
-
-                                                    final int nthCheckIn = currWeekCheckIns + 1;
-
-                                                    ParseQuery<ParseUser> checkInBotQuery = ParseQuery.getQuery(ParseUser.class);
-                                                    checkInBotQuery.whereEqualTo("username", "Check In Bot");
-                                                    checkInBotQuery.findInBackground(new FindCallback<ParseUser>() {
-                                                        @Override
-                                                        public void done(List<ParseUser> objects, ParseException e) {
-                                                            ParseUser checkInBot = objects.get(0);
-                                                            final Post post = new Post();
-                                                            post.setUser(checkInBot);
-                                                            post.setGroup(group);
-                                                            String suffix = "th";
-                                                            switch (nthCheckIn) {
-                                                                case 1:
-                                                                    suffix = "st";
-                                                                    break;
-                                                                case 2:
-                                                                    suffix = "nd";
-                                                                    break;
-                                                                case 3:
-                                                                    suffix = "rd";
-                                                                    break;
-                                                            }
-
-                                                            post.setDescription(String.format("%s just completed their %d%s check in for the week with %s! Awesome!", getCurrentUser().getUsername(), nthCheckIn, suffix, group.getName()));
-
-                                                            post.saveInBackground(new SaveCallback() {
-                                                                @Override
-                                                                public void done(ParseException e) {
-                                                                    ParseRelation<Post> groupRelation = group.getRelation("posts");
-                                                                    groupRelation.add(post);
-
-                                                                    group.saveInBackground(new SaveCallback() {
-                                                                       @Override
-                                                                       public void done(ParseException e) {
-                                                                           dialog.dismiss();
-                                                                           queryPosts();
-
-                                                                       }
-                                                                   });
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            });
-
-                                            builder.setNegativeButton("get fancy", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int i) {
-                                                    // go to create post
-                                                    dialog.dismiss();
-                                                    checkInPost();
-                                                }
-                                            });
-
-                                            builder.show();
-
+                                            doAlerts(currWeekCheckIns);
                                         }
                                     }, 6000);
 
@@ -759,6 +695,73 @@ public class GroupFragment extends Fragment {
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("You're done for the week!");
         }
+    }
+
+    private void doAlerts(final int currWeekCheckIns) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("You've checked in!");
+        builder.setMessage("What do you want to do next?");
+        builder.setPositiveButton("keep it simple", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int i) {
+
+                final int nthCheckIn = currWeekCheckIns + 1;
+
+                ParseQuery<ParseUser> checkInBotQuery = ParseQuery.getQuery(ParseUser.class);
+                checkInBotQuery.whereEqualTo("username", "Check In Bot");
+                checkInBotQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> objects, ParseException e) {
+                        ParseUser checkInBot = objects.get(0);
+                        final Post post = new Post();
+                        post.setUser(checkInBot);
+                        post.setGroup(group);
+                        String suffix = "th";
+                        switch (nthCheckIn) {
+                            case 1:
+                                suffix = "st";
+                                break;
+                            case 2:
+                                suffix = "nd";
+                                break;
+                            case 3:
+                                suffix = "rd";
+                                break;
+                        }
+
+                        post.setDescription(String.format("%s just completed their %d%s check in for the week with %s! Awesome!", getCurrentUser().getUsername(), nthCheckIn, suffix, group.getName()));
+
+                        post.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                ParseRelation<Post> groupRelation = group.getRelation("posts");
+                                groupRelation.add(post);
+
+                                group.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        dialog.dismiss();
+                                        queryPosts();
+
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        builder.setNegativeButton("get fancy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                // go to create post
+                dialog.dismiss();
+                checkInPost();
+            }
+        });
+
+        builder.show();
     }
 
     private void checkInPost() {
