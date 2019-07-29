@@ -1,16 +1,7 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -27,8 +24,8 @@ import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
 import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.example.bettertogether.models.UserAward;
@@ -169,7 +166,7 @@ public class ProfileFragment extends Fragment {
         ivUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (user.getObjectId() == ParseUser.getCurrentUser().getObjectId()) {
+                if (user.hasSameId(ParseUser.getCurrentUser())) {
                     Toast.makeText(view.getContext(), "Is current user", Toast.LENGTH_SHORT).show();
                     mListener.createProfilePicture(view);
                 } else {
@@ -189,6 +186,10 @@ public class ProfileFragment extends Fragment {
                                 relation.remove(user);
 
                             } else {
+                                Invitation invitation = new Invitation();
+                                invitation.setInviter(ParseUser.getCurrentUser());
+                                invitation.setReceiver(user);
+                                invitation.saveInBackground();
                                 relation.add(user);
                                 ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                                 query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
