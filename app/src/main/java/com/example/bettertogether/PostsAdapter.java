@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -82,10 +83,18 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         });
 
+        // setting size of image depending on whether or not media was attached to post
         if (post.getMedia() != null) {
+            holder.ivMedia.requestLayout();
+            holder.ivMedia.getLayoutParams().height = 350;
+            holder.ivMedia.getLayoutParams().width = 350;
             Glide.with(context)
                     .load(post.getMedia().getUrl())
                     .into(holder.ivMedia);
+        } else {
+            holder.ivMedia.requestLayout();
+            holder.ivMedia.getLayoutParams().height = 0;
+            holder.ivMedia.getLayoutParams().width = 0;
         }
 
         ParseQuery<Like> query = new ParseQuery<Like>(Like.class);
