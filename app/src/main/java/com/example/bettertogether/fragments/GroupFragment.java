@@ -1,9 +1,12 @@
 package com.example.bettertogether.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +38,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -58,11 +64,13 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -77,6 +85,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import nl.dionsegijn.konfetti.KonfettiView;
+import nl.dionsegijn.konfetti.models.Shape;
+import nl.dionsegijn.konfetti.models.Size;
 
 import static com.parse.ParseUser.getCurrentUser;
 
@@ -124,6 +136,8 @@ public class GroupFragment extends Fragment {
     private Context mcontext;
     private TextView tvCreatePost;
     private ImageView ivProfPic;
+    private ScrollView scrollView;
+    private KonfettiView viewKonfetti;
 
 
     public GroupFragment() {
@@ -172,8 +186,10 @@ public class GroupFragment extends Fragment {
         chart = view.findViewById(R.id.chart);
         chart.setVisibility(View.INVISIBLE);
         constraintLayout = view.findViewById(R.id.constraintLayout);
+        scrollView = view.findViewById(R.id.scrollView);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
+        viewKonfetti = view.findViewById(R.id.viewKonfetti);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -461,7 +477,6 @@ public class GroupFragment extends Fragment {
         parseQuery.addDescendingOrder("createdAt");
         parseQuery.include("user");
         parseQuery.setLimit(25);
-        parseQuery.addDescendingOrder("createdAt");
 
         parseQuery.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -473,6 +488,7 @@ public class GroupFragment extends Fragment {
                 }
 
                 // add new posts to the list and notify postsAdapter
+                mPosts.clear();
                 mPosts.addAll((List<Post>) (Object) posts);
                 postsAdapter.notifyDataSetChanged();
             }
@@ -541,7 +557,7 @@ public class GroupFragment extends Fragment {
             hasCheckInLeft = true;
         }
         if (hasCheckInLeft) {
-            int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
+            final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
@@ -564,7 +580,18 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void onFinish() {
                             tvTimer.setText("Finished!");
-                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
+//                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
+                            viewKonfetti.build()
+                                    .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                                    .setDirection(0.0, 359.0)
+                                    .setSpeed(1f, 5f)
+                                    .setFadeOutEnabled(true)
+                                    .setTimeToLive(2000L)
+                                    .addShapes(Shape.RECT, Shape.CIRCLE)
+                                    .addSizes(new Size(12, 5))
+                                    .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                                    .streamFor(300, 5000L);
+
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                             numCheckIns.add(currNum + 1);
                             currMem.setNumCheckIns(numCheckIns);
@@ -619,7 +646,8 @@ public class GroupFragment extends Fragment {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            checkInPost();
+//                                            checkInPost();
+                                            doAlerts(currWeekCheckIns);
                                         }
                                     }, 6000);
 
@@ -667,6 +695,73 @@ public class GroupFragment extends Fragment {
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("You're done for the week!");
         }
+    }
+
+    private void doAlerts(final int currWeekCheckIns) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("You've checked in!");
+        builder.setMessage("What do you want to do next?");
+        builder.setPositiveButton("keep it simple", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(final DialogInterface dialog, int i) {
+
+                final int nthCheckIn = currWeekCheckIns + 1;
+
+                ParseQuery<ParseUser> checkInBotQuery = ParseQuery.getQuery(ParseUser.class);
+                checkInBotQuery.whereEqualTo("username", "Check In Bot");
+                checkInBotQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(List<ParseUser> objects, ParseException e) {
+                        ParseUser checkInBot = objects.get(0);
+                        final Post post = new Post();
+                        post.setUser(checkInBot);
+                        post.setGroup(group);
+                        String suffix = "th";
+                        switch (nthCheckIn) {
+                            case 1:
+                                suffix = "st";
+                                break;
+                            case 2:
+                                suffix = "nd";
+                                break;
+                            case 3:
+                                suffix = "rd";
+                                break;
+                        }
+
+                        post.setDescription(String.format("%s just completed their %d%s check in for the week with %s! Awesome!", getCurrentUser().getUsername(), nthCheckIn, suffix, group.getName()));
+
+                        post.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                ParseRelation<Post> groupRelation = group.getRelation("posts");
+                                groupRelation.add(post);
+
+                                group.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        dialog.dismiss();
+                                        queryPosts();
+
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        builder.setNegativeButton("get fancy", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                // go to create post
+                dialog.dismiss();
+                checkInPost();
+            }
+        });
+
+        builder.show();
     }
 
     private void checkInPost() {

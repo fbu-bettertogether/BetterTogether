@@ -25,9 +25,9 @@ public class AddUsersAdapter extends RecyclerView.Adapter<AddUsersAdapter.ViewHo
 
     private Context context;
 
-    public AddUsersAdapter(List<ParseUser> users, List<ParseUser> taggedUsers) {
+    public AddUsersAdapter(List<ParseUser> users, List<ParseUser> addedUsers) {
         this.users = users;
-        this.addedMembers = taggedUsers;
+        this.addedMembers = addedUsers;
 
     }
 
