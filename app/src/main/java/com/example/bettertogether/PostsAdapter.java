@@ -2,6 +2,8 @@ package com.example.bettertogether;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +64,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.tvUsername.setText(user.getString("username"));
         holder.tvBody.setText(post.getDescription());
         holder.tvTime.setText(post.getRelativeTimeAgo(post.getCreatedAt()));
+
+        if (user.getUsername().equals("Check In Bot")) {
+            holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.fade_orange));
+        } else {
+            holder.itemView.setBackgroundColor(Color.WHITE);
+        }
 
         ParseFile profileImage = (ParseFile) user.get("profileImage");
         if (profileImage != null) {

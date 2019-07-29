@@ -1,7 +1,9 @@
 package com.example.bettertogether.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -36,6 +38,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -61,11 +64,13 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -552,7 +557,7 @@ public class GroupFragment extends Fragment {
             hasCheckInLeft = true;
         }
         if (hasCheckInLeft) {
-            int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
+            final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
@@ -641,7 +646,72 @@ public class GroupFragment extends Fragment {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            checkInPost();
+//                                            checkInPost();
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                            builder.setTitle("You've checked in!");
+                                            builder.setMessage("What do you want to do next?");
+                                            builder.setPositiveButton("keep it simple", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(final DialogInterface dialog, int i) {
+
+                                                    final int nthCheckIn = currWeekCheckIns + 1;
+
+                                                    ParseQuery<ParseUser> checkInBotQuery = ParseQuery.getQuery(ParseUser.class);
+                                                    checkInBotQuery.whereEqualTo("username", "Check In Bot");
+                                                    checkInBotQuery.findInBackground(new FindCallback<ParseUser>() {
+                                                        @Override
+                                                        public void done(List<ParseUser> objects, ParseException e) {
+                                                            ParseUser checkInBot = objects.get(0);
+                                                            final Post post = new Post();
+                                                            post.setUser(checkInBot);
+                                                            post.setGroup(group);
+                                                            String suffix = "th";
+                                                            switch (nthCheckIn) {
+                                                                case 1:
+                                                                    suffix = "st";
+                                                                    break;
+                                                                case 2:
+                                                                    suffix = "nd";
+                                                                    break;
+                                                                case 3:
+                                                                    suffix = "rd";
+                                                                    break;
+                                                            }
+
+                                                            post.setDescription(String.format("%s just completed their %d%s check in for the week with %s! Awesome!", getCurrentUser().getUsername(), nthCheckIn, suffix, group.getName()));
+
+                                                            post.saveInBackground(new SaveCallback() {
+                                                                @Override
+                                                                public void done(ParseException e) {
+                                                                    ParseRelation<Post> groupRelation = group.getRelation("posts");
+                                                                    groupRelation.add(post);
+
+                                                                    group.saveInBackground(new SaveCallback() {
+                                                                       @Override
+                                                                       public void done(ParseException e) {
+                                                                           dialog.dismiss();
+                                                                           queryPosts();
+
+                                                                       }
+                                                                   });
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+
+                                            builder.setNegativeButton("get fancy", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int i) {
+                                                    // go to create post
+                                                    dialog.dismiss();
+                                                    checkInPost();
+                                                }
+                                            });
+
+                                            builder.show();
+
                                         }
                                     }, 6000);
 
