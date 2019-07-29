@@ -39,6 +39,7 @@ import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
+import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -70,6 +71,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 
+import static java.security.AccessController.getContext;
+
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "MakeNewGroupActivity";
     private EditText groupNameInput;
@@ -88,8 +91,9 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 
     // declaring added users fields
     private RecyclerView rvAddedMembers;
-    private MemberAdapter adapter;
+    private AddUsersAdapter adapter;
     private ArrayList<ParseUser> addedMembers;
+    private List<ParseUser> addedUsers = new ArrayList<ParseUser>();
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     private final int ADD_REQUEST_CODE = 20;
@@ -119,6 +123,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         spCategory = (Spinner) findViewById(R.id.spCategory);
         spFrequency = (Spinner) findViewById(R.id.spFrequency);
         cdStartDate = (MaterialCalendarView) findViewById(R.id.calStartDate);
+        rvAddedMembers = (RecyclerView) findViewById(R.id.rvAddedMembers);
 
         createBtn = (Button) findViewById(R.id.create_btn);
         npMinTime = (NumberPicker) findViewById(R.id.npMinTime);
@@ -152,15 +157,15 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             }
         });
 
-//        // configuring recycler view for added members
-//        // setting up recycler view of posts
-//        rvAddedMembers = findViewById(R.id.rvTimeline);
-//        addedMembers = new ArrayList<>();
-//        adapter = new PostsAdapter(getContext(), mPosts);
-//        rvTimeline.setAdapter(adapter);
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-//        rvTimeline.setLayoutManager(linearLayoutManager);
-//
+        // configuring recycler view for added members
+        // setting up recycler view of posts
+        rvAddedMembers = findViewById(R.id.rvAddedMembers);
+        addedMembers = new ArrayList<>();
+        adapter = new AddUsersAdapter(addedUsers, addedUsers);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MakeNewGroupActivity.this);
+        rvAddedMembers.setLayoutManager(linearLayoutManager);
+        rvAddedMembers.setAdapter(adapter);
+
         btnAddUsers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -265,6 +270,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 //            groupProf.setImageURI(selectedImage);
         } else if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
+            addedUsers.addAll(addedMembers);
+            adapter.notifyDataSetChanged();
         }
     }
 
