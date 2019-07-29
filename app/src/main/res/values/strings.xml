@@ -11,4 +11,7 @@
     <string name="friendship_goals_award">ARaQjCqMVa</string>
     <string name="one_week_streak_award">5BbbXUZn1B</string>
     <string name="first_complete_award">9qgMgRKb7l</string>
+
+    <string name="remote_service_started">Remote service started</string>
+    <string name="remote_service_stopped">Remote service stopped</string>
 </resources>

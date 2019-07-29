@@ -333,7 +333,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         return file;
     }
 
-    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, ParseUser user, int minTime) {
+    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, final ParseUser user, int minTime) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
         newGroup.setIcon(imageFile);
@@ -368,7 +368,18 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     }
                     MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                     mfms.logToken(getApplicationContext());
-                    sendNotification(notification);
+                    try {
+                        //addedMembers.get(0).get("deviceId")
+                        mfms.sendNotification((String) user.get("deviceId"), getApplicationContext());
+                    } catch (InstantiationException e1) {
+                        e1.printStackTrace();
+                    } catch (IllegalAccessException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    
+                    //sendNotification(notification);
 //                    Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
 //                    int notificationId = 31;
 //                    intent.putExtra("notificationId", notificationId);

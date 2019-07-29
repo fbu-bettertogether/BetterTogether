@@ -54,6 +54,7 @@ import com.parse.SaveCallback;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -183,7 +184,15 @@ public class CreatePostActivity extends AppCompatActivity {
                         } else {
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
+                            try {
+                                mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
+                            } catch (InstantiationException e1) {
+                                e1.printStackTrace();
+                            } catch (IllegalAccessException e1) {
+                                e1.printStackTrace();
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
                             finish();
                         }
                     }

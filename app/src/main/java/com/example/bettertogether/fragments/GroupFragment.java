@@ -3,6 +3,7 @@ package com.example.bettertogether.fragments;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -78,6 +79,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.parse.ParseUser.getCurrentUser;
 
 /**
@@ -95,9 +97,13 @@ public class GroupFragment extends Fragment {
     public PlacesClient placesClient;
     public final String APP_TAG = "BetterTogether";
     private static final String ARG_GROUP = "group";
+    public static final int REQUEST_CODE = 45;
+    private boolean mTimerRunning;
+    private long mTimeLeftInMillis;
+    private long mEndTime;
+
     private Group group;
     private OnGroupFragmentInteractionListener mListener;
-    public static final int REQUEST_CODE = 45;
     private ParseGeoPoint location;
     private ImageView ivBanner;
     private ImageView ivUserIcon;
@@ -563,6 +569,14 @@ public class GroupFragment extends Fragment {
 
                         @Override
                         public void onFinish() {
+                            SharedPreferences prefs = getContext().getSharedPreferences("prefs", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+
+                            editor.putLong("millisLeft", mTimeLeftInMillis);
+                            editor.putBoolean("timerRunning", mTimerRunning);
+                            editor.putLong("endTime", mEndTime);
+
+                            editor.apply();
                             tvTimer.setText("Finished!");
                             CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
                             int currNum = numCheckIns.remove(numCheckIns.size() - 1);

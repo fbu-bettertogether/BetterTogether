@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
@@ -44,8 +45,15 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.parse.ParseUser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -95,7 +103,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setupChannels(NotificationManager notificationManager){
         CharSequence adminChannelName = "New notification";
-        String adminChannelDescription = "Device to devie notification";
+        String adminChannelDescription = "Device to device notification";
 
         NotificationChannel adminChannel;
         adminChannel = new NotificationChannel(ADMIN_CHANNEL_ID, adminChannelName, NotificationManager.IMPORTANCE_HIGH);
@@ -144,7 +152,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 });
     }
 
-    public void sendNotification(String token, Context context) {
+    public void sendNotification(String token, Context context) throws InstantiationException, IllegalAccessException, IOException {
         Intent intent = new Intent(context, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
@@ -166,6 +174,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("message", "New Notification from Your Friend.");
         hashMap.put("notification_key", (String) ParseUser.getCurrentUser().get("deviceId"));
+
+
+        ProcessBuilderTest.class.newInstance().writeCommand(token);
+
+        // This registration token comes from the client FCM SDKs.
+//        String registrationToken = "YOUR_REGISTRATION_TOKEN";
+//
+//        // See documentation on defining a message payload.
+//        Message message = Message.builder()
+//                .putData("score", "850")
+//                .putData("time", "2:45")
+//                .setToken(registrationToken)
+//                .build();
+//
+//        // Send a message to the device corresponding to the provided registration token.
+//        String response = FirebaseMessaging.getInstance().send(message);
+//        // Response is a message ID string.
+//        System.out.println("Successfully sent message: " + response);
+
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
                 .setMessageId(String.valueOf(msgId.get()))
                 .addData("message", "Check out this new group!").build());
