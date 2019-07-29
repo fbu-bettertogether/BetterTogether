@@ -1,7 +1,6 @@
 package com.example.bettertogether;
 
 import android.Manifest;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -9,14 +8,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -24,37 +20,29 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.bettertogether.fragments.DiscoveryFragment;
-import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.GroupsFragment;
+import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.ProfileFragment;
-import com.example.bettertogether.models.Category;
+import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity implements ProfileFragment.OnProfileFragmentInteraction {
 
     private static final int ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS = 36;
+    public final int INVITATION_REQUEST_CODE = 232;
     public PlacesClient placesClient;
     public final static int PROFILE_IMAGE_ACTIVITY_REQUEST_CODE = 121;
     public final String APP_TAG = "BetterTogether";
@@ -178,9 +166,65 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
 
                     }
                 });
+            } else {
+                int unmaskedRequestCode = requestCode & 0x0000ffff;
+                if (unmaskedRequestCode == INVITATION_REQUEST_CODE) {
+                    List<Invitation> invitations = data.getParcelableArrayListExtra("taggedInvitations");
+                    for (Invitation invitation : invitations) {
+                        if (invitation.getGroup() == null) {
+                            ParseUser receiver = new ParseUser();
+                            ParseUser inviter = new ParseUser();
+                            try {
+                                receiver = invitation.getReceiver().fetchIfNeeded();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                inviter = invitation.getInviter().fetchIfNeeded();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            ParseRelation receiverFriends = (ParseRelation) receiver.get("friends");
+                            receiverFriends.add(invitation.getInviter());
+                            receiver.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        } else {
+                            Membership membership = new Membership();
+                            membership.setUser(invitation.getReceiver());
+                            membership.setGroup(invitation.getGroup());
+                            membership.setNumCheckIns(new ArrayList<Integer>());
+                            membership.setPoints(0);
+                            membership.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    if (e != null) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+
+                        }
+                        invitation.setAccepted("accepted");
+                        invitation.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                    }
+
+                }
             }
-        } else {
-            Toast.makeText(this, "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
         }
     }
 

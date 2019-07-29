@@ -22,7 +22,7 @@ public class ProfileDetailFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String param_user = "param_user";
     public final String APP_TAG = "BetterTogether";
-
+    public final int INVITATION_REQUEST_CODE = 232;
     private ProfileFragment.OnProfileFragmentInteraction mListener;
     private Button btnPendingRequests;
     private Button btnNotifications;
@@ -91,7 +91,7 @@ public class ProfileDetailFragment extends Fragment {
                                                   @Override
                                                   public void onClick(View view) {
                                                       Intent intent = new Intent(getContext(), InvitationActivity.class);
-                                                      startActivity(intent);
+                                                      startActivityForResult(intent, INVITATION_REQUEST_CODE);
                                                   }
                                               }
 

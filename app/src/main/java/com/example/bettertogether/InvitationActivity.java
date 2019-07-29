@@ -51,6 +51,7 @@ public class InvitationActivity extends AppCompatActivity {
         invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
         invitationParseQuery.include("inviter");
         invitationParseQuery.include("group");
+        invitationParseQuery.whereNotEqualTo("accepted", "accepted");
         invitationParseQuery.findInBackground(new FindCallback<Invitation>() {
             @Override
             public void done(List<Invitation> objects, ParseException e) {
