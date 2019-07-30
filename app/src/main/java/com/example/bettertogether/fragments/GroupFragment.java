@@ -10,10 +10,27 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +54,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -59,6 +78,7 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -135,6 +155,7 @@ public class GroupFragment extends Fragment {
     private ImageView ivProfPic;
     private ScrollView scrollView;
     private KonfettiView viewKonfetti;
+    public final int GROUP_INVITATION_REQUEST_CODE = 514;
 
 
     public GroupFragment() {
@@ -172,9 +193,54 @@ public class GroupFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        ((AppCompatActivity) getActivity()).getMenuInflater().inflate(R.menu.group_detail_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // return to groups fragment
+            FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+            GroupsFragment fragment = new GroupsFragment();
+            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+        } else if (item.getItemId() == R.id.action_requests) {
+            Intent intent = new Intent(getContext(), InvitationActivity.class);
+            intent.putExtra("group", (Parcelable) group);
+            startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
+        } else if (item.getItemId() == R.id.action_leave) {
+            if (group.getIsActive()) {
+                Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
+            } else {
+                ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
+                membershipParseQuery.whereEqualTo("group", group);
+                membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
+                    @Override
+                    public void done(Membership object, ParseException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        } else if (object != null) {
+                            try {
+                                object.delete();
+                                Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        Log.d("itemId", item.toString());
+        return true;
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ivBanner = view.findViewById(R.id.ivBanner);
         tvGroupName = view.findViewById(R.id.tvGroupName);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         tvStartDate = view.findViewById(R.id.tvStartDate);
@@ -195,12 +261,24 @@ public class GroupFragment extends Fragment {
         rvTimeline.setAdapter(postsAdapter);
         rvTimeline.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(group.getName());
+        setHasOptionsMenu(true);
+
+        final ImageView imageView = view.findViewById(R.id.backdrop);
+        if (group.getIcon() != null) {
+            Glide.with(view.getContext())
+                    .load(group.getIcon().getUrl())
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(imageView);
+        }
+
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
-
-        if (group.getIcon() != null) {
-            Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
-        }
 
         if (getCurrentUser().getParseFile("profileImage") != null) {
             Glide.with(view.getContext())
@@ -208,6 +286,7 @@ public class GroupFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivProfPic);
         }
+
         tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -360,7 +439,7 @@ public class GroupFragment extends Fragment {
             public void done(List<Membership> objects, ParseException e) {
                 if (objects.isEmpty()) {
                     btnCheckIn.setVisibility(View.VISIBLE);
-                    btnCheckIn.setText("Click to search for a group member");
+                    btnCheckIn.setText("Find a nearby group member");
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

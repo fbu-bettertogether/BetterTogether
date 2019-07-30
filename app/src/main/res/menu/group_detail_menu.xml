@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_requests"
+        android:title="show pending requests"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_history"
+        android:title="show group history"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_icon"
+        android:title="change group icon"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_notifications"
+        android:title="toggle notifications"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_leave"
+        android:title="leave group"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_delete"
+        android:title="delete group"
+        app:showAsAction="never"/>
+
+
+</menu>
