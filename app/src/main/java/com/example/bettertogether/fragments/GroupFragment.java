@@ -25,6 +25,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -62,6 +64,7 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -178,7 +181,6 @@ public class GroupFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ivBanner = view.findViewById(R.id.ivBanner);
         tvGroupName = view.findViewById(R.id.tvGroupName);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         tvStartDate = view.findViewById(R.id.tvStartDate);
@@ -202,8 +204,20 @@ public class GroupFragment extends Fragment {
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
 
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(group.getName());
+        setHasOptionsMenu(true);
+
+        final ImageView imageView = view.findViewById(R.id.backdrop);
         if (group.getIcon() != null) {
-            Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
+            Glide.with(view.getContext())
+                    .load(group.getIcon().getUrl())
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(imageView);
         }
 
         if (getCurrentUser().getParseFile("profileImage") != null) {
@@ -263,13 +277,6 @@ public class GroupFragment extends Fragment {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
                 if (objects.size() > 0) {
-                    ivSettings.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
-                        }
-                    });
-
                     if (group.getIsActive()) {
                         currMem = objects.get(0);
                         numCheckIns = currMem.getNumCheckIns();
