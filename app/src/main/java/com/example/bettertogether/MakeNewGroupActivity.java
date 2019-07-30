@@ -381,66 +381,19 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 if (e == null) {
                     saveCat(objects, addedMembers, newGroup, category);
 
-                    JSONObject notification = new JSONObject();
-                    JSONObject notificationBody = new JSONObject();
-//                    try {
-//                        notificationBody.put("title", "Better Together");
-//                        notificationBody.put("message", "A new group was created. Check it out!");
-//
-//                        notification.put("to", "/topics/userABC");
-//                        notification.put("data", notificationBody);
-//                    } catch (JSONException error) {
-//                        Log.e(TAG, "onCreate: " + error.getMessage() );
-//                    }
-
                     MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
 
                     mfms.logToken(getApplicationContext());
 
-                    String tokens = (String) user.get("deviceId");
-
+                    Messaging.sendNotification((String) user.get("deviceId"), "A new group was created by " + user.getUsername() + "!");
                     for (int i = 0; i < addedMembers.size(); i++) {
-                        tokens = tokens + "," + ((String)addedMembers.get(i).get("deviceId"));
+                        Messaging.sendNotification((String)addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
                     }
-                    Messaging.sendNotification(tokens);
-
-//                    ArrayList<String> tokens = new ArrayList<>();
-//                    tokens.add((String) user.get("deviceId"));
-//                    tokens.add((String) addedMembers.get(0).get("deviceId"));
-//                    mfms.sendMessage(tokens, "Better Together", "A new post was made! Check it out!","A new post was made!", getApplicationContext());
                 } else {
                     e.printStackTrace();
                 }
             }
         });
-    }
-
-
-
-    private void sendNotification(JSONObject notification) {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i(TAG, "onResponse: " + response.toString());
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "Request error", Toast.LENGTH_LONG).show();
-                        Log.i(TAG, "onErrorResponse: Didn't work");
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", serverKey);
-                params.put("Content-Type", contentType);
-                return params;
-            }
-        };
-        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     private void saveCat(List<Category> objects, final ArrayList<ParseUser> addedMembers, final Group newGroup, String category) {
