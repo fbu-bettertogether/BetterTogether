@@ -13,8 +13,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -42,6 +46,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -105,6 +110,7 @@ import static com.parse.ParseUser.getCurrentUser;
  */
 public class GroupFragment extends Fragment {
     private static final int ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS = 36;
+    public final int GROUP_INVITATION_REQUEST_CODE = 514;
     private static final int REQUEST_LOCATION = 1;
     LocationManager locationManager;
     public PlacesClient placesClient;
@@ -375,17 +381,16 @@ public class GroupFragment extends Fragment {
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            FragmentManager manager = getChildFragmentManager();
+                            FragmentTransaction ft = manager.beginTransaction();
+                            ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
+                            ft.commitAllowingStateLoss();
                             saveCurrentUserLocation();
                             checkProximity();
                             chartFrame.getLayoutParams().height = 500;
                             chartFrame.requestLayout();
-
                         }
                     });
-                    FragmentManager manager = getChildFragmentManager();
-                    FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
-                    ft.commitAllowingStateLoss();
                 } else {
                     drawButton();
                 }
@@ -859,6 +864,52 @@ public class GroupFragment extends Fragment {
                 category = objects.get(0).getCategory();
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        ((AppCompatActivity) getActivity()).getMenuInflater().inflate(R.menu.group_detail_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // return to groups fragment
+            FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+            GroupsFragment fragment = new GroupsFragment();
+            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+        } else if (item.getItemId() == R.id.action_requests) {
+            Intent intent = new Intent(getContext(), InvitationActivity.class);
+            intent.putExtra("group", (Parcelable) group);
+            startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
+        } else if (item.getItemId() == R.id.action_leave) {
+            if (group.getIsActive()) {
+                Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
+            } else {
+                ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
+                membershipParseQuery.whereEqualTo("group", group);
+                membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
+                    @Override
+                    public void done(Membership object, ParseException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        } else if (object != null) {
+                            try {
+                                object.delete();
+                                Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        Log.d("itemId", item.toString());
+        return true;
     }
 
     @Override
