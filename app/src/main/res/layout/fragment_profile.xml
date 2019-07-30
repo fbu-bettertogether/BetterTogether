@@ -1,171 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ProfileFragment">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
-        android:id="@+id/ivUserIcon"
-        android:layout_width="130dp"
-        android:layout_height="130dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/tvUsername"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@tools:sample/avatars" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.ProfileFragment">
+        <ImageView
+            android:id="@+id/ivUserIcon"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/tvUsername"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/tvUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Username"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.048"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivUserIcon" />
+        <TextView
+            android:id="@+id/tvUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Username"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.048"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivUserIcon" />
 
-    <TextView
-        android:id="@+id/tvDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Joined _ days ago"
-        app:layout_constraintBottom_toBottomOf="@+id/tvUsername"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toEndOf="@+id/tvUsername"
-        app:layout_constraintTop_toTopOf="@+id/tvUsername" />
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Joined _ days ago"
+            app:layout_constraintBottom_toBottomOf="@+id/tvUsername"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toEndOf="@+id/tvUsername"
+            app:layout_constraintTop_toTopOf="@+id/tvUsername" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAwards"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:scrollbars="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvFriends" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvAwards"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rvFriends" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPosts"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvAwards" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPosts"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rvAwards" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvGroups"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvGroups"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvFriends"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvGroups" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFriends"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rvGroups" />
 
-    <ImageView
-        android:id="@+id/ivFitnessPoints"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="60dp"
-        android:src="@drawable/sharp_fitness_center_black_18dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivUserIcon"
-        app:layout_constraintStart_toEndOf="@+id/ivUserIcon"
-        app:layout_constraintTop_toTopOf="@+id/ivUserIcon"
-        app:layout_constraintVertical_bias="0.25" />
+        <ImageView
+            android:id="@+id/ivFitnessPoints"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="60dp"
+            android:src="@drawable/sharp_fitness_center_black_18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/ivUserIcon"
+            app:layout_constraintStart_toEndOf="@+id/ivUserIcon"
+            app:layout_constraintTop_toTopOf="@+id/ivUserIcon"
+            app:layout_constraintVertical_bias="0.25" />
 
-    <TextView
-        android:id="@+id/tvFitnessPoints"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        android:textSize="24dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/ivUserIcon"
-        app:layout_constraintEnd_toEndOf="@+id/ivFitnessPoints"
-        app:layout_constraintHorizontal_bias="0.454"
-        app:layout_constraintStart_toStartOf="@+id/ivFitnessPoints"
-        app:layout_constraintTop_toBottomOf="@+id/ivFitnessPoints"
-        app:layout_constraintVertical_bias="0.465" />
+        <TextView
+            android:id="@+id/tvFitnessPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/ivUserIcon"
+            app:layout_constraintEnd_toEndOf="@+id/ivFitnessPoints"
+            app:layout_constraintHorizontal_bias="0.454"
+            app:layout_constraintStart_toStartOf="@+id/ivFitnessPoints"
+            app:layout_constraintTop_toBottomOf="@+id/ivFitnessPoints"
+            app:layout_constraintVertical_bias="0.465" />
 
-    <ImageView
-        android:id="@+id/ivGetTogetherPoints"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="36dp"
-        android:src="@drawable/sharp_people_black_18dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivFitnessPoints"
-        app:layout_constraintStart_toEndOf="@+id/tvFitnessPoints"
-        app:layout_constraintTop_toTopOf="@+id/ivFitnessPoints"
-        app:layout_constraintVertical_bias="0.0" />
+        <ImageView
+            android:id="@+id/ivGetTogetherPoints"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="36dp"
+            android:src="@drawable/sharp_people_black_18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/ivFitnessPoints"
+            app:layout_constraintStart_toEndOf="@+id/tvFitnessPoints"
+            app:layout_constraintTop_toTopOf="@+id/ivFitnessPoints"
+            app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
-        android:id="@+id/tvGetTogetherPoints"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        android:textSize="24dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/tvFitnessPoints"
-        app:layout_constraintEnd_toEndOf="@+id/ivGetTogetherPoints"
-        app:layout_constraintStart_toStartOf="@+id/ivGetTogetherPoints"
-        app:layout_constraintTop_toTopOf="@+id/tvFitnessPoints" />
+        <TextView
+            android:id="@+id/tvGetTogetherPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tvFitnessPoints"
+            app:layout_constraintEnd_toEndOf="@+id/ivGetTogetherPoints"
+            app:layout_constraintStart_toStartOf="@+id/ivGetTogetherPoints"
+            app:layout_constraintTop_toTopOf="@+id/tvFitnessPoints" />
 
-    <ImageView
-        android:id="@+id/ivServicePoints"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="36dp"
-        android:src="@drawable/sharp_local_florist_black_18dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivGetTogetherPoints"
-        app:layout_constraintStart_toEndOf="@+id/ivGetTogetherPoints"
-        app:layout_constraintTop_toTopOf="@+id/ivGetTogetherPoints"
-        app:layout_constraintVertical_bias="0.0" />
+        <ImageView
+            android:id="@+id/ivServicePoints"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="36dp"
+            android:src="@drawable/sharp_local_florist_black_18dp"
+            app:layout_constraintBottom_toBottomOf="@+id/ivGetTogetherPoints"
+            app:layout_constraintStart_toEndOf="@+id/ivGetTogetherPoints"
+            app:layout_constraintTop_toTopOf="@+id/ivGetTogetherPoints"
+            app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
-        android:id="@+id/tvServicePoints"
-        android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:text="0"
-        android:textSize="24dp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/tvGetTogetherPoints"
-        app:layout_constraintEnd_toEndOf="@+id/ivServicePoints"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/ivServicePoints"
-        app:layout_constraintTop_toTopOf="@+id/tvGetTogetherPoints" />
+        <TextView
+            android:id="@+id/tvServicePoints"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="0"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/tvGetTogetherPoints"
+            app:layout_constraintEnd_toEndOf="@+id/ivServicePoints"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/ivServicePoints"
+            app:layout_constraintTop_toTopOf="@+id/tvGetTogetherPoints" />
 
-    <ImageView
-        android:id="@+id/ivSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/settings"
-        android:tint="@color/colorPrimary"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/ivSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/settings"
+            android:tint="@color/colorPrimary"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

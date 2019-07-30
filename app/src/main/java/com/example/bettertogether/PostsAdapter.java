@@ -2,6 +2,8 @@ package com.example.bettertogether;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -62,6 +65,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.tvBody.setText(post.getDescription());
         holder.tvTime.setText(post.getRelativeTimeAgo(post.getCreatedAt()));
 
+        if (user.getUsername().equals("Check In Bot")) {
+            holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.fade_orange));
+        } else {
+            holder.itemView.setBackgroundColor(Color.WHITE);
+        }
+
         ParseFile profileImage = (ParseFile) user.get("profileImage");
         if (profileImage != null) {
             Glide.with(context)
@@ -82,10 +91,18 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         });
 
+        // setting size of image depending on whether or not media was attached to post
         if (post.getMedia() != null) {
+            holder.ivMedia.requestLayout();
+            holder.ivMedia.getLayoutParams().height = 350;
+            holder.ivMedia.getLayoutParams().width = 350;
             Glide.with(context)
                     .load(post.getMedia().getUrl())
                     .into(holder.ivMedia);
+        } else {
+            holder.ivMedia.requestLayout();
+            holder.ivMedia.getLayoutParams().height = 0;
+            holder.ivMedia.getLayoutParams().width = 0;
         }
 
         ParseQuery<Like> query = new ParseQuery<Like>(Like.class);

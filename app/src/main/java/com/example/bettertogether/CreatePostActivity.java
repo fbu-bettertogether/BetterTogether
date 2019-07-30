@@ -41,6 +41,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseInstallation;
@@ -158,6 +159,8 @@ public class CreatePostActivity extends AppCompatActivity {
             for (int i = 0; i < taggedUsers.size(); i++) {
                 relation.add(taggedUsers.get(i));
             }
+        } else {
+            taggedUsers = new ArrayList<ParseUser>();
         }
         post.setDescription(etPost.getText().toString());
         post.setUser(ParseUser.getCurrentUser());
@@ -169,7 +172,6 @@ public class CreatePostActivity extends AppCompatActivity {
                     e.printStackTrace();
                 } else {
                     Log.d(APP_TAG, "success");
-//                    finish();
                 }
 
                 ParseRelation<Post> groupRelation = group.getRelation("posts");

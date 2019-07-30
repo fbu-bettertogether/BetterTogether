@@ -2,55 +2,27 @@ package com.example.bettertogether.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.MainActivity;
 import com.example.bettertogether.R;
-import com.example.bettertogether.fragments.AwardFragment;
-import com.example.bettertogether.fragments.ProfileFragment;
-import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.Group;
-import com.example.bettertogether.models.Membership;
-import com.example.bettertogether.models.Post;
-import com.example.bettertogether.models.UserAward;
-import com.parse.FindCallback;
-import com.parse.GetCallback;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class ProfileDetailFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String param_user = "param_user";
     public final String APP_TAG = "BetterTogether";
-
+    public final int INVITATION_REQUEST_CODE = 232;
     private ProfileFragment.OnProfileFragmentInteraction mListener;
     private Button btnPendingRequests;
     private Button btnNotifications;
@@ -94,10 +66,10 @@ public class ProfileDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         btnPendingRequests = view.findViewById(R.id.btnPendingRequests);
         btnNotifications = view.findViewById(R.id.btnNotifications);
-        btnLogOut = view.findViewById(R.id.btnLogOut);
+        btnLogOut = view.findViewById(R.id.btnLeaveGroup);
         btnProfilePicture = view.findViewById(R.id.btnProfilePicture);
         btnGroupHistory = view.findViewById(R.id.btnGroupHistory);
-        btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
+        btnDeleteAccount = view.findViewById(R.id.btnDeleteGroup);
 
         btnProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +86,16 @@ public class ProfileDetailFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        btnPendingRequests.setOnClickListener(new View.OnClickListener() {
+                                                  @Override
+                                                  public void onClick(View view) {
+                                                      Intent intent = new Intent(getContext(), InvitationActivity.class);
+                                                      startActivityForResult(intent, INVITATION_REQUEST_CODE);
+                                                  }
+                                              }
+
+        );
     }
 
 
