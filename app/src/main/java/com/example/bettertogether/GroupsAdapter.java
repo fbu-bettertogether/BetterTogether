@@ -1,15 +1,11 @@
 package com.example.bettertogether;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -90,12 +86,11 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 tvDescription.setText(String.format("We set aside time to meet our goals %d times every week!", group.getFrequency()));
             }
 
-            if(group.getIcon() != null) {
+            if (group.getIcon() != null) {
                 Glide.with(context)
                         .load(group.getIcon().getUrl())
                         .into(ivGroupProf);
             }
-
             String startDateUgly = group.getStartDate();
             String endDateUgly = group.getEndDate();
             String startDate = startDateUgly.substring(4, 10).concat(", " + startDateUgly.substring(24));

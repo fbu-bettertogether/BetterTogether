@@ -20,11 +20,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
-import org.json.JSONException;
-
 import java.util.List;
-
-import static com.parse.ParseUser.getCurrentUser;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 
@@ -51,7 +47,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
             ivGroupProf =(ImageView)itemView.findViewById(R.id.ivGroupIcon);
             tvGroupName =(TextView)itemView.findViewById(R.id.tvGroupName);
             tvNumMembers = (TextView) itemView.findViewById(R.id.tvNumPeople);
-            tvMembersText = (TextView) itemView.findViewById(R.id.tvMembersText);
             itemView.setOnClickListener(this);
         }
 
@@ -91,7 +86,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
             parseQuery.findInBackground(new FindCallback<Membership>() {
                 @Override
                 public void done(List<Membership> objects, ParseException e) {
-                    holder.tvNumMembers.setText(String.valueOf(objects.size()));
+                    holder.tvNumMembers.setText(String.format("%s members", String.valueOf(objects.size())));
                 }
                 }
             );

@@ -183,27 +183,7 @@ public class CreatePostActivity extends AppCompatActivity {
                         } else {
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("message", "New Notification from Your Friend.");
-                            hashMap.put("notification_key", (String) taggedUsers.get(0).get("deviceId"));
                             mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
-//                            ParseInstallation installation = ParseInstallation.getCurrentInstallation();
-//                            installation.put("device_id", (String) taggedUsers.get(0).get("deviceId"));
-//                            installation.saveInBackground();
-//
-//                            ParseQuery query = ParseInstallation.getQuery();
-//                            query.whereEqualTo("device_id", (String) taggedUsers.get(0).get("deviceId"));
-//                            ParsePush push = new ParsePush();
-//                            push.setMessage("Better Together");
-//                            push.setQuery(query);
-//                            push.sendInBackground();
-//
-//                            final String currUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//                            String content = "You were tagged in " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
-//                            sendMessage(currUser, (String) taggedUsers.get(0).get("deviceId"), content);
-//                            ParsePush push = new ParsePush();
-//                            push.setMessage("Better Together");
-//                            push.sendInBackground();
                             finish();
                         }
                     }
@@ -275,40 +255,6 @@ public class CreatePostActivity extends AppCompatActivity {
         }
     }
 
-    private void sendMessage(String sender, String receiver, String message) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("sender", sender);
-        hashMap.put("receiver", receiver);
-        hashMap.put("message", message);
-
-        reference.child("Chats").push().setValue(hashMap);
-    }
-
-    private void sendNotification() {
-        MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
-        mfms.logToken(getApplicationContext());
-        createNotificationChannel();
-        Intent intent = new Intent(this, HomeFragment.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        String title = "BetterTogether";
-        String content = "You were tagged in " + ParseUser.getCurrentUser().getUsername() + "'s new post.";
-        int importance = NotificationManagerCompat.IMPORTANCE_DEFAULT;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL_ID")
-                .setSmallIcon(R.drawable.handshake)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(content))
-                .setPriority(importance)
-                // Set the intent that will fire when the user taps the notification
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(1100, builder.build());
-    }
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String title = "BetterTogether";

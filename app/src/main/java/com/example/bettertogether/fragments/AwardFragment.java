@@ -114,7 +114,7 @@ public class AwardFragment extends Fragment {
 
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");
-        query.whereEqualTo("user", user);
+        query.whereEqualTo("user", getCurrentUser());
         query.findInBackground(new FindCallback<UserAward>() {
             @Override
             public void done(List<UserAward> objects, ParseException e) {
