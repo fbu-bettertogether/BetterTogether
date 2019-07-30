@@ -380,17 +380,16 @@ public class GroupFragment extends Fragment {
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            FragmentManager manager = getChildFragmentManager();
+                            FragmentTransaction ft = manager.beginTransaction();
+                            ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
+                            ft.commitAllowingStateLoss();
                             saveCurrentUserLocation();
                             checkProximity();
                             chartFrame.getLayoutParams().height = 500;
                             chartFrame.requestLayout();
-
                         }
                     });
-                    FragmentManager manager = getChildFragmentManager();
-                    FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
-                    ft.commitAllowingStateLoss();
                 } else {
                     drawButton();
                 }
