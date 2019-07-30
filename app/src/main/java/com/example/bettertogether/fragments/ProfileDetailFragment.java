@@ -66,10 +66,10 @@ public class ProfileDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         btnPendingRequests = view.findViewById(R.id.btnPendingRequests);
         btnNotifications = view.findViewById(R.id.btnNotifications);
-        btnLogOut = view.findViewById(R.id.btnLogOut);
+        btnLogOut = view.findViewById(R.id.btnLeaveGroup);
         btnProfilePicture = view.findViewById(R.id.btnProfilePicture);
         btnGroupHistory = view.findViewById(R.id.btnGroupHistory);
-        btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
+        btnDeleteAccount = view.findViewById(R.id.btnDeleteGroup);
 
         btnProfilePicture.setOnClickListener(new View.OnClickListener() {
             @Override

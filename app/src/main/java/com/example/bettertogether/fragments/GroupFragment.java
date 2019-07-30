@@ -10,17 +10,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
@@ -33,21 +22,29 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
-import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
-import com.github.jinatonic.confetti.CommonConfetti;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -64,7 +61,6 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -113,6 +109,7 @@ public class GroupFragment extends Fragment {
     private ParseGeoPoint location;
     private ImageView ivBanner;
     private ImageView ivUserIcon;
+    private ImageView ivSettings;
     private TextView tvGroupName;
     private Button btnCheckIn;
     private TextView tvStartDate;
@@ -189,6 +186,7 @@ public class GroupFragment extends Fragment {
         scrollView = view.findViewById(R.id.scrollView);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
+        ivSettings = view.findViewById(R.id.ivSettings);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
@@ -210,7 +208,12 @@ public class GroupFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivProfPic);
         }
-
+        ivSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
+            }
+        });
         tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,31 +288,55 @@ public class GroupFragment extends Fragment {
                     }
                 } else {
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
-                        btnCheckIn.setText("Click to Join");
-                        btnCheckIn.setOnClickListener(new View.OnClickListener() {
+                        ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
+                        query.whereEqualTo("receiver", ParseUser.getCurrentUser());
+                        query.whereEqualTo("group", group);
+                        query.getFirstInBackground(new GetCallback<Invitation>() {
                             @Override
-                            public void onClick(View view) {
-                                Membership membership = new Membership();
-                                membership.setGroup(group);
-                                membership.setUser(ParseUser.getCurrentUser());
-                                membership.saveInBackground();
-                                btnCheckIn.setOnClickListener(null);
-                                currMem = membership;
-                                numCheckIns = currMem.getNumCheckIns();
-                                if (numCheckIns == null) {
-                                    numCheckIns = new ArrayList<>();
-                                    numCheckIns.add(0);
-                                }
-                                try {
-                                    checkPlace(category.getLocationTypesList());
-                                } catch (JSONException e1) {
-                                    e1.printStackTrace();
-                                }
+                            public void done(Invitation object, ParseException e) {
+                                if (e != null) {
+                                    e.printStackTrace();
+                                } else if (object != null) {
+                                    btnCheckIn.setText("Request Pending");
+                                } else {
+                                    btnCheckIn.setText("Click to Join");
+                                    btnCheckIn.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            Invitation invitation = new Invitation();
+                                            invitation.setGroup(group);
+                                            invitation.setReceiver(ParseUser.getCurrentUser());
+                                            invitation.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    btnCheckIn.setText("Request Pending");
+                                                }
+                                            });
 
+//                                Membership membership = new Membership();
+//                                membership.setGroup(group);
+//                                membership.setUser(ParseUser.getCurrentUser());
+//                                membership.saveInBackground();
+//                                btnCheckIn.setOnClickListener(null);
+//                                currMem = membership;
+//                                numCheckIns = currMem.getNumCheckIns();
+//                                if (numCheckIns == null) {
+//                                    numCheckIns = new ArrayList<>();
+//                                    numCheckIns.add(0);
+//                                }
+//                                try {
+//                                    checkPlace(category.getLocationTypesList());
+//                                } catch (JSONException e1) {
+//                                    e1.printStackTrace();
+//                                }
+
+                                        }
+                                    });
+                                }
                             }
                         });
                     } else {
-                        btnCheckIn.setText("Group is Private");
+                        btnCheckIn.setText("Group is Unavailable");
                     }
                 }
             }

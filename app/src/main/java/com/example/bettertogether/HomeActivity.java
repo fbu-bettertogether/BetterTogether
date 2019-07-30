@@ -43,12 +43,13 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
 
     private static final int ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS = 36;
     public final int INVITATION_REQUEST_CODE = 232;
-    public PlacesClient placesClient;
+    public final int GROUP_INVITATION_REQUEST_CODE = 514;
     public final static int PROFILE_IMAGE_ACTIVITY_REQUEST_CODE = 121;
     public final String APP_TAG = "BetterTogether";
     private String photoFileName = "photo.jpg";
     private File profilePhotoFile;
     private BottomNavigationView bottomNavigationView;
+    public PlacesClient placesClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +169,7 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                 });
             } else {
                 int unmaskedRequestCode = requestCode & 0x0000ffff;
-                if (unmaskedRequestCode == INVITATION_REQUEST_CODE) {
+                if (unmaskedRequestCode == INVITATION_REQUEST_CODE || unmaskedRequestCode == GROUP_INVITATION_REQUEST_CODE) {
                     List<Invitation> invitations = data.getParcelableArrayListExtra("taggedInvitations");
                     for (Invitation invitation : invitations) {
                         if (invitation.getGroup() == null) {

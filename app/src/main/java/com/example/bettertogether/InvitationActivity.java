@@ -13,6 +13,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Invitation;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -27,6 +28,7 @@ public class InvitationActivity extends AppCompatActivity {
     private InvitationAdapter adapter;
     private Toolbar toolbar;
 
+    private Group group;
     private ArrayList<Invitation> taggedInvitiations;
     private ArrayList<Invitation> invitiations;
 
@@ -40,7 +42,6 @@ public class InvitationActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         taggedInvitiations = new ArrayList<>();
         invitiations = new ArrayList<>();
         adapter = new InvitationAdapter(invitiations, taggedInvitiations);
@@ -49,8 +50,13 @@ public class InvitationActivity extends AppCompatActivity {
 
         ParseQuery<Invitation> invitationParseQuery = new ParseQuery<>(Invitation.class);
         invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
-        invitationParseQuery.include("inviter");
-        invitationParseQuery.include("group");
+        if (getIntent().getParcelableExtra("group") != null) {
+            group = getIntent().getParcelableExtra("group");
+            invitationParseQuery.whereEqualTo("group", group);
+            invitationParseQuery.include("group");
+        } else {
+            invitationParseQuery.include("inviter");
+        }
         invitationParseQuery.whereNotEqualTo("accepted", "accepted");
         invitationParseQuery.findInBackground(new FindCallback<Invitation>() {
             @Override
@@ -63,8 +69,6 @@ public class InvitationActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         });
-
-
     }
 
     @Override

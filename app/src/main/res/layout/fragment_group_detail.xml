@@ -126,6 +126,18 @@
             app:layout_constraintStart_toEndOf="@+id/ivProfPic"
             app:layout_constraintTop_toBottomOf="@+id/chart" />
 
+        <ImageView
+            android:id="@+id/ivSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/tvCreatePost"
+            app:layout_constraintEnd_toEndOf="@+id/btnCheckIn"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/tvCreatePost"
+            app:layout_constraintTop_toTopOf="@+id/tvCreatePost"
+            app:srcCompat="@drawable/settings" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
