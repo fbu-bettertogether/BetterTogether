@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -28,6 +29,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -130,6 +133,7 @@ public class GroupFragment extends Fragment {
     private AwardFragment af = new AwardFragment();
     private PieChart chart;
     private ConstraintLayout constraintLayout;
+    private FrameLayout chartFrame;
     private Context mcontext;
     private TextView tvCreatePost;
     private ImageView ivProfPic;
@@ -194,7 +198,7 @@ public class GroupFragment extends Fragment {
         postsAdapter = new PostsAdapter(getContext(), mPosts, getFragmentManager());
         rvTimeline.setAdapter(postsAdapter);
         rvTimeline.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        chartFrame = view.findViewById(R.id.chartFrame);
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
 
@@ -354,11 +358,10 @@ public class GroupFragment extends Fragment {
         ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
         query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
         query.whereEqualTo("group", group);
-        query.whereNotEqualTo("user", getCurrentUser());
         query.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<Membership> objects, ParseException e) {
-                if (objects.isEmpty()) {
+            public void done(final List<Membership> objects, ParseException e) {
+                if (objects.size() == 1) {
                     btnCheckIn.setVisibility(View.VISIBLE);
                     btnCheckIn.setText("Click to search for a group member");
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
@@ -366,8 +369,15 @@ public class GroupFragment extends Fragment {
                         public void onClick(View view) {
                             saveCurrentUserLocation();
                             checkProximity();
+                            chartFrame.getLayoutParams().height = 500;
+                            chartFrame.requestLayout();
+
                         }
                     });
+                    FragmentManager manager = getChildFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
+                    ft.commitAllowingStateLoss();
                 } else {
                     drawButton();
                 }
@@ -580,8 +590,10 @@ public class GroupFragment extends Fragment {
     }
 
     public void drawButton() {
+        if (!getChildFragmentManager().getFragments().isEmpty()) {
+            getChildFragmentManager().beginTransaction().remove(getChildFragmentManager().getFragments().get(0));
+        }
         boolean hasCheckInLeft = false;
-
         if (numCheckIns.isEmpty()) {
             hasCheckInLeft = true;
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {

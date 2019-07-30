@@ -1,9 +1,9 @@
 package com.example.bettertogether.models;
 
 import com.parse.ParseClassName;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class Membership extends ParseObject {
     public static final String GROUP = "group";
     public static final String KEY_NUM_CHECK_INS = "numCheckIns";
     public static final String KEY_POINTS = "points";
-
+    public static final String LOCATION = "location";
 
     public String getDate() {
         return String.valueOf(getCreatedAt());
@@ -66,6 +66,14 @@ public class Membership extends ParseObject {
 
     public int getPoints() {
         return getInt(KEY_POINTS);
+    }
+
+    public ParseGeoPoint getLocation() {
+        return getParseGeoPoint(LOCATION);
+    }
+
+    public void setLocation(ParseGeoPoint location) {
+        put(LOCATION, location);
     }
 
 }
