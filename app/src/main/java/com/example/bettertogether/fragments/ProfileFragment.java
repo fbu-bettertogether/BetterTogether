@@ -272,17 +272,19 @@ public class ProfileFragment extends Fragment {
                     e.printStackTrace();
                 } else {
                     for (int i = 0; i < objects.size(); i++) {
-                        if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
-                            if (objects.get(i).getAccepted().equals("rejected")) {
-                                relation.remove(objects.get(i).getReceiver());
-                            } else {
-                                relation.add(objects.get(i).getReceiver());
-                            }
-                        } else if (objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
-                            if (objects.get(i).getAccepted().equals("rejected")) {
-                                relation.remove(objects.get(i).getInviter());
-                            } else {
-                                relation.add(objects.get(i).getInviter());
+                        if (objects.get(i).getGroup() == null) {
+                            if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
+                                if (objects.get(i).getAccepted().equals("rejected")) {
+                                    relation.remove(objects.get(i).getReceiver());
+                                } else {
+                                    relation.add(objects.get(i).getReceiver());
+                                }
+                            } else if (objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
+                                if (objects.get(i).getAccepted().equals("rejected")) {
+                                    relation.remove(objects.get(i).getInviter());
+                                } else {
+                                    relation.add(objects.get(i).getInviter());
+                                }
                             }
                         }
                     }
