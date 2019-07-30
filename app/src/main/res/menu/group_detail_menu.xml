@@ -4,27 +4,27 @@
     <item
         android:id="@+id/action_requests"
         android:title="show pending requests"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_history"
         android:title="show group history"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_icon"
         android:title="change group icon"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_notifications"
         android:title="toggle notifications"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_leave"
         android:title="leave group"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_delete"
         android:title="delete group"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
 
 </menu>

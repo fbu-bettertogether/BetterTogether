@@ -55,6 +55,7 @@ import com.parse.SaveCallback;
 import org.parceler.Parcels;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -185,8 +186,9 @@ public class CreatePostActivity extends AppCompatActivity {
                         } else {
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            if (taggedUsers != null && taggedUsers.size() > 0) {
-                                mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
+                            Messaging.sendNotification((String) ParseUser.getCurrentUser().get("deviceId"),  ParseUser.getCurrentUser().getUsername() + " just posted!");
+                            for (int i = 0; i < taggedUsers.size(); i++) {
+                                Messaging.sendNotification((String)taggedUsers.get(i).get("deviceId"), "A new group was created by " + ParseUser.getCurrentUser().getUsername() + "!");
                             }
                             finish();
                         }

@@ -24,6 +24,8 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.parse.ParseUser.getCurrentUser;
@@ -88,6 +90,13 @@ public class HomeFragment extends Fragment {
 
                             // add new posts to the list and notify adapter
                             mPosts.addAll(posts);
+                            Collections.sort(mPosts, new Comparator<Post>() {
+                                @Override
+                                public int compare(Post post1, Post post2) {
+                                    return post2.getCreatedAt().compareTo(post1.getCreatedAt());
+                                }
+                            });
+
                             adapter.notifyDataSetChanged();
                         }
                     });

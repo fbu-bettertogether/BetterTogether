@@ -34,6 +34,7 @@ dependencies {
 
     implementation 'com.github.hotchemi:permissionsdispatcher:3.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.gms:play-services-maps:16.1.0'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.1.0'
 
 //    implementation 'com.github.parse-community.Parse-SDK-Android:parse:1.18.5'

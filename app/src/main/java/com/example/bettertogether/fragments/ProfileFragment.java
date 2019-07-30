@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -152,7 +153,7 @@ public class ProfileFragment extends Fragment {
         rvGroups.setAdapter(simpleGroupAdapter);
         rvGroups.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvAwards.setAdapter(awardsAdapter);
-        rvAwards.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rvAwards.setLayoutManager(new GridLayoutManager(getContext(), 4));
 
         drawSettings();
 
@@ -262,6 +263,7 @@ public class ProfileFragment extends Fragment {
             });
         }
     }
+
     public void onFriendUpdate() {
         final ParseRelation relation = ParseUser.getCurrentUser().getRelation("friends");
         ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
@@ -272,17 +274,19 @@ public class ProfileFragment extends Fragment {
                     e.printStackTrace();
                 } else {
                     for (int i = 0; i < objects.size(); i++) {
-                        if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
-                            if (objects.get(i).getAccepted().equals("rejected")) {
-                                relation.remove(objects.get(i).getReceiver());
-                            } else {
-                                relation.add(objects.get(i).getReceiver());
-                            }
-                        } else if (objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
-                            if (objects.get(i).getAccepted().equals("rejected")) {
-                                relation.remove(objects.get(i).getInviter());
-                            } else {
-                                relation.add(objects.get(i).getInviter());
+                        if (objects.get(i).getGroup() == null) {
+                            if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
+                                if (objects.get(i).getAccepted().equals("rejected")) {
+                                    relation.remove(objects.get(i).getReceiver());
+                                } else {
+                                    relation.add(objects.get(i).getReceiver());
+                                }
+                            } else if (objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
+                                if (objects.get(i).getAccepted().equals("rejected")) {
+                                    relation.remove(objects.get(i).getInviter());
+                                } else {
+                                    relation.add(objects.get(i).getInviter());
+                                }
                             }
                         }
                     }

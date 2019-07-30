@@ -59,17 +59,22 @@ public class InvitationAdapter extends RecyclerView.Adapter<InvitationAdapter.Vi
                 }
             }
         });
-
-        if (invitation.getGroup() == null) {
-            holder.tvUsername.setText(invitation.getInviter().getString("username"));
-            if (invitation.getInviter().get("profileImage") != null) {
-                Glide.with(context).load(((ParseFile) invitation.getInviter().get("profileImage")).getUrl()).apply(RequestOptions.circleCropTransform()).into(holder.ivUserIcon);
-            }
+        if (invitation.getInviter() == null) {
+            holder.tvUsername.setText(invitation.getReceiver().getString("username"));
+            Glide.with(context).load(((ParseFile) invitation.getReceiver().get("profileImage")).getUrl()).apply(RequestOptions.circleCropTransform()).into(holder.ivUserIcon);
         } else {
-            holder.tvUsername.setText(invitation.getGroup().getName());
-            if (invitation.getGroup().getIcon() != null) {
-                Glide.with(context).load(((ParseFile) invitation.getGroup().getIcon()).getUrl()).apply(RequestOptions.circleCropTransform()).into(holder.ivUserIcon);
+            if (invitation.getGroup() == null) {
+                holder.tvUsername.setText(invitation.getInviter().getString("username"));
+                if (invitation.getInviter().get("profileImage") != null) {
+                    Glide.with(context).load(((ParseFile) invitation.getInviter().get("profileImage")).getUrl()).apply(RequestOptions.circleCropTransform()).into(holder.ivUserIcon);
+                }
+            } else {
+                holder.tvUsername.setText(invitation.getGroup().getName());
+                if (invitation.getGroup().getIcon() != null) {
+                    Glide.with(context).load(((ParseFile) invitation.getGroup().getIcon()).getUrl()).apply(RequestOptions.circleCropTransform()).into(holder.ivUserIcon);
+                }
             }
+
         }
     }
 
