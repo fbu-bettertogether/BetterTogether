@@ -338,12 +338,6 @@ public class GroupFragment extends Fragment {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
                 if (objects.size() > 0) {
-                    ivSettings.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
-                        }
-                    });
 
                     if (group.getIsActive()) {
                         currMem = objects.get(0);
@@ -481,7 +475,6 @@ public class GroupFragment extends Fragment {
     public void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
-//            chart.setVisibility(View.INVISIBLE);
             return;
         }
 
@@ -543,7 +536,7 @@ public class GroupFragment extends Fragment {
                     chart.setCenterText("Week " + Integer.toString(weekNumber));
                     chart.getDescription().setEnabled(false);
                     chart.getLegend().setEnabled(false);
-//                chart.spin(500, 0, 360f, Easing.EaseInQuad);
+
                     if (checkingIn) {
                         chart.spin(3000, 0, 360f, Easing.EaseInQuad);
                     } else {
