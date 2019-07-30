@@ -208,12 +208,6 @@ public class GroupFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivProfPic);
         }
-        ivSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
-            }
-        });
         tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -244,9 +238,7 @@ public class GroupFragment extends Fragment {
         if (now.after(end)) {
             Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
         } else if (nowBeforeStart) {
-            btnCheckIn.setVisibility(View.INVISIBLE);
-            tvTimer.setVisibility(View.VISIBLE);
-            tvTimer.setText("Group has not started yet! Hang tight!");
+
         }
 
         if (group.getIsActive()) {
@@ -266,27 +258,41 @@ public class GroupFragment extends Fragment {
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
-                if (objects.size() > 0 & group.getIsActive()) {
-                    currMem = objects.get(0);
-                    numCheckIns = currMem.getNumCheckIns();
-                    if (numCheckIns == null) {
-                        numCheckIns = new ArrayList<>();
-                        numCheckIns.add(0);
-                    } else if (numCheckIns.size() == 0) {
-                        numCheckIns.add(0);
-                    }
-                    if (category.getName().equals("Get-Togethers")) {
-                        saveCurrentUserLocation();
-                        checkProximity();
-                     } else {
-                        try {
-                            checkPlace(category.getLocationTypesList());
-                            drawButton();
-                        } catch (JSONException e1) {
-                            e1.printStackTrace();
+                if (objects.size() > 0) {
+                    ivSettings.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
                         }
+                    });
+
+                    if (group.getIsActive()) {
+                        currMem = objects.get(0);
+                        numCheckIns = currMem.getNumCheckIns();
+                        if (numCheckIns == null) {
+                            numCheckIns = new ArrayList<>();
+                            numCheckIns.add(0);
+                        } else if (numCheckIns.size() == 0) {
+                            numCheckIns.add(0);
+                        }
+                        if (category.getName().equals("Get-Togethers")) {
+                            saveCurrentUserLocation();
+                            checkProximity();
+                        } else {
+                            try {
+                                checkPlace(category.getLocationTypesList());
+                                drawButton();
+                            } catch (JSONException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    } else {
+                        btnCheckIn.setVisibility(View.INVISIBLE);
+                        tvTimer.setVisibility(View.VISIBLE);
+                        tvTimer.setText("Group has not started yet! Hang tight!");
                     }
                 } else {
+                    ivSettings.setVisibility(View.INVISIBLE);
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
                         ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
                         query.whereEqualTo("receiver", ParseUser.getCurrentUser());
@@ -294,9 +300,7 @@ public class GroupFragment extends Fragment {
                         query.getFirstInBackground(new GetCallback<Invitation>() {
                             @Override
                             public void done(Invitation object, ParseException e) {
-                                if (e != null) {
-                                    e.printStackTrace();
-                                } else if (object != null) {
+                                if (object != null) {
                                     btnCheckIn.setText("Request Pending");
                                 } else {
                                     btnCheckIn.setText("Click to Join");

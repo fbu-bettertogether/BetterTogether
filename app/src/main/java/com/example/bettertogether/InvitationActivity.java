@@ -49,13 +49,14 @@ public class InvitationActivity extends AppCompatActivity {
         rvMembers.setAdapter(adapter);
 
         ParseQuery<Invitation> invitationParseQuery = new ParseQuery<>(Invitation.class);
-        invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
+        invitationParseQuery.include("inviter");
+        invitationParseQuery.include("receiver");
         if (getIntent().getParcelableExtra("group") != null) {
             group = getIntent().getParcelableExtra("group");
             invitationParseQuery.whereEqualTo("group", group);
             invitationParseQuery.include("group");
         } else {
-            invitationParseQuery.include("inviter");
+            invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
         }
         invitationParseQuery.whereNotEqualTo("accepted", "accepted");
         invitationParseQuery.findInBackground(new FindCallback<Invitation>() {
