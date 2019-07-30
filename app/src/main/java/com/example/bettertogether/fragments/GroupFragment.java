@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,6 +54,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -153,6 +155,7 @@ public class GroupFragment extends Fragment {
     private ImageView ivProfPic;
     private ScrollView scrollView;
     private KonfettiView viewKonfetti;
+    public final int GROUP_INVITATION_REQUEST_CODE = 514;
 
 
     public GroupFragment() {
@@ -202,7 +205,36 @@ public class GroupFragment extends Fragment {
             FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
             GroupsFragment fragment = new GroupsFragment();
             fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+        } else if (item.getItemId() == R.id.action_requests) {
+            Intent intent = new Intent(getContext(), InvitationActivity.class);
+            intent.putExtra("group", (Parcelable) group);
+            startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
+        } else if (item.getItemId() == R.id.action_leave) {
+            if (group.getIsActive()) {
+                Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
+            } else {
+                ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
+                membershipParseQuery.whereEqualTo("group", group);
+                membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
+                    @Override
+                    public void done(Membership object, ParseException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        } else if (object != null) {
+                            try {
+                                object.delete();
+                                Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
         }
+
+        Log.d("itemId", item.toString());
         return true;
     }
 
@@ -254,12 +286,14 @@ public class GroupFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivProfPic);
         }
-        ivSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
-            }
-        });
+
+//        ivSettings.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
+//            }
+//        });
+
         tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
