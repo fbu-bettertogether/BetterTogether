@@ -23,9 +23,6 @@
             android:exported="true"
             android:process=":remote"></receiver>
 
-        <service android:name=".MessengerService"
-            android:process=":remote" />
-
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">
