@@ -1,9 +1,12 @@
 package com.example.bettertogether;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -13,7 +16,14 @@ import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.provider.MediaStore;
+import android.renderscript.ScriptGroup;
+import android.renderscript.ScriptGroup.Binding;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -39,6 +50,8 @@ import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.JsonObject;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -51,16 +64,24 @@ import com.parse.SaveCallback;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,6 +93,10 @@ import java.time.ZoneId;
 import java.util.Map;
 
 import static java.security.AccessController.getContext;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import static cz.msebera.android.httpclient.HttpHeaders.USER_AGENT;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "MakeNewGroupActivity";
@@ -340,7 +365,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         return file;
     }
 
-    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, ParseUser user, int minTime) {
+    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, final ParseUser user, int minTime) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
         newGroup.setIcon(imageFile);
@@ -357,73 +382,22 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 
         final Category.Query catQuery = new Category.Query();
         catQuery.findInBackground(new FindCallback<Category>() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
-            public void done(List<Category> objects, ParseException e) {
+            public void done(List<Category> objects, final ParseException e) {
                 if (e == null) {
                     saveCat(objects, addedMembers, newGroup, category);
-
-                    JSONObject notification = new JSONObject();
-                    JSONObject notificationBody = new JSONObject();
-                    try {
-                        notificationBody.put("title", "Better Together");
-                        notificationBody.put("message", "A new group was created. Check it out!");
-
-                        notification.put("to", "/topics/userABC");
-                        notification.put("data", notificationBody);
-                    } catch (JSONException error) {
-                        Log.e(TAG, "onCreate: " + error.getMessage() );
-                    }
                     MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                     mfms.logToken(getApplicationContext());
-                    sendNotification(notification);
-//                    Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-//                    int notificationId = 31;
-//                    intent.putExtra("notificationId", notificationId);
-//                    PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-//                    AlarmManager alarm = (AlarmManager) getSystemService(ALARM_SERVICE);
-//                    Date now = new Date();
-//                    int hour = now.getHours();
-//                    int minute = now.getMinutes();
-//                    Calendar startTime = Calendar.getInstance();
-//                    startTime.set(Calendar.HOUR_OF_DAY, 0);
-//                    startTime.set(Calendar.MINUTE, 0);
-//                    startTime.set(Calendar.SECOND, 1);
-//                    long alarmStartTime = startTime.getTimeInMillis();
-//                    alarm.set(AlarmManager.RTC_WAKEUP, alarmStartTime, alarmIntent);
-//                    MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
-//                    mfms.logToken(getApplicationContext());
-//                    mfms.sendNotification((String) addedMembers.get(0).get("deviceId"), getApplicationContext());
+                    Messaging.sendNotification((String) user.get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                    for (int i = 0; i < addedMembers.size(); i++) {
+                        Messaging.sendNotification((String)addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                    }
                 } else {
                     e.printStackTrace();
                 }
             }
         });
-    }
-
-    private void sendNotification(JSONObject notification) {
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(FCM_API, notification,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i(TAG, "onResponse: " + response.toString());
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "Request error", Toast.LENGTH_LONG).show();
-                        Log.i(TAG, "onErrorResponse: Didn't work");
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("Authorization", serverKey);
-                params.put("Content-Type", contentType);
-                return params;
-            }
-        };
-        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
     }
 
     private void saveCat(List<Category> objects, final ArrayList<ParseUser> addedMembers, final Group newGroup, String category) {

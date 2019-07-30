@@ -263,6 +263,7 @@ public class ProfileFragment extends Fragment {
             });
         }
     }
+
     public void onFriendUpdate() {
         final ParseRelation relation = ParseUser.getCurrentUser().getRelation("friends");
         ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");

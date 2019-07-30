@@ -5,24 +5,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -34,18 +22,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -118,6 +110,7 @@ import static com.parse.ParseUser.getCurrentUser;
  */
 public class GroupFragment extends Fragment {
     private static final int ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS = 36;
+    public final int GROUP_INVITATION_REQUEST_CODE = 514;
     private static final int REQUEST_LOCATION = 1;
     LocationManager locationManager;
     public PlacesClient placesClient;
@@ -150,12 +143,12 @@ public class GroupFragment extends Fragment {
     private AwardFragment af = new AwardFragment();
     private PieChart chart;
     private ConstraintLayout constraintLayout;
+    private FrameLayout chartFrame;
     private Context mcontext;
     private TextView tvCreatePost;
     private ImageView ivProfPic;
     private ScrollView scrollView;
     private KonfettiView viewKonfetti;
-    public final int GROUP_INVITATION_REQUEST_CODE = 514;
 
 
     public GroupFragment() {
@@ -193,52 +186,6 @@ public class GroupFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        ((AppCompatActivity) getActivity()).getMenuInflater().inflate(R.menu.group_detail_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            // return to groups fragment
-            FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-            GroupsFragment fragment = new GroupsFragment();
-            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-        } else if (item.getItemId() == R.id.action_requests) {
-            Intent intent = new Intent(getContext(), InvitationActivity.class);
-            intent.putExtra("group", (Parcelable) group);
-            startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
-        } else if (item.getItemId() == R.id.action_leave) {
-            if (group.getIsActive()) {
-                Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
-            } else {
-                ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
-                membershipParseQuery.whereEqualTo("group", group);
-                membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
-                    @Override
-                    public void done(Membership object, ParseException e) {
-                        if (e != null) {
-                            e.printStackTrace();
-                        } else if (object != null) {
-                            try {
-                                object.delete();
-                                Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
-                            } catch (ParseException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        Log.d("itemId", item.toString());
-        return true;
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tvGroupName = view.findViewById(R.id.tvGroupName);
@@ -260,6 +207,9 @@ public class GroupFragment extends Fragment {
         postsAdapter = new PostsAdapter(getContext(), mPosts, getFragmentManager());
         rvTimeline.setAdapter(postsAdapter);
         rvTimeline.setLayoutManager(new LinearLayoutManager(getContext()));
+        chartFrame = view.findViewById(R.id.chartFrame);
+        users = new ArrayList<>();
+        friendAdapter = new FriendAdapter(users, getFragmentManager());
 
         final Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -277,16 +227,12 @@ public class GroupFragment extends Fragment {
                     .into(imageView);
         }
 
-        users = new ArrayList<>();
-        friendAdapter = new FriendAdapter(users, getFragmentManager());
-
         if (getCurrentUser().getParseFile("profileImage") != null) {
             Glide.with(view.getContext())
                     .load(((ParseFile) getCurrentUser().get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivProfPic);
         }
-
         tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -338,7 +284,6 @@ public class GroupFragment extends Fragment {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
                 if (objects.size() > 0) {
-
                     if (group.getIsActive()) {
                         currMem = objects.get(0);
                         numCheckIns = currMem.getNumCheckIns();
@@ -427,18 +372,23 @@ public class GroupFragment extends Fragment {
         ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
         query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
         query.whereEqualTo("group", group);
-        query.whereNotEqualTo("user", getCurrentUser());
         query.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<Membership> objects, ParseException e) {
-                if (objects.isEmpty()) {
+            public void done(final List<Membership> objects, ParseException e) {
+                if (objects.size() == 1) {
                     btnCheckIn.setVisibility(View.VISIBLE);
-                    btnCheckIn.setText("Find a nearby group member");
+                    btnCheckIn.setText("Click to search for a group member");
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            FragmentManager manager = getChildFragmentManager();
+                            FragmentTransaction ft = manager.beginTransaction();
+                            ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
+                            ft.commitAllowingStateLoss();
                             saveCurrentUserLocation();
                             checkProximity();
+                            chartFrame.getLayoutParams().height = 500;
+                            chartFrame.requestLayout();
                         }
                     });
                 } else {
@@ -652,8 +602,10 @@ public class GroupFragment extends Fragment {
     }
 
     public void drawButton() {
+        if (!getChildFragmentManager().getFragments().isEmpty()) {
+            getChildFragmentManager().beginTransaction().remove(getChildFragmentManager().getFragments().get(0));
+        }
         boolean hasCheckInLeft = false;
-
         if (numCheckIns.isEmpty()) {
             hasCheckInLeft = true;
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
@@ -911,6 +863,52 @@ public class GroupFragment extends Fragment {
                 category = objects.get(0).getCategory();
             }
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        ((AppCompatActivity) getActivity()).getMenuInflater().inflate(R.menu.group_detail_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // return to groups fragment
+            FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+            GroupsFragment fragment = new GroupsFragment();
+            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+        } else if (item.getItemId() == R.id.action_requests) {
+            Intent intent = new Intent(getContext(), InvitationActivity.class);
+            intent.putExtra("group", (Parcelable) group);
+            startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
+        } else if (item.getItemId() == R.id.action_leave) {
+            if (group.getIsActive()) {
+                Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
+            } else {
+                ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
+                membershipParseQuery.whereEqualTo("group", group);
+                membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
+                    @Override
+                    public void done(Membership object, ParseException e) {
+                        if (e != null) {
+                            e.printStackTrace();
+                        } else if (object != null) {
+                            try {
+                                object.delete();
+                                Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
+                            } catch (ParseException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        Log.d("itemId", item.toString());
+        return true;
     }
 
     @Override
