@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +29,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -194,6 +196,17 @@ public class GroupFragment extends Fragment {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            // return to groups fragment
+            FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+            GroupsFragment fragment = new GroupsFragment();
+            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+        }
+        return true;
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tvGroupName = view.findViewById(R.id.tvGroupName);
@@ -219,8 +232,10 @@ public class GroupFragment extends Fragment {
         final Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
+        setHasOptionsMenu(true);
 
         final ImageView imageView = view.findViewById(R.id.backdrop);
         if (group.getIcon() != null) {
