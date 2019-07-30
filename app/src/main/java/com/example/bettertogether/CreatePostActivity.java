@@ -186,6 +186,7 @@ public class CreatePostActivity extends AppCompatActivity {
                             mfms.logToken(getApplicationContext());
                             try {
                                 mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
+
                             } catch (InstantiationException e1) {
                                 e1.printStackTrace();
                             } catch (IllegalAccessException e1) {

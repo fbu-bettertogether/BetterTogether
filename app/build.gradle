@@ -64,6 +64,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0-alpha02'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.github.jinatonic.confetti:confetti:1.1.2'
-    //implementation 'com.google.firebase:firebase-admin:6.9.0'
 }
 apply plugin: 'com.google.gms.google-services'

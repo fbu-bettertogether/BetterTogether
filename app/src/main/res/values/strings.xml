@@ -14,4 +14,6 @@
 
     <string name="remote_service_started">Remote service started</string>
     <string name="remote_service_stopped">Remote service stopped</string>
+    <string name="remote_service_connected">Remote service connected</string>
+    <string name="remote_service_disconnected">Remote service disconnected</string>
 </resources>

@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
@@ -45,10 +46,16 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.parse.ParseUser;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,11 +63,24 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private final String ADMIN_CHANNEL_ID ="admin_channel";
     private static final String TAG = "mFirebaseIIDService";
-    private static final String SUBSCRIBE_TO = "userABC";
+
+    private OkHttpClient mClient = new OkHttpClient();
+
+    private JSONArray jsonArray = new JSONArray();
+    final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
+    final private String serverKey = "key=" + "AAAArU_ed7A:APA91bHInx5XEXefgNJI83z6_kCcryuj_LqFrz-9kHPLb-MEClcwIMt_XI9HVTb4AreIxonQuOAEG5_UZDTCgkY1SykbUbE_fOobhRv6WehEF6TuMUmiKofMQjUPGoF1zz7WQTwyIEj9";
+    final private String contentType = "application/json";
+
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -143,7 +163,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                         // Get new Instance ID token
                         String token = task.getResult().getToken();
-                        FirebaseMessaging.getInstance().subscribeToTopic(SUBSCRIBE_TO);
+                        FirebaseMessaging.getInstance().subscribeToTopic("userABC");
                         sendRegistrationToServer(token);
                         // Log and toast
                         Log.d(TAG, token);
@@ -152,7 +172,69 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 });
     }
 
+    public void sendMessage(final ArrayList<String> tokens, final String title, final String body, final String message, final Context context) {
+        jsonArray.put(tokens);
+        new AsyncTask<String, String, String>() {
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+                    JSONObject root = new JSONObject();
+                    JSONObject notification = new JSONObject();
+                    notification.put("body", body);
+                    notification.put("title", title);
+                    //notification.put("icon", R.drawable.handshake);
+
+                    JSONObject data = new JSONObject();
+                    data.put("message", message);
+                    root.put("notification", notification);
+                    root.put("data", data);
+                    root.put("Authorization", serverKey);
+                    root.put("Content-Type", contentType);
+                    root.put("registration_ids", jsonArray);
+
+                    String result = postToFCM(root.toString());
+                    Log.d("Main Activity", "Result: " + result);
+                    return result;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                try {
+                    JSONObject resultJson = new JSONObject(result);
+                    int success, failure;
+                    success = resultJson.getInt("success");
+                    failure = resultJson.getInt("failure");
+                    Toast.makeText(context, "Message Success: " + success + "Message Failed: " + failure, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Message Failed, Unknown error occurred.", Toast.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
+    }
+
+    String postToFCM(String bodyString) throws IOException {
+
+        final String FCM_MESSAGE_URL = "https://fcm.googleapis.com/fcm/send";
+        final MediaType JSON
+                = MediaType.parse("application/json; charset=utf-8");
+
+        RequestBody body = RequestBody.create(JSON, bodyString);
+        Request request = new Request.Builder()
+                .url(FCM_MESSAGE_URL)
+                .post(body)
+                .addHeader("Authorization", "key=" + serverKey)
+                .build();
+        Response response = mClient.newCall(request).execute();
+        return response.body().string();
+    }
+
     public void sendNotification(String token, Context context) throws InstantiationException, IllegalAccessException, IOException {
+        jsonArray.put(token);
         Intent intent = new Intent(context, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
@@ -176,22 +258,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         hashMap.put("notification_key", (String) ParseUser.getCurrentUser().get("deviceId"));
 
 
-        ProcessBuilderTest.class.newInstance().writeCommand(token);
+        //ProcessBuilderTest.class.newInstance().writeCommand(token);
 
-        // This registration token comes from the client FCM SDKs.
-//        String registrationToken = "YOUR_REGISTRATION_TOKEN";
-//
-//        // See documentation on defining a message payload.
-//        Message message = Message.builder()
-//                .putData("score", "850")
-//                .putData("time", "2:45")
-//                .setToken(registrationToken)
-//                .build();
-//
-//        // Send a message to the device corresponding to the provided registration token.
-//        String response = FirebaseMessaging.getInstance().send(message);
-//        // Response is a message ID string.
-//        System.out.println("Successfully sent message: " + response);
 
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
                 .setMessageId(String.valueOf(msgId.get()))
