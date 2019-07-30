@@ -287,13 +287,6 @@ public class GroupFragment extends Fragment {
                     .into(ivProfPic);
         }
 
-//        ivSettings.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                getFragmentManager().beginTransaction().replace(R.id.flContainer, GroupDetailFragment.newInstance(group)).commit();
-//            }
-//        });
-
         tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -436,7 +429,7 @@ public class GroupFragment extends Fragment {
             public void done(List<Membership> objects, ParseException e) {
                 if (objects.isEmpty()) {
                     btnCheckIn.setVisibility(View.VISIBLE);
-                    btnCheckIn.setText("Click to search for a group member");
+                    btnCheckIn.setText("Find a nearby group member");
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
