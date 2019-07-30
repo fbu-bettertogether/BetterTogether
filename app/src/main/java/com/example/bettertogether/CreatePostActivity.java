@@ -184,15 +184,9 @@ public class CreatePostActivity extends AppCompatActivity {
                         } else {
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            try {
-                                mfms.sendNotification((String) taggedUsers.get(0).get("deviceId"), getApplicationContext());
-
-                            } catch (InstantiationException e1) {
-                                e1.printStackTrace();
-                            } catch (IllegalAccessException e1) {
-                                e1.printStackTrace();
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
+                            Messaging.sendNotification((String) ParseUser.getCurrentUser().get("deviceId"),  ParseUser.getCurrentUser().getUsername() + " just posted!");
+                            for (int i = 0; i < taggedUsers.size(); i++) {
+                                Messaging.sendNotification((String)taggedUsers.get(i).get("deviceId"), "A new group was created by " + ParseUser.getCurrentUser().getUsername() + "!");
                             }
                             finish();
                         }
