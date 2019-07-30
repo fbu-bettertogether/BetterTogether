@@ -13,6 +13,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -25,6 +26,8 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -62,6 +66,7 @@ import com.google.android.libraries.places.api.model.PlaceLikelihood;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.Parse;
@@ -175,9 +180,14 @@ public class GroupFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        ((AppCompatActivity) getActivity()).getMenuInflater().inflate(R.menu.group_detail_menu, menu);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ivBanner = view.findViewById(R.id.ivBanner);
         tvGroupName = view.findViewById(R.id.tvGroupName);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         tvStartDate = view.findViewById(R.id.tvStartDate);
@@ -197,12 +207,22 @@ public class GroupFragment extends Fragment {
         rvTimeline.setAdapter(postsAdapter);
         rvTimeline.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(group.getName());
+
+        final ImageView imageView = view.findViewById(R.id.backdrop);
+        if (group.getIcon() != null) {
+            Glide.with(view.getContext())
+                    .load(group.getIcon().getUrl())
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(imageView);
+        }
+
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
-
-        if (group.getIcon() != null) {
-            Glide.with(view.getContext()).load(group.getIcon().getUrl()).into(ivBanner);
-        }
 
         if (getCurrentUser().getParseFile("profileImage") != null) {
             Glide.with(view.getContext())

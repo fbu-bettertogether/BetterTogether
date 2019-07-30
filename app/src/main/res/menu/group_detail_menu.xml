@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_night"
+        android:title="Night mode"
+        app:showAsAction="never">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_night_mode_system"
+                    android:title="hi" />
+                <item
+                    android:id="@+id/menu_night_mode_day"
+                    android:title="it" />
+                <item
+                    android:id="@+id/menu_night_mode_night"
+                    android:title="me" />
+                <item
+                    android:id="@+id/menu_night_mode_auto"
+                    android:title="yeet" />
+            </group>
+        </menu>
+    </item>
+
+</menu>
