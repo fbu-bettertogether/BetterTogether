@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ParseUser currentUser = ParseUser.getCurrentUser();
+
         if (currentUser != null) {
             Log.d("LoginActivity", "Login successful");
             ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());

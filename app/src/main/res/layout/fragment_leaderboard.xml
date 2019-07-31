@@ -6,57 +6,43 @@
     android:layout_height="match_parent"
     tools:context=".fragments.LeaderboardFragment">
 
-    <Button
-        android:id="@+id/btnOverall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="Button"
+    <ImageView
+        android:id="@+id/ivServicePoints2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="32dp"
+        android:src="@drawable/sharp_local_florist_black_18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivGetTogetherPoints2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintTop_toTopOf="@+id/ivGetTogetherPoints2" />
+
+    <ImageView
+        android:id="@+id/ivFitnessPoints2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/sharp_fitness_center_black_18dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btnFitness"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginEnd="16dp"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="@+id/btnOverall"
-        app:layout_constraintEnd_toStartOf="@+id/btnService"
-        app:layout_constraintTop_toTopOf="@+id/btnService"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
-        android:id="@+id/btnService"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="@+id/btnOverall"
-        app:layout_constraintEnd_toStartOf="@+id/btnOverall"
-        app:layout_constraintTop_toTopOf="@+id/btnOverall"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
-        android:id="@+id/btnGetTogethers"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="Together"
-        app:layout_constraintBottom_toBottomOf="@+id/btnOverall"
-        app:layout_constraintEnd_toStartOf="@+id/btnFitness"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnOverall" />
+    <ImageView
+        android:id="@+id/ivGetTogetherPoints2"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/sharp_people_black_18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivFitnessPoints2"
+        app:layout_constraintEnd_toStartOf="@+id/ivServicePoints2"
+        app:layout_constraintStart_toEndOf="@+id/ivFitnessPoints2"
+        app:layout_constraintTop_toTopOf="@+id/ivFitnessPoints2" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barchart"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnOverall"
+        app:layout_constraintTop_toBottomOf="@+id/ivFitnessPoints2"
         tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
