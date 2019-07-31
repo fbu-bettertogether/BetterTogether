@@ -84,6 +84,7 @@ public class WeeklyIntentService extends JobIntentService {
                             public void done(List<Group> objects, ParseException e) {
                                 Group group = objects.get(0);
                                 group.setIsActive(false);
+                                group.setShowCheckInReminderBadge(false);
                                 group.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {

@@ -613,6 +613,9 @@ public class GroupFragment extends Fragment {
             hasCheckInLeft = true;
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
             hasCheckInLeft = true;
+            group.setShowCheckInReminderBadge(true);
+        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()){
+            group.setShowCheckInReminderBadge(false);
         }
         if (hasCheckInLeft) {
             final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
@@ -655,7 +658,6 @@ public class GroupFragment extends Fragment {
                             currMem.setNumCheckIns(numCheckIns);
                             final int addedPoints = currMem.getGroup().getMinTime();
                             currMem.setPoints(currMem.getPoints() + addedPoints);
-                            group.setShowCheckInReminderBadge(false);
                             ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
                             groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
                             groupQuery.include("category");

@@ -196,6 +196,6 @@ public class Group extends ParseObject implements Serializable {
 
     public Boolean getShowCheckInReminderBadge() { return getBoolean(SHOW_BADGE); }
 
-    public void setShowCheckInReminderBadge(Boolean show) { put(SHOW_BADGE, show); }
+    public void setShowCheckInReminderBadge(Boolean showBadge) { put(SHOW_BADGE, showBadge); }
 
     }
