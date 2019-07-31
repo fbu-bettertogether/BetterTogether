@@ -113,6 +113,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private Button btnAddUsers;
     private NumberPicker npNumWeeks;
     private Date start;
+    private String status;
 
     // declaring added users fields
     private RecyclerView rvAddedMembers;
@@ -219,8 +220,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 } else if (cdStartDate.getSelectedDate().isAfter(now)) {
                     active = false;
                 } else if (cdStartDate.getSelectedDate().isBefore(now)) {
-                    Log.e(APP_TAG, "Start date or end date is out of range.");
-                    Toast.makeText(getApplicationContext(), "Start date or end date is out of range.", Toast.LENGTH_SHORT).show();
+                    Log.e(APP_TAG, "Start date is out of range.");
+                    Toast.makeText(getApplicationContext(), "Start date is out of range.", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
                     active = true;
@@ -390,9 +391,10 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     saveCat(objects, addedMembers, newGroup, category);
                     MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                     mfms.logToken(getApplicationContext());
-                    Messaging.sendNotification((String) user.get("deviceId"), "A new group was created by " + user.getUsername() + "!");
-                    for (int i = 0; i < addedMembers.size(); i++) {
-                        Messaging.sendNotification((String)addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                    if (addedMembers != null) {
+                        for (int i = 0; i < addedMembers.size(); i++) {
+                            Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                        }
                     }
                 } else {
                     e.printStackTrace();

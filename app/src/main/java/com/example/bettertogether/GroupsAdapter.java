@@ -27,6 +27,9 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
@@ -109,12 +112,26 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             String startDate = startDateUgly.substring(4, 10).concat(", " + startDateUgly.substring(24));
             String endDate = endDateUgly.substring(4, 10).concat(", " + endDateUgly.substring(24));
 
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+            Date start = null;
+            Calendar cal = Calendar.getInstance();
+            try {
+                start = sdf.parse(startDateUgly);
+                cal.add(Calendar.DATE, group.getNumWeeks() * 7);
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
+            Date currentDate = Calendar.getInstance().getTime();
+
             if(group.getIsActive()) {
-                tvDates.setText("Active: " + startDate + " - " + endDate);
-                tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
-            } else {
-                tvDates.setText("Inactive: " + startDate + " - " + endDate);
+                tvDates.setText("Active: Ends on " + endDate);
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            } else if (currentDate.before(start)){
+                tvDates.setText("Inactive: Starts on " + startDate);
+                tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
+            } else if (currentDate.after(cal.getTime())) {
+                tvDates.setText("Inactive: Completed on " + endDate);
+                tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             }
         }
 
