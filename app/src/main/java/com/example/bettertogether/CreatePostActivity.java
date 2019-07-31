@@ -186,9 +186,9 @@ public class CreatePostActivity extends AppCompatActivity {
                         } else {
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            Messaging.sendNotification((String) ParseUser.getCurrentUser().get("deviceId"),  ParseUser.getCurrentUser().getUsername() + " just posted!");
+                            Messaging.sendNotification((String) ParseUser.getCurrentUser().get("deviceId"),  ParseUser.getCurrentUser().getUsername() + " just tagged you in a post!");
                             for (int i = 0; i < taggedUsers.size(); i++) {
-                                Messaging.sendNotification((String)taggedUsers.get(i).get("deviceId"), "A new group was created by " + ParseUser.getCurrentUser().getUsername() + "!");
+                                Messaging.sendNotification((String)taggedUsers.get(i).get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just tagged you in a post!");
                             }
                             finish();
                         }
@@ -255,25 +255,8 @@ public class CreatePostActivity extends AppCompatActivity {
                 if (tagText.length() > 0) {
                     tagText = tagText.substring(0, tagText.length() - 1);
                 }
-                tvTag.setText(tagText);
                 etPost.setText(etPost.getText() + " " + tagText);
             }
         }
     }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String title = "BetterTogether";
-            String content = "BetterTogether's Channel";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("CHANNEL_ID", title, importance);
-            channel.setDescription(content);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-
 }

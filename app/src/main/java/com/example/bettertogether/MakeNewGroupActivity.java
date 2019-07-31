@@ -346,7 +346,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     mfms.logToken(getApplicationContext());
                     if (addedMembers != null) {
                         for (int i = 0; i < addedMembers.size(); i++) {
-                            Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                            Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), user.getUsername() + " just added you to their new group!");
                         }
                     }
                 } else {
