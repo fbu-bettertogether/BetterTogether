@@ -16,7 +16,9 @@ import android.view.MenuItem;
 import com.example.bettertogether.models.Group;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -49,15 +51,19 @@ public class AddUsersActivity extends AppCompatActivity {
         rvMembers.setAdapter(adapter);
         rvMembers.setLayoutManager(new LinearLayoutManager(rvMembers.getContext()));
 
-        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
-        userQuery.findInBackground(new FindCallback<ParseUser>() {
+        //Only the current user's friends on the app are added to the list of people they can add/invite to the group.
+        final ParseRelation<ParseUser> relation = ParseUser.getCurrentUser().getRelation("friends");
+        ParseQuery<ParseUser> query = relation.getQuery();
+        query.include("friends");
+        query.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void done(List<ParseUser> objects, ParseException e) {
+            public void done(List<ParseUser> friends, ParseException e) {
                 if (e != null) {
-                    Log.e("Querying groups", "error with query");
+                    Log.e("Querying friends", "error with query");
                     e.printStackTrace();
+                    return;
                 }
-                users.addAll(objects);
+                users.addAll(friends);
                 adapter.notifyDataSetChanged();
             }
         });

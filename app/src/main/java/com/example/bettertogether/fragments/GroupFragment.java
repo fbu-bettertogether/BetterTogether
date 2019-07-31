@@ -483,7 +483,7 @@ public class GroupFragment extends Fragment {
                     dataSet.setSliceSpace(3);
 
                     PieData data = new PieData(dataSet);
-                    data.setValueTextSize(30f);
+                    data.setValueTextSize(20f);
                     data.setValueFormatter(new Formatter());
                     chart.setData(data);
                     chart.setCenterText("Week " + Integer.toString(weekNumber));
