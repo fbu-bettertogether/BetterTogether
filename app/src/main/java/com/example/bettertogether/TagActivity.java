@@ -34,6 +34,8 @@ public class TagActivity extends AppCompatActivity {
     private Group group;
     private ArrayList<ParseUser> taggedUsers;
     private ArrayList<ParseUser> groupMembers;
+    private ArrayList<String> objIds;
+    private ArrayList<ParseUser> alreadyTagged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,11 @@ public class TagActivity extends AppCompatActivity {
         group = getIntent().getParcelableExtra("group");
         taggedUsers = new ArrayList<>();
         groupMembers = new ArrayList<>();
+        alreadyTagged = getIntent().getParcelableArrayListExtra("alreadyTagged");
+        objIds = new ArrayList<>();
+        for (ParseUser user : alreadyTagged) {
+            objIds.add(user.getObjectId());
+        }
         adapter = new MemberAdapter(groupMembers, taggedUsers);
         rvMembers.setLayoutManager(new LinearLayoutManager(rvMembers.getContext()));
         rvMembers.setAdapter(adapter);
@@ -63,12 +70,16 @@ public class TagActivity extends AppCompatActivity {
                     Log.e("Querying groups", "error with query");
                     e.printStackTrace();
                 }
-                groupMembers.addAll(Membership.getAllUsers(objects));
+                ArrayList<ParseUser> untaggedFriends = new ArrayList<>();
+                for (ParseUser curr: Membership.getAllUsers(objects)) {
+                    if (alreadyTagged == null || alreadyTagged.size() == 0 || !objIds.contains(curr.getObjectId())) {
+                        untaggedFriends.add(curr);
+                    }
+                }
+                groupMembers.addAll(untaggedFriends);
                 adapter.notifyDataSetChanged();
             }
         });
-
-
     }
 
     @Override

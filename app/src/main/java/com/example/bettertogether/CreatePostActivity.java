@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -57,6 +58,7 @@ import org.parceler.Parcels;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -85,6 +87,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ArrayList<ParseUser> taggedUsers;
     private DatabaseReference reference;
+    private String tagText = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,8 @@ public class CreatePostActivity extends AppCompatActivity {
         tvGroup = findViewById(R.id.tvGroup);
         etPost = findViewById(R.id.etPost);
         toolbar = findViewById(R.id.toolbar);
+
+        taggedUsers = new ArrayList<>();
 
         setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -126,6 +131,7 @@ public class CreatePostActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(CreatePostActivity.this, TagActivity.class);
                 intent.putExtra("group", (Serializable) group);
+                intent.putParcelableArrayListExtra("alreadyTagged", (ArrayList<? extends Parcelable>) taggedUsers);
                 startActivityForResult(intent, TAG_REQUEST_CODE);
             }
         });
@@ -186,7 +192,6 @@ public class CreatePostActivity extends AppCompatActivity {
                         } else {
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            Messaging.sendNotification((String) ParseUser.getCurrentUser().get("deviceId"),  ParseUser.getCurrentUser().getUsername() + " just tagged you in a post!");
                             for (int i = 0; i < taggedUsers.size(); i++) {
                                 Messaging.sendNotification((String)taggedUsers.get(i).get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just tagged you in a post!");
                             }
@@ -244,13 +249,15 @@ public class CreatePostActivity extends AppCompatActivity {
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                 ivCamera.setImageBitmap(takenImage);
             } else if (requestCode == TAG_REQUEST_CODE) {
-                taggedUsers = data.getParcelableArrayListExtra("taggedUsers");
-                String tagText = "";
+                ArrayList<ParseUser> newTaggedUsers = new ArrayList<>();
+                newTaggedUsers = data.getParcelableArrayListExtra("taggedUsers");
+                taggedUsers.addAll(newTaggedUsers);
+                tagText = "";
                 if (taggedUsers == null) {
                     taggedUsers = new ArrayList<>();
                 }
-                for (int i = 0; i < taggedUsers.size(); i++) {
-                    tagText = tagText + "@" + taggedUsers.get(i).getUsername() + ",";
+                for (int i = 0; i < newTaggedUsers.size(); i++) {
+                    tagText = tagText + "@" + newTaggedUsers.get(i).getUsername() + " ";
                 }
                 if (tagText.length() > 0) {
                     tagText = tagText.substring(0, tagText.length() - 1);
