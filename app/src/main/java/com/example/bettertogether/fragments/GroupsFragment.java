@@ -67,13 +67,18 @@ public class GroupsFragment extends Fragment {
                     e.printStackTrace();
                     return;
                 }
+                List<Group> activeGroups = new ArrayList<>();
+                List<Group> inactiveGroups = new ArrayList<>();
+
                 for (Group group : Membership.getAllGroups(memberships)) {
                     if (group.getIsActive()) {
-                        mGroups.add(0, group);
+                        activeGroups.add(group);
                     } else {
-                        mGroups.add(group);
+                        inactiveGroups.add(group);
                     }
                 }
+                mGroups.addAll(activeGroups);
+                mGroups.addAll(inactiveGroups);
                 adapter.notifyDataSetChanged();
             }
         });
