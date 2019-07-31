@@ -2,25 +2,29 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-    <item
-        android:id="@+id/action_home"
-        android:icon="@drawable/home"
-        android:title="Home"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/action_discovery"
-        android:icon="@drawable/compass"
-        android:title="Discover"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/action_profile"
-        android:icon="@drawable/account"
-        android:title="Profile"
-        app:showAsAction="always" />
     <item
         android:id="@+id/action_groups"
         android:icon="@drawable/account_group"
         android:title="My Groups"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_discovery"
+        android:icon="@drawable/compass"
+        android:title="Discover"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_home"
+        android:icon="@drawable/feed"
+        android:title="Feed"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_profile"
+        android:icon="@drawable/account"
+        android:title="Profile"
+        app:showAsAction="always" />
+
+
 </menu>

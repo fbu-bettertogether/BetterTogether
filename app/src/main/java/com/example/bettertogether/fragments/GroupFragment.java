@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -424,7 +425,6 @@ public class GroupFragment extends Fragment {
     public void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
-//            chart.setVisibility(View.INVISIBLE);
             return;
         }
 
@@ -486,7 +486,7 @@ public class GroupFragment extends Fragment {
                     chart.setCenterText("Week " + Integer.toString(weekNumber));
                     chart.getDescription().setEnabled(false);
                     chart.getLegend().setEnabled(false);
-//                chart.spin(500, 0, 360f, Easing.EaseInQuad);
+
                     if (checkingIn) {
                         chart.spin(3000, 0, 360f, Easing.EaseInQuad);
                     } else {

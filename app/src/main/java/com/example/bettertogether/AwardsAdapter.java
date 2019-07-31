@@ -2,6 +2,7 @@ package com.example.bettertogether;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,9 +66,11 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
         // decide to tint the medal to gold or not depending on whether the user has gotten the award
         for (int i = 0; i < achievedAwards.size(); i++) {
             if (achievedAwards.get(i).get("name").toString().equalsIgnoreCase(award.get("name").toString())) {
+                holder.ivAwardImage.setColorFilter(Color.TRANSPARENT);
+            } else {
                 Resources res = context.getResources();
-                final int goldTint = res.getColor(R.color.gold);
-                holder.ivAwardImage.setColorFilter(goldTint);
+                final int grayTint = res.getColor(R.color.gray);
+                holder.ivAwardImage.setColorFilter(grayTint);
             }
         }
     }
