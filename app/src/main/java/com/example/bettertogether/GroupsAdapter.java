@@ -1,13 +1,6 @@
 package com.example.bettertogether;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,7 +92,6 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 tvDescription.setText(String.format("We set aside time to meet our goals %d times every week!", group.getFrequency()));
             }
 
-            group.setShowCheckInReminderBadge(true);
 
             if (group.getIcon() != null) {
                 RequestOptions requestOptions = new RequestOptions();
