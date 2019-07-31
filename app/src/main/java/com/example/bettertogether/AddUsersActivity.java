@@ -1,30 +1,24 @@
 package com.example.bettertogether;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.example.bettertogether.models.Group;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +44,7 @@ public class AddUsersActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         alreadyAdded = getIntent().getParcelableArrayListExtra("alreadyAdded");
         objIds = new ArrayList<>();
-        for (ParseUser user: alreadyAdded) {
+        for (ParseUser user : alreadyAdded) {
             objIds.add(user.getObjectId());
         }
         addedMembers = new ArrayList<>();
@@ -77,7 +71,7 @@ public class AddUsersActivity extends AppCompatActivity {
                 }
                 //Only friends that have not been added to the current group would be available to be added (avoids repeatedly adding the same friend(s) to the group).
                 ArrayList<ParseUser> unaddedFriends = new ArrayList<>();
-                for (ParseUser curr: friends) {
+                for (ParseUser curr : friends) {
                     if (alreadyAdded == null || alreadyAdded.size() == 0 || !objIds.contains(curr.getObjectId())) {
                         unaddedFriends.add(curr);
                     }

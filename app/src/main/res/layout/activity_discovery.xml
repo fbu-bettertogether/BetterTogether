@@ -23,7 +23,7 @@
     <Button
         android:id="@+id/create_group_btn"
         android:layout_width="170dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="Create New Group"
@@ -33,7 +33,7 @@
     <Button
         android:id="@+id/btnLeaderboard"
         android:layout_width="170dp"
-        android:layout_height="50sp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:text="View Leaderboard"
         app:layout_constraintBottom_toBottomOf="@+id/create_group_btn"

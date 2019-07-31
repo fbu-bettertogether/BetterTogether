@@ -1,8 +1,8 @@
 package com.example.bettertogether;
 
 import android.app.IntentService;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -11,12 +11,9 @@ import androidx.core.app.JobIntentService;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
-
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;

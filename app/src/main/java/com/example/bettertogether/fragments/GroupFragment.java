@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -614,7 +613,7 @@ public class GroupFragment extends Fragment {
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
             hasCheckInLeft = true;
             group.setShowCheckInReminderBadge(true);
-        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()){
+        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
             group.setShowCheckInReminderBadge(false);
         }
         if (hasCheckInLeft) {
