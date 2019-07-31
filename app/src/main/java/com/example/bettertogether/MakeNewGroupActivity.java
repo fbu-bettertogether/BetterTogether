@@ -379,6 +379,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIsActive(active);
         newGroup.setMinTime(minTime);
         newGroup.setNumWeeks(npNumWeeks.getValue());
+        newGroup.saveInBackground();
 
         final Category.Query catQuery = new Category.Query();
         catQuery.findInBackground(new FindCallback<Category>() {
