@@ -135,10 +135,6 @@ public class Group extends ParseObject implements Serializable {
         put(END_DATE, endDate);
     }
 
-//    public Boolean getIsActive() {
-//        return getBoolean(IS_ACTIVE);
-//    }
-
     public Boolean getIsActive() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
         Date start = null;

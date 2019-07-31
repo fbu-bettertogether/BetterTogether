@@ -391,9 +391,10 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     saveCat(objects, addedMembers, newGroup, category);
                     MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                     mfms.logToken(getApplicationContext());
-                    Messaging.sendNotification((String) user.get("deviceId"), "A new group was created by " + user.getUsername() + "!");
-                    for (int i = 0; i < addedMembers.size(); i++) {
-                        Messaging.sendNotification((String)addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                    if (addedMembers != null) {
+                        for (int i = 0; i < addedMembers.size(); i++) {
+                            Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                        }
                     }
                 } else {
                     e.printStackTrace();
