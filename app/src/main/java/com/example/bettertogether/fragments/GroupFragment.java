@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -483,7 +482,7 @@ public class GroupFragment extends Fragment {
                     dataSet.setSliceSpace(3);
 
                     PieData data = new PieData(dataSet);
-                    data.setValueTextSize(30f);
+                    data.setValueTextSize(20f);
                     data.setValueFormatter(new Formatter());
                     chart.setData(data);
                     chart.setCenterText("Week " + Integer.toString(weekNumber));
@@ -613,6 +612,9 @@ public class GroupFragment extends Fragment {
             hasCheckInLeft = true;
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
             hasCheckInLeft = true;
+            group.setShowCheckInReminderBadge(true);
+        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
+            group.setShowCheckInReminderBadge(false);
         }
         if (hasCheckInLeft) {
             final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
@@ -655,7 +657,6 @@ public class GroupFragment extends Fragment {
                             currMem.setNumCheckIns(numCheckIns);
                             final int addedPoints = currMem.getGroup().getMinTime();
                             currMem.setPoints(currMem.getPoints() + addedPoints);
-                            group.setShowCheckInReminderBadge(false);
                             ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
                             groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
                             groupQuery.include("category");

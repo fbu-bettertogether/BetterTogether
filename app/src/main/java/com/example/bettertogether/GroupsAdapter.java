@@ -58,6 +58,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private ImageView ivGroupProf;
+        private ImageView ivBadgeIcon;
         private TextView tvGroupName;
         private TextView tvCategory;
         private TextView tvDescription;
@@ -71,6 +72,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             tvCategory = itemView.findViewById(R.id.tvCategory);
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvDates = itemView.findViewById(R.id.tvDates);
+            ivBadgeIcon = itemView.findViewById(R.id.ivBadgeIcon);
 
             itemView.setOnClickListener(this);
         }
@@ -92,6 +94,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 tvDescription.setText(String.format("We set aside time to meet our goals %d times every week!", group.getFrequency()));
             }
 
+            group.setShowCheckInReminderBadge(true);
 
             if (group.getIcon() != null) {
                 RequestOptions requestOptions = new RequestOptions();
@@ -101,6 +104,13 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                         .apply(requestOptions)
                         .into(ivGroupProf);
             }
+
+            if (group.getShowCheckInReminderBadge()) {
+                ivBadgeIcon.setVisibility(View.VISIBLE);
+            } else {
+                ivBadgeIcon.setVisibility(View.INVISIBLE);
+            }
+
             String startDateUgly = group.getStartDate();
             String endDateUgly = group.getEndDate();
             String startDate = startDateUgly.substring(4, 10).concat(", " + startDateUgly.substring(24));

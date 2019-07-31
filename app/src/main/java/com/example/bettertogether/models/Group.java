@@ -1,9 +1,5 @@
 package com.example.bettertogether.models;
 
-import android.os.Parcelable;
-
-import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -11,14 +7,11 @@ import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
-import org.xml.sax.Parser;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.List;
 
 @ParseClassName("Group")
 public class Group extends ParseObject implements Serializable {
@@ -196,6 +189,8 @@ public class Group extends ParseObject implements Serializable {
 
     public Boolean getShowCheckInReminderBadge() { return getBoolean(SHOW_BADGE); }
 
-    public void setShowCheckInReminderBadge(Boolean show) { put(SHOW_BADGE, show); }
+    public void setShowCheckInReminderBadge(Boolean showBadge) {
+        put(SHOW_BADGE, showBadge);
+    }
 
     }

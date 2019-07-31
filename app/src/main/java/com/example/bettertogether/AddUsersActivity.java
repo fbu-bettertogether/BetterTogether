@@ -1,11 +1,5 @@
 package com.example.bettertogether;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,10 +7,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.bettertogether.models.Group;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -27,7 +27,8 @@ public class AddUsersActivity extends AppCompatActivity {
     private RecyclerView rvMembers;
     private AddUsersAdapter adapter;
     private Toolbar toolbar;
-
+    private ArrayList<ParseUser> alreadyAdded;
+    private ArrayList<String> objIds;
     private ArrayList<ParseUser> addedMembers;
     private ArrayList<ParseUser> users;
 
@@ -41,23 +42,41 @@ public class AddUsersActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
+        alreadyAdded = getIntent().getParcelableArrayListExtra("alreadyAdded");
+        objIds = new ArrayList<>();
+        for (ParseUser user : alreadyAdded) {
+            objIds.add(user.getObjectId());
+        }
         addedMembers = new ArrayList<>();
-        addedMembers.add(ParseUser.getCurrentUser());
+        //Current user should only be added to the "addedMembers" list once (in case the person goes back to add other users).
+        if (!objIds.contains(ParseUser.getCurrentUser().getObjectId())) {
+            addedMembers.add(ParseUser.getCurrentUser());
+        }
         users = new ArrayList<>();
         adapter = new AddUsersAdapter(users, addedMembers);
         rvMembers.setAdapter(adapter);
         rvMembers.setLayoutManager(new LinearLayoutManager(rvMembers.getContext()));
 
-        ParseQuery<ParseUser> userQuery = ParseUser.getQuery();
-        userQuery.findInBackground(new FindCallback<ParseUser>() {
+        //Only the current user's friends on the app are added to the list of people they can add/invite to the group.
+        final ParseRelation<ParseUser> relation = ParseUser.getCurrentUser().getRelation("friends");
+        ParseQuery<ParseUser> query = relation.getQuery();
+        query.include("friends");
+        query.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void done(List<ParseUser> objects, ParseException e) {
+            public void done(List<ParseUser> friends, ParseException e) {
                 if (e != null) {
-                    Log.e("Querying groups", "error with query");
+                    Log.e("Querying friends", "error with query");
                     e.printStackTrace();
+                    return;
                 }
-                users.addAll(objects);
+                //Only friends that have not been added to the current group would be available to be added (avoids repeatedly adding the same friend(s) to the group).
+                ArrayList<ParseUser> unaddedFriends = new ArrayList<>();
+                for (ParseUser curr : friends) {
+                    if (alreadyAdded == null || alreadyAdded.size() == 0 || !objIds.contains(curr.getObjectId())) {
+                        unaddedFriends.add(curr);
+                    }
+                }
+                users.addAll(unaddedFriends);
                 adapter.notifyDataSetChanged();
             }
         });
