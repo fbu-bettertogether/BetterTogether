@@ -40,6 +40,7 @@ public class Group extends ParseObject implements Serializable {
     public static final String END_DATE = "endDate";
     public static final String MIN_TIME = "minTime";
     public static final String NUM_WEEKS = "numWeeks";
+    public static final String SHOW_BADGE = "showCheckInReminderBadge";
 
     public ParseUser getOwner() {
         return getParseUser(KEY_OWNER);
@@ -192,5 +193,9 @@ public class Group extends ParseObject implements Serializable {
     public void setNumWeeks(int weeks) {
         put(NUM_WEEKS, weeks);
     }
+
+    public Boolean getShowCheckInReminderBadge() { return getBoolean(SHOW_BADGE); }
+
+    public void setShowCheckInReminderBadge(Boolean show) { put(SHOW_BADGE, show); }
 
     }

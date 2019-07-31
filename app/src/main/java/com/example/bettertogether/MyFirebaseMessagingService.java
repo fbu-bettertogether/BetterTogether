@@ -117,6 +117,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setContentText((CharSequence) content.get(0))
                 .setAutoCancel(true)
                 .setSound(notificationSoundUri)
+                .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
                 .setContentIntent(pendingIntent);
 
         //Set notification color to match your app color template
@@ -137,6 +138,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         adminChannel.enableLights(true);
         adminChannel.setLightColor(Color.RED);
         adminChannel.enableVibration(true);
+        adminChannel.setShowBadge(true);
         if (notificationManager != null) {
             notificationManager.createNotificationChannel(adminChannel);
         }
@@ -275,10 +277,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("message", "New Notification from Your Friend.");
         hashMap.put("notification_key", (String) ParseUser.getCurrentUser().get("deviceId"));
-
-
-        //ProcessBuilderTest.class.newInstance().writeCommand(token);
-
 
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
                 .setMessageId(String.valueOf(msgId.get()))

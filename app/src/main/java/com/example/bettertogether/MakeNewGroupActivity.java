@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.renderscript.ScriptGroup;
@@ -113,7 +114,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private Button btnAddUsers;
     private NumberPicker npNumWeeks;
     private Date start;
-    private String status;
 
     // declaring added users fields
     private RecyclerView rvAddedMembers;
@@ -483,6 +483,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         // setup periodic alarm every week from the start day onwards
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC, start.getTime(), AlarmManager.INTERVAL_DAY * 7, pIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CUPCAKE) {
+            alarm.setInexactRepeating(AlarmManager.RTC, start.getTime(), AlarmManager.INTERVAL_DAY * 7, pIntent);
+        }
     }
 }

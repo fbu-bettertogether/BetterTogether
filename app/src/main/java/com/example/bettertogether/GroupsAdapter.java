@@ -99,6 +99,8 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 tvDescription.setText(String.format("We set aside time to meet our goals %d times every week!", group.getFrequency()));
             }
 
+            group.setShowCheckInReminderBadge(true);
+
             if (group.getIcon() != null) {
                 RequestOptions requestOptions = new RequestOptions();
                 requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
