@@ -28,7 +28,6 @@ public class AddUsersAdapter extends RecyclerView.Adapter<AddUsersAdapter.ViewHo
     public AddUsersAdapter(List<ParseUser> users, List<ParseUser> addedUsers) {
         this.users = users;
         this.addedMembers = addedUsers;
-
     }
 
     @NonNull
@@ -44,7 +43,10 @@ public class AddUsersAdapter extends RecyclerView.Adapter<AddUsersAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull final AddUsersAdapter.ViewHolder holder, int position) {
         // get the data according to position
-
+        if (users.size() == 0) {
+            holder.tvUsername.setText("All your friends have been added to this group!");
+            return;
+        }
         final ParseUser user = users.get(position);
         if (user.getUsername().equals(ParseUser.getCurrentUser().getUsername())) {
             holder.ivAdd.setVisibility(View.INVISIBLE);
