@@ -117,6 +117,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setContentText((CharSequence) content.get(0))
                 .setAutoCancel(true)
                 .setSound(notificationSoundUri)
+                .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
                 .setContentIntent(pendingIntent);
 
         //Set notification color to match your app color template
@@ -137,6 +138,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         adminChannel.enableLights(true);
         adminChannel.setLightColor(Color.RED);
         adminChannel.enableVibration(true);
+        adminChannel.setShowBadge(true);
         if (notificationManager != null) {
             notificationManager.createNotificationChannel(adminChannel);
         }

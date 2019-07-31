@@ -655,6 +655,7 @@ public class GroupFragment extends Fragment {
                             currMem.setNumCheckIns(numCheckIns);
                             final int addedPoints = currMem.getGroup().getMinTime();
                             currMem.setPoints(currMem.getPoints() + addedPoints);
+                            group.setShowCheckInReminderBadge(false);
                             ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
                             groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
                             groupQuery.include("category");
