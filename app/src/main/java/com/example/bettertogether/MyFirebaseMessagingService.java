@@ -276,10 +276,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         hashMap.put("message", "New Notification from Your Friend.");
         hashMap.put("notification_key", (String) ParseUser.getCurrentUser().get("deviceId"));
 
-
-        //ProcessBuilderTest.class.newInstance().writeCommand(token);
-
-
         FirebaseMessaging.getInstance().send(new RemoteMessage.Builder(token)
                 .setMessageId(String.valueOf(msgId.get()))
                 .addData("message", "Check out this new group!").build());

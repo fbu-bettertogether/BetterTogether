@@ -448,18 +448,21 @@ public class GroupFragment extends Fragment {
                     for (int i = 0; i < objects.size(); i++) {
                         Membership currMem = objects.get(i);
                         List<Integer> numCheckIns = currMem.getNumCheckIns();
-                        if (numCheckIns.isEmpty()) {
-                            numCheckIns.add(0);
+                        if (numCheckIns != null) {
+                            if (numCheckIns.isEmpty()) {
+                                numCheckIns.add(0);
+                            }
+                            int currWeek = numCheckIns.get(numCheckIns.size() - 1);
+                            weekNumber = numCheckIns.size();
+                            if (currWeek > 0) {
+                                totalCheckIns += currWeek;
+                                String currUser = currMem.getUser().getUsername();
+                                PieEntry newEntry = new PieEntry(currWeek, currUser);
+                                entries.add(newEntry);
+                            }
                         }
                         // numCheckIns should not have size 0 because will not draw chart if inactive
-                        int currWeek = numCheckIns.get(numCheckIns.size() - 1);
-                        weekNumber = numCheckIns.size();
-                        if (currWeek > 0) {
-                            totalCheckIns += currWeek;
-                            String currUser = currMem.getUser().getUsername();
-                            PieEntry newEntry = new PieEntry(currWeek, currUser);
-                            entries.add(newEntry);
-                        }
+
                     }
                     // calculate total weekly check ins using frequency and the number of members
                     int expectedCheckIns = group.getFrequency() * objects.size();
