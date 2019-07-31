@@ -425,8 +425,15 @@ public class GroupFragment extends Fragment {
     public void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
+            chart.requestLayout();
+            chart.getLayoutParams().height = 0;
+            chart.getLayoutParams().width = 0;
             return;
         }
+
+        chart.requestLayout();
+        chart.getLayoutParams().height = 700;
+        chart.getLayoutParams().width = 0;
 
         // query for membership objects with this group
         ParseQuery<Membership> membershipQuery = ParseQuery.getQuery(Membership.class);
