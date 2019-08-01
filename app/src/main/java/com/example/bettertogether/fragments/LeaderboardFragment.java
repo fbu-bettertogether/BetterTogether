@@ -4,13 +4,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.example.bettertogether.R;
@@ -37,6 +40,9 @@ import java.util.Map;
 public class LeaderboardFragment extends Fragment {
 
     private boolean isQueryComplete = false;
+    private ImageView ivServicePoints;
+    private ImageView ivFitnessPoints;
+    private ImageView ivGetTogetherPoints;
     private OnFragmentInteractionListener mListener;
 
     public LeaderboardFragment() {
@@ -67,6 +73,37 @@ public class LeaderboardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ivFitnessPoints = view.findViewById(R.id.ivFitnessPoints);
+        ivServicePoints = view.findViewById(R.id.ivServicePoints);
+        ivGetTogetherPoints = view.findViewById(R.id.ivGetTogetherPoints);
+
+        ivFitnessPoints.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View view) {
+                ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
+                ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+                ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+            }
+        });
+        ivGetTogetherPoints.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View view) {
+                ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
+                ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+                ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+            }
+        });
+        ivServicePoints.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View view) {
+                ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
+                ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+                ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+            }
+        });
         queryMembers();
     }
 
@@ -147,6 +184,7 @@ public class LeaderboardFragment extends Fragment {
         BarData data = new BarData(dataSet);
         chart.setData(data);
         chart.setDrawBarShadow(true);
+        chart.getDescription().setEnabled(false);
         chart.animateXY(2000, 2000);
         chart.invalidate();
 

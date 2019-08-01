@@ -421,7 +421,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    public void configChart(final boolean checkingIn) {
+    private void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
             return;
@@ -603,7 +603,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    public void drawButton() {
+    private void drawButton() {
         if (!getChildFragmentManager().getFragments().isEmpty()) {
             getChildFragmentManager().beginTransaction().remove(getChildFragmentManager().getFragments().get(0));
         }
