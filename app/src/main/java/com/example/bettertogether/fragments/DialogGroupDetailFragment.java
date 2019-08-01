@@ -33,7 +33,7 @@ import java.util.List;
 
 public class DialogGroupDetailFragment extends DialogFragment {
 
-    private TextView tvGroupName;
+    private ImageView ivCatIcon;
     private RecyclerView rvMembers;
     private FriendAdapter adapter;
     private TextView tvDates;
@@ -64,7 +64,7 @@ public class DialogGroupDetailFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Get field from view
-        tvGroupName = view.findViewById(R.id.tvGroupName);
+        ivCatIcon = view.findViewById(R.id.ivCatIcon);
         rvMembers = view.findViewById(R.id.rvMembers);
         tvDates = view.findViewById(R.id.tvDates);
         tvDescription = view.findViewById(R.id.tvDescription);
@@ -73,7 +73,20 @@ public class DialogGroupDetailFragment extends DialogFragment {
         // Fetch arguments from bundle and set title
         Group group = (Group) getArguments().getSerializable("group");
         getDialog().setTitle(group.getName());
-        tvGroupName.setText(group.getName());
+
+        switch (group.getCategory()) {
+            case "Get-Togethers":
+                ivCatIcon.setImageResource(R.drawable.sharp_people_black_18dp);
+                break;
+            case "Fitness":
+                ivCatIcon.setImageResource(R.drawable.sharp_fitness_center_black_18dp);
+                break;
+            case "Service":
+                ivCatIcon.setImageResource(R.drawable.sharp_local_florist_black_18dp);
+                break;
+        }
+        ivCatIcon.setColorFilter(getResources().getColor(R.color.colorPrimary));
+
         String initialStartDate = group.getStartDate();
         String startDate = initialStartDate.substring(0, 10) + "," + initialStartDate.substring(23);
         String initialEndDate = group.getEndDate();
