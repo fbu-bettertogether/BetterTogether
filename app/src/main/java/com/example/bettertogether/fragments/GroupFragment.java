@@ -218,6 +218,25 @@ public class GroupFragment extends Fragment {
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
         setHasOptionsMenu(true);
+        collapsingToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "title clicked", Toast.LENGTH_LONG).show();
+                FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance("Some Title");
+                groupDetailFragment.show(fm, "fragment_edit_name");
+
+            }
+        });
+
+//        final int abTitleId = getResources().getIdentifier("action_bar_title", "id", "android");
+//        view.findViewById(abTitleId).setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getContext(), "title clicked", Toast.LENGTH_LONG).show();
+//            }
+//        });
 
         final ImageView imageView = view.findViewById(R.id.backdrop);
         if (group.getIcon() != null) {

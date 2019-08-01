@@ -26,5 +26,4 @@
         android:title="delete group"
         app:showAsAction="never" />
 
-
 </menu>
