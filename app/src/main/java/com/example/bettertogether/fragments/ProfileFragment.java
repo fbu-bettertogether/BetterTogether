@@ -73,6 +73,10 @@ public class ProfileFragment extends Fragment {
     private TextView tvFitnessPoints;
     private TextView tvGetTogetherPoints;
     private TextView tvServicePoints;
+    private TextView tvNumGroups;
+    private TextView tvNumFriends;
+    private TextView tvNumAwards;
+    private TextView tvNumPosts;
 
     private List<Post> posts;
     private List<Group> groups;
@@ -143,6 +147,10 @@ public class ProfileFragment extends Fragment {
         tvFitnessPoints = view.findViewById(R.id.tvFitnessPoints);
         tvGetTogetherPoints = view.findViewById(R.id.tvGetTogetherPoints);
         tvServicePoints = view.findViewById(R.id.tvServicePoints);
+        tvNumAwards = view.findViewById(R.id.tvNumAwards);
+        tvNumFriends = view.findViewById(R.id.tvNumFriends);
+        tvNumGroups = view.findViewById(R.id.tvNumGroups);
+        tvNumPosts = view.findViewById(R.id.tvNumPosts);
 
         rvPosts.setAdapter(postsAdapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -361,6 +369,7 @@ public class ProfileFragment extends Fragment {
 
                 // add new posts to the list and notify adapter
                 posts.addAll((List<Post>) (Object) objects);
+                tvNumPosts.setText(Integer.toString(posts.size()));
                 postsAdapter.notifyDataSetChanged();
             }
         });
@@ -382,6 +391,7 @@ public class ProfileFragment extends Fragment {
                 Log.d("carmel",Integer.toString(memberships.size()));
 
                 groups.addAll(Membership.getAllGroups(memberships));
+                tvNumGroups.setText(Integer.toString(groups.size()));
                 simpleGroupAdapter.notifyDataSetChanged();
             }
         });
@@ -403,6 +413,7 @@ public class ProfileFragment extends Fragment {
 
                 // add new posts to the list and notify adapter
                 friends.addAll((List<ParseUser>) (Object) objects);
+                tvNumFriends.setText(Integer.toString(friends.size()));
                 friendAdapter.notifyDataSetChanged();
             }
         });
@@ -444,6 +455,7 @@ public class ProfileFragment extends Fragment {
                                 }
                             }
                             awardsAdapter.notifyDataSetChanged();
+                            tvNumAwards.setText(Integer.toString(achievedAwards.size()));
                         }
                     }
                 });

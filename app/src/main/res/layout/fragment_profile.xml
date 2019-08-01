@@ -293,5 +293,45 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvPostsLabel" />
 
+        <TextView
+            android:id="@+id/tvNumGroups"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            app:layout_constraintBottom_toTopOf="@+id/divider7"
+            app:layout_constraintStart_toEndOf="@+id/tvGroupLabel"
+            app:layout_constraintTop_toBottomOf="@+id/divNameGroups"
+            android:textColor="@color/gray"/>
+
+        <TextView
+            android:id="@+id/tvNumFriends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            app:layout_constraintBottom_toTopOf="@+id/divider8"
+            app:layout_constraintStart_toEndOf="@+id/tvFriendsLabel"
+            app:layout_constraintTop_toBottomOf="@+id/divGroupsFriends"
+            android:textColor="@color/gray"/>
+
+        <TextView
+            android:id="@+id/tvNumAwards"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            app:layout_constraintBottom_toTopOf="@+id/divider9"
+            app:layout_constraintStart_toEndOf="@+id/tvAwardsLabel"
+            app:layout_constraintTop_toBottomOf="@+id/divFriendsAwards"
+            android:textColor="@color/gray"/>
+
+        <TextView
+            android:id="@+id/tvNumPosts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            app:layout_constraintBottom_toTopOf="@+id/divider10"
+            app:layout_constraintStart_toEndOf="@+id/tvPostsLabel"
+            app:layout_constraintTop_toBottomOf="@+id/divAwardsPosts"
+            android:textColor="@color/gray"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
