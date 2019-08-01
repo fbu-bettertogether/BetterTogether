@@ -96,6 +96,7 @@ public class DiscoveryFragment extends Fragment {
         ParseQuery<CatMembership> query = new ParseQuery<CatMembership>(CatMembership.class);
         query.include("group");
         query.whereEqualTo("category", cat);
+        query.setLimit(10);
         query.findInBackground(new FindCallback<CatMembership>() {
             @Override
             public void done(List<CatMembership> objects, ParseException e) {
