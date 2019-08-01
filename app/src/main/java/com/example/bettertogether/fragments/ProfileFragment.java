@@ -179,7 +179,7 @@ public class ProfileFragment extends Fragment {
                         public void done(List<ParseUser> objects, ParseException e) {
                             boolean found = false;
                             for (int i = 0; i < objects.size(); i++) {
-                                if (objects.get(i).getObjectId().equals(user.getObjectId())) {
+                                if (objects.get(i).hasSameId(user)) {
                                     found = true;
                                 }
                             }
@@ -201,6 +201,29 @@ public class ProfileFragment extends Fragment {
                                                     }
                                                 }
                                             });
+
+                                        } else {
+                                            ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+                                            invitationParseQuery.whereEqualTo("inviter", user);
+                                            invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
+                                            invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
+                                                @Override
+                                                public void done(Invitation object, ParseException e) {
+                                                    if (object != null) {
+                                                        object.setAccepted("rejected");
+                                                        object.saveInBackground(new SaveCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                if (e != null) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+                                                        });
+
+                                                    }
+                                                }
+                                            });
+
                                         }
                                     }
                                 });
