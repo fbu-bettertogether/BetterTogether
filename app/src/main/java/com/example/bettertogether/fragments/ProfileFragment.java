@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.example.bettertogether.models.UserAward;
+import com.google.android.material.appbar.AppBarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -162,6 +164,9 @@ public class ProfileFragment extends Fragment {
         rvAwards.setLayoutManager(new GridLayoutManager(getContext(), 4));
 
         drawSettings();
+
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setTitle(user.getUsername());
 
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
