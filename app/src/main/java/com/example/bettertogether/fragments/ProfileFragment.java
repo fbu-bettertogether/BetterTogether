@@ -215,6 +215,7 @@ public class ProfileFragment extends Fragment {
                                             Invitation invitation = new Invitation();
                                             invitation.setInviter(ParseUser.getCurrentUser());
                                             invitation.setReceiver(user);
+                                            invitation.setAccepted("sent");
                                             invitation.saveInBackground();
                                             ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                                             query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
