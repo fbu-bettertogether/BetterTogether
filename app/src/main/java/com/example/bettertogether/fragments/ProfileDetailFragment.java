@@ -25,7 +25,6 @@ public class ProfileDetailFragment extends Fragment {
     public final int INVITATION_REQUEST_CODE = 232;
     private ProfileFragment.OnProfileFragmentInteraction mListener;
     private Button btnPendingRequests;
-    private Button btnNotifications;
     private Button btnLogOut;
     private Button btnProfilePicture;
     private Button btnGroupHistory;
@@ -65,7 +64,6 @@ public class ProfileDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         btnPendingRequests = view.findViewById(R.id.btnPendingRequests);
-        btnNotifications = view.findViewById(R.id.btnNotifications);
         btnLogOut = view.findViewById(R.id.btnLeaveGroup);
         btnProfilePicture = view.findViewById(R.id.btnProfilePicture);
         btnGroupHistory = view.findViewById(R.id.btnGroupHistory);

@@ -3,28 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_requests"
-        android:title="show pending requests"
+        android:title="Show Pending Requests"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_history"
-        android:title="show group history"
+        android:title="Show Group History"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_icon"
-        android:title="change group icon"
+        android:title="Change Group Icon"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_notifications"
-        android:title="toggle notifications"
+        android:id="@+id/action_invite_to_group"
+        android:title="Invite Friends to Join Group"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_leave"
-        android:title="leave group"
+        android:title="Leave Group"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_delete"
-        android:title="delete group"
+        android:title="Delete Group"
         app:showAsAction="never" />
-
-
 </menu>
