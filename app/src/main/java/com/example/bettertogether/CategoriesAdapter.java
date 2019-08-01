@@ -38,7 +38,6 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
         public ImageView ivGroupProf;
         public TextView tvGroupName;
         public TextView tvNumMembers;
-        public TextView tvMembersText;
         public View rootView;
 
         public ViewHolder(View itemView) {
