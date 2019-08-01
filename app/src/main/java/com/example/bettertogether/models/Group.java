@@ -76,7 +76,12 @@ public class Group extends ParseObject implements Serializable {
     }
 
     public String getCategory() {
-        ParseObject cat = getParseObject(CATEGORY);
+        ParseObject cat = null;
+        try {
+            cat = getParseObject(CATEGORY).fetch();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return cat.getString(NAME);
     }
 
