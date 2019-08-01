@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.example.bettertogether.models.UserAward;
+import com.google.android.material.appbar.AppBarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -62,7 +64,6 @@ public class ProfileFragment extends Fragment {
 
     private ImageView ivUserIcon;
     private TextView tvUsername;
-    private TextView tvDate;
     private RecyclerView rvPosts;
     private RecyclerView rvGroups;
     private RecyclerView rvFriends;
@@ -74,6 +75,10 @@ public class ProfileFragment extends Fragment {
     private TextView tvFitnessPoints;
     private TextView tvGetTogetherPoints;
     private TextView tvServicePoints;
+    private TextView tvNumGroups;
+    private TextView tvNumFriends;
+    private TextView tvNumAwards;
+    private TextView tvNumPosts;
 
     private List<Post> posts;
     private List<Group> groups;
@@ -134,7 +139,6 @@ public class ProfileFragment extends Fragment {
         ivUserIcon = view.findViewById(R.id.ivUserIcon);
         tvUsername = view.findViewById(R.id.tvUsername);
         ivSettings = view.findViewById(R.id.ivSettings);
-        tvDate = view.findViewById(R.id.tvDate);
         rvPosts = view.findViewById(R.id.rvPosts);
         rvGroups = view.findViewById(R.id.rvGroups);
         rvFriends = view.findViewById(R.id.rvFriends);
@@ -145,6 +149,10 @@ public class ProfileFragment extends Fragment {
         tvFitnessPoints = view.findViewById(R.id.tvFitnessPoints);
         tvGetTogetherPoints = view.findViewById(R.id.tvGetTogetherPoints);
         tvServicePoints = view.findViewById(R.id.tvServicePoints);
+        tvNumAwards = view.findViewById(R.id.tvNumAwards);
+        tvNumFriends = view.findViewById(R.id.tvNumFriends);
+        tvNumGroups = view.findViewById(R.id.tvNumGroups);
+        tvNumPosts = view.findViewById(R.id.tvNumPosts);
 
         rvPosts.setAdapter(postsAdapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -156,6 +164,9 @@ public class ProfileFragment extends Fragment {
         rvAwards.setLayoutManager(new GridLayoutManager(getContext(), 4));
 
         drawSettings();
+
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setTitle(user.getUsername());
 
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
@@ -267,7 +278,7 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-        tvDate.setText(String.format("Joined %s", Post.getRelativeTimeAgo(user.getCreatedAt())));
+
         ivServicePoints.setColorFilter(getResources().getColor(R.color.o9));
         ivGetTogetherPoints.setColorFilter(getResources().getColor(R.color.o4));
         ivFitnessPoints.setColorFilter(getResources().getColor(R.color.colorPrimary));
@@ -298,18 +309,20 @@ public class ProfileFragment extends Fragment {
                     e.printStackTrace();
                 } else {
                     for (int i = 0; i < objects.size(); i++) {
-                        if (objects.get(i).getGroup() == null) {
-                            if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
-                                if (objects.get(i).getAccepted().equals("rejected")) {
-                                    relation.remove(objects.get(i).getReceiver());
-                                } else {
-                                    relation.add(objects.get(i).getReceiver());
-                                }
-                            } else if (objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
-                                if (objects.get(i).getAccepted().equals("rejected")) {
-                                    relation.remove(objects.get(i).getInviter());
-                                } else {
-                                    relation.add(objects.get(i).getInviter());
+                        if (objects.get(i) != null) {
+                            if (objects.get(i).getGroup() == null) {
+                                if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
+                                    if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("rejected")) {
+                                        relation.remove(objects.get(i).getReceiver());
+                                    } else {
+                                        relation.add(objects.get(i).getReceiver());
+                                    }
+                                } else if (objects.get(i).getReceiver() != null && objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
+                                    if (objects.get(i).getAccepted().equals("rejected")) {
+                                        relation.remove(objects.get(i).getInviter());
+                                    } else {
+                                        relation.add(objects.get(i).getInviter());
+                                    }
                                 }
                             }
                         }
@@ -361,6 +374,7 @@ public class ProfileFragment extends Fragment {
 
                 // add new posts to the list and notify adapter
                 posts.addAll((List<Post>) (Object) objects);
+                tvNumPosts.setText(Integer.toString(posts.size()));
                 postsAdapter.notifyDataSetChanged();
             }
         });
@@ -382,6 +396,7 @@ public class ProfileFragment extends Fragment {
                 Log.d("carmel",Integer.toString(memberships.size()));
 
                 groups.addAll(Membership.getAllGroups(memberships));
+                tvNumGroups.setText(Integer.toString(groups.size()));
                 simpleGroupAdapter.notifyDataSetChanged();
             }
         });
@@ -403,6 +418,7 @@ public class ProfileFragment extends Fragment {
 
                 // add new posts to the list and notify adapter
                 friends.addAll((List<ParseUser>) (Object) objects);
+                tvNumFriends.setText(Integer.toString(friends.size()));
                 friendAdapter.notifyDataSetChanged();
             }
         });
@@ -444,6 +460,7 @@ public class ProfileFragment extends Fragment {
                                 }
                             }
                             awardsAdapter.notifyDataSetChanged();
+                            tvNumAwards.setText(Integer.toString(achievedAwards.size()));
                         }
                     }
                 });

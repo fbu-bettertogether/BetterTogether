@@ -116,9 +116,9 @@ public class SimpleGroupAdapter extends RecyclerView.Adapter<SimpleGroupAdapter.
             }
 
             if(group.getIsActive()) {
-                tvGroupName.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
+                tvGroupName.setTextColor(context.getResources().getColor(R.color.colorPrimary));
             } else {
-                tvGroupName.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+                tvGroupName.setTextColor(context.getResources().getColor(R.color.gray));
             }
         }
 
