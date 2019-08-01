@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bettertogether.MemberAdapter;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Group;
@@ -20,8 +19,9 @@ import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,37 +70,96 @@ public class HomeFragment extends Fragment {
                     return;
                 }
 
-                List<Group> groups = Membership.getAllGroups(objects);
+                final List<Group> groups = Membership.getAllGroups(objects);
 
-                for (int i = 0; i < groups.size(); i++) {
-                    ParseQuery<Post> postQuery = new ParseQuery<Post>(Post.class);
-                    postQuery.whereEqualTo("group", groups.get(i));
-                    postQuery.setLimit(3);
-                    postQuery.addDescendingOrder("createdAt");
-                    postQuery.include("user");
-
-                    postQuery.findInBackground(new FindCallback<Post>() {
-                        @Override
-                        public void done(List<Post> posts, ParseException e) {
-                            if (e != null) {
-                                Log.e("querying posts", "error with query");
-                                e.printStackTrace();
-                                return;
-                            }
-
-                            // add new posts to the list and notify adapter
-                            mPosts.addAll(posts);
-                            Collections.sort(mPosts, new Comparator<Post>() {
-                                @Override
-                                public int compare(Post post1, Post post2) {
-                                    return post2.getCreatedAt().compareTo(post1.getCreatedAt());
-                                }
-                            });
-
-                            adapter.notifyDataSetChanged();
-                        }
-                    });
+//                for (int i = 0; i < groups.size(); i++) {
+//                    ParseQuery<Post> postQuery = new ParseQuery<Post>(Post.class);
+//                    postQuery.whereEqualTo("group", groups.get(i));
+//                    postQuery.setLimit(3);
+//                    postQuery.addDescendingOrder("createdAt");
+//                    postQuery.include("user");
+//
+//                    postQuery.findInBackground(new FindCallback<Post>() {
+//                        @Override
+//                        public void done(List<Post> posts, ParseException e) {
+//                            if (e != null) {
+//                                Log.e("querying posts", "error with query");
+//                                e.printStackTrace();
+//                                return;
+//                            }
+//
+//                            // add new posts to the list and notify adapter
+//                            mPosts.addAll(posts);
+//                            Collections.sort(mPosts, new Comparator<Post>() {
+//                                @Override
+//                                public int compare(Post post1, Post post2) {
+//                                    return post2.getCreatedAt().compareTo(post1.getCreatedAt());
+//                                }
+//                            });
+//
+//                            adapter.notifyDataSetChanged();
+//                        }
+//                    });
+//                }
+                ParseQuery friendQuery = null;
+                try {
+                    friendQuery = ((ParseRelation) ParseUser.getCurrentUser().fetchIfNeeded().get("friends")).getQuery();
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
                 }
+                friendQuery.findInBackground(new FindCallback() {
+                    @Override
+                    public void done(List objects, ParseException e) {
+
+                    }
+
+                    @Override
+                    public void done(Object o, Throwable throwable) {
+                        if (throwable != null) {
+                            throwable.printStackTrace();
+                        } else {
+                            queryFriendPosts(groups, (List<ParseUser>) o);
+                        }
+                    }
+                });
+
+            }
+        });
+    }
+
+    private void queryFriendPosts(final List<Group> groups, final List<ParseUser> friends) {
+        ParseQuery<Post> postQuery = new ParseQuery<Post>(Post.class);
+        postQuery.include("user");
+        postQuery.include("group");
+        postQuery.setLimit(100);
+        postQuery.addDescendingOrder("createdAt");
+        postQuery.findInBackground(new FindCallback<Post>() {
+            @Override
+            public void done(List<Post> objects, ParseException e) {
+                postLoop:
+                for (Post post : objects) {
+                    for (Group group : groups) {
+                        if (post.getGroup().hasSameId(group)) {
+                            mPosts.add(post);
+                            continue postLoop;
+                        }
+                    }
+                    for (ParseUser friend : friends) {
+                        if (post.getUser().hasSameId(friend)) {
+                            mPosts.add(post);
+                            continue postLoop;
+                        }
+                    }
+                }
+                Collections.sort(mPosts, new Comparator<Post>() {
+                    @Override
+                    public int compare(Post post1, Post post2) {
+                        return post2.getCreatedAt().compareTo(post1.getCreatedAt());
+                    }
+                });
+
+                adapter.notifyDataSetChanged();
+
             }
         });
     }
