@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.LeaderboardFragment">
+
+    <ImageView
+        android:id="@+id/ivServicePoints"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="32dp"
+        android:src="@drawable/sharp_local_florist_black_18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivGetTogetherPoints"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ivGetTogetherPoints" />
+
+    <ImageView
+        android:id="@+id/ivFitnessPoints"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/sharp_fitness_center_black_18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ivGetTogetherPoints"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/sharp_people_black_18dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivFitnessPoints"
+        app:layout_constraintEnd_toStartOf="@+id/ivServicePoints"
+        app:layout_constraintStart_toEndOf="@+id/ivFitnessPoints"
+        app:layout_constraintTop_toTopOf="@+id/ivFitnessPoints" />
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/barchart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivFitnessPoints"
+        tools:layout_editor_absoluteX="0dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

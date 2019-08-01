@@ -129,12 +129,14 @@ public class AwardFragment extends Fragment {
                             achievedAwards.add(objects.get(i).getAward());
                         }
                     }
-                    for (int i = 0; i < achievedAwards.size(); i++) {
-                        if (achievedAwards.get(i).get("name").toString().equalsIgnoreCase(award.get("name").toString())) {
-                            Resources res = getContext().getResources();
-                            final int goldTint = res.getColor(R.color.gold);
-                            ivAwardImage.setColorFilter(goldTint);
-                        }
+                    ArrayList<String> awardNames = new ArrayList<>();
+                    for (Award a: achievedAwards) {
+                        awardNames.add(a.get("name").toString());
+                    }
+                    if (!awardNames.contains(award.get("name").toString())) {
+                        Resources res = getContext().getResources();
+                        final int greyTint = res.getColor(R.color.grey);
+                        ivAwardImage.setColorFilter(greyTint);
                     }
                 }
             }

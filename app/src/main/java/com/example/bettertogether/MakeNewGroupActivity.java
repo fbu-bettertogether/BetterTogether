@@ -1,29 +1,19 @@
 package com.example.bettertogether;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
+import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.renderscript.ScriptGroup;
-import android.renderscript.ScriptGroup.Binding;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +21,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -41,62 +30,25 @@ import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.gson.JsonObject;
-import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.parceler.Parcels;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Map;
-
-import static java.security.AccessController.getContext;
-
-import javax.net.ssl.HttpsURLConnection;
-
-import static cz.msebera.android.httpclient.HttpHeaders.USER_AGENT;
 
 public class MakeNewGroupActivity extends AppCompatActivity {
     public final String APP_TAG = "MakeNewGroupActivity";
@@ -194,7 +146,9 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         btnAddUsers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MakeNewGroupActivity.this, AddUsersActivity.class);;
+                Intent intent = new Intent(MakeNewGroupActivity.this, AddUsersActivity.class);
+                //Keeps track of which users have already been added, so that they cannot be added again.
+                intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
                 startActivityForResult(intent, ADD_REQUEST_CODE);
             }
         });
@@ -219,8 +173,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 } else if (cdStartDate.getSelectedDate().isAfter(now)) {
                     active = false;
                 } else if (cdStartDate.getSelectedDate().isBefore(now)) {
-                    Log.e(APP_TAG, "Start date or end date is out of range.");
-                    Toast.makeText(getApplicationContext(), "Start date or end date is out of range.", Toast.LENGTH_SHORT).show();
+                    Log.e(APP_TAG, "Start date is out of range.");
+                    Toast.makeText(getApplicationContext(), "Start date is out of range.", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
                     active = true;
@@ -379,6 +333,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setIsActive(active);
         newGroup.setMinTime(minTime);
         newGroup.setNumWeeks(npNumWeeks.getValue());
+        newGroup.saveInBackground();
 
         final Category.Query catQuery = new Category.Query();
         catQuery.findInBackground(new FindCallback<Category>() {
@@ -389,9 +344,10 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                     saveCat(objects, addedMembers, newGroup, category);
                     MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                     mfms.logToken(getApplicationContext());
-                    Messaging.sendNotification((String) user.get("deviceId"), "A new group was created by " + user.getUsername() + "!");
-                    for (int i = 0; i < addedMembers.size(); i++) {
-                        Messaging.sendNotification((String)addedMembers.get(i).get("deviceId"), "A new group was created by " + user.getUsername() + "!");
+                    if (addedMembers != null) {
+                        for (int i = 0; i < addedMembers.size(); i++) {
+                            Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), user.getUsername() + " just added you to their new group!");
+                        }
                     }
                 } else {
                     e.printStackTrace();
@@ -480,6 +436,8 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         // setup periodic alarm every week from the start day onwards
         AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarm.setInexactRepeating(AlarmManager.RTC, start.getTime(), AlarmManager.INTERVAL_DAY * 7, pIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CUPCAKE) {
+            alarm.setInexactRepeating(AlarmManager.RTC, start.getTime(), AlarmManager.INTERVAL_DAY * 7, pIntent);
+        }
     }
 }

@@ -1,9 +1,5 @@
 package com.example.bettertogether.models;
 
-import android.os.Parcelable;
-
-import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -11,14 +7,11 @@ import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
-import org.xml.sax.Parser;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
-import java.util.List;
 
 @ParseClassName("Group")
 public class Group extends ParseObject implements Serializable {
@@ -40,6 +33,7 @@ public class Group extends ParseObject implements Serializable {
     public static final String END_DATE = "endDate";
     public static final String MIN_TIME = "minTime";
     public static final String NUM_WEEKS = "numWeeks";
+    public static final String SHOW_BADGE = "showCheckInReminderBadge";
 
     public ParseUser getOwner() {
         return getParseUser(KEY_OWNER);
@@ -135,10 +129,6 @@ public class Group extends ParseObject implements Serializable {
         put(END_DATE, endDate);
     }
 
-//    public Boolean getIsActive() {
-//        return getBoolean(IS_ACTIVE);
-//    }
-
     public Boolean getIsActive() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
         Date start = null;
@@ -195,6 +185,12 @@ public class Group extends ParseObject implements Serializable {
 
     public void setNumWeeks(int weeks) {
         put(NUM_WEEKS, weeks);
+    }
+
+    public Boolean getShowCheckInReminderBadge() { return getBoolean(SHOW_BADGE); }
+
+    public void setShowCheckInReminderBadge(Boolean showBadge) {
+        put(SHOW_BADGE, showBadge);
     }
 
     }

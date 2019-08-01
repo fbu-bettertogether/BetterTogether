@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCategoryName">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -44,6 +45,7 @@
             android:layout_marginBottom="8dp"
             android:background="#FFFFFFFF"
             android:scrollbars="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tvCategoryName"
             app:layout_constraintTop_toBottomOf="@+id/tvCategoryName" />
 

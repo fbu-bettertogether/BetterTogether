@@ -15,6 +15,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
@@ -104,8 +107,11 @@ public class SimpleGroupAdapter extends RecyclerView.Adapter<SimpleGroupAdapter.
             // loading in the rest of the group fields if they are available
 
             if(group.getIcon() != null) {
+                RequestOptions requestOptions = new RequestOptions();
+                requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
                 Glide.with(context)
                         .load(group.getIcon().getUrl())
+                        .apply(requestOptions)
                         .into(ivGroupProf);
             }
 

@@ -18,7 +18,6 @@ import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
@@ -68,8 +67,18 @@ public class GroupsFragment extends Fragment {
                     e.printStackTrace();
                     return;
                 }
+                List<Group> activeGroups = new ArrayList<>();
+                List<Group> inactiveGroups = new ArrayList<>();
 
-                mGroups.addAll(Membership.getAllGroups(memberships));
+                for (Group group : Membership.getAllGroups(memberships)) {
+                    if (group.getIsActive()) {
+                        activeGroups.add(group);
+                    } else {
+                        inactiveGroups.add(group);
+                    }
+                }
+                mGroups.addAll(activeGroups);
+                mGroups.addAll(inactiveGroups);
                 adapter.notifyDataSetChanged();
             }
         });

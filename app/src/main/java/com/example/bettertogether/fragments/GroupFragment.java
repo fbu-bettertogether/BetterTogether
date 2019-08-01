@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -441,7 +440,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    public void configChart(final boolean checkingIn) {
+    private void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
             chart.requestLayout();
@@ -474,18 +473,21 @@ public class GroupFragment extends Fragment {
                     for (int i = 0; i < objects.size(); i++) {
                         Membership currMem = objects.get(i);
                         List<Integer> numCheckIns = currMem.getNumCheckIns();
-                        if (numCheckIns.isEmpty()) {
-                            numCheckIns.add(0);
+                        if (numCheckIns != null) {
+                            if (numCheckIns.isEmpty()) {
+                                numCheckIns.add(0);
+                            }
+                            int currWeek = numCheckIns.get(numCheckIns.size() - 1);
+                            weekNumber = numCheckIns.size();
+                            if (currWeek > 0) {
+                                totalCheckIns += currWeek;
+                                String currUser = currMem.getUser().getUsername();
+                                PieEntry newEntry = new PieEntry(currWeek, currUser);
+                                entries.add(newEntry);
+                            }
                         }
                         // numCheckIns should not have size 0 because will not draw chart if inactive
-                        int currWeek = numCheckIns.get(numCheckIns.size() - 1);
-                        weekNumber = numCheckIns.size();
-                        if (currWeek > 0) {
-                            totalCheckIns += currWeek;
-                            String currUser = currMem.getUser().getUsername();
-                            PieEntry newEntry = new PieEntry(currWeek, currUser);
-                            entries.add(newEntry);
-                        }
+
                     }
                     // calculate total weekly check ins using frequency and the number of members
                     int expectedCheckIns = group.getFrequency() * objects.size();
@@ -506,7 +508,7 @@ public class GroupFragment extends Fragment {
                     dataSet.setSliceSpace(3);
 
                     PieData data = new PieData(dataSet);
-                    data.setValueTextSize(30f);
+                    data.setValueTextSize(20f);
                     data.setValueFormatter(new Formatter());
                     chart.setData(data);
                     chart.setCenterText("Week " + Integer.toString(weekNumber));
@@ -627,7 +629,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    public void drawButton() {
+    private void drawButton() {
         if (!getChildFragmentManager().getFragments().isEmpty()) {
             getChildFragmentManager().beginTransaction().remove(getChildFragmentManager().getFragments().get(0));
         }
@@ -636,6 +638,9 @@ public class GroupFragment extends Fragment {
             hasCheckInLeft = true;
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
             hasCheckInLeft = true;
+            group.setShowCheckInReminderBadge(true);
+        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
+            group.setShowCheckInReminderBadge(false);
         }
         if (hasCheckInLeft) {
             final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);

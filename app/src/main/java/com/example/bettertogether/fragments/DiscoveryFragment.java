@@ -2,7 +2,6 @@ package com.example.bettertogether.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,34 +11,22 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.DiscoveryAdapter;
-import com.example.bettertogether.GroupsAdapter;
 import com.example.bettertogether.MakeNewGroupActivity;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
-import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.bettertogether.models.Group.CATEGORY;
-import static com.example.bettertogether.models.Group.ICON;
-import static com.example.bettertogether.models.Group.KEY_DESCRIPTION;
-import static com.example.bettertogether.models.Group.NAME;
-import static com.parse.ParseUser.getCurrentUser;
-
-import static com.parse.ParseUser.getCurrentUser;
 
 public class DiscoveryFragment extends Fragment {
     public static final String LOGTAG ="carousels";
@@ -52,6 +39,7 @@ public class DiscoveryFragment extends Fragment {
     private List<Category> mCategories = new ArrayList<>();
     private ProgressBar progressBar = null;
     private Button createGroupBtn;
+    private Button btnLeaderboard;
     private List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
     private final int REQUEST_CODE = 20;
 
@@ -65,12 +53,19 @@ public class DiscoveryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_rootview);
         createGroupBtn = (Button) view.findViewById(R.id.create_group_btn);
+        btnLeaderboard = view.findViewById(R.id.btnLeaderboard);
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         ParseQuery<Category> query = ParseQuery.getQuery(Category.class);
 
         queryCategories();
+        btnLeaderboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getFragmentManager().beginTransaction().replace(R.id.flContainer, new LeaderboardFragment()).commit();
+            }
+        });
     }
 
     private void queryCategories() {
@@ -90,7 +85,6 @@ public class DiscoveryFragment extends Fragment {
                             queryGroups(mCategories.get(i));
                         }
                     }
-                    //rvDiscovery.scrollToPosition(0);
                 } else {
                     e.printStackTrace();
                 }
@@ -102,6 +96,7 @@ public class DiscoveryFragment extends Fragment {
         ParseQuery<CatMembership> query = new ParseQuery<CatMembership>(CatMembership.class);
         query.include("group");
         query.whereEqualTo("category", cat);
+        query.setLimit(10);
         query.findInBackground(new FindCallback<CatMembership>() {
             @Override
             public void done(List<CatMembership> objects, ParseException e) {
@@ -177,7 +172,7 @@ public class DiscoveryFragment extends Fragment {
 
                             position = mRecyclerView.getChildAdapterPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition2));
                         }
-                        mRecyclerView.scrollToPosition(position);
+                        //mRecyclerView.scrollToPosition(position);
                         break;
                     case RecyclerView.SCROLL_STATE_DRAGGING:
                         break;

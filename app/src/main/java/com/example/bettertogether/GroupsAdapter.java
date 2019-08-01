@@ -14,9 +14,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.GroupFragment;
 import com.example.bettertogether.models.Group;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
@@ -52,6 +58,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private ImageView ivGroupProf;
+        private ImageView ivBadgeIcon;
         private TextView tvGroupName;
         private TextView tvCategory;
         private TextView tvDescription;
@@ -65,6 +72,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             tvCategory = itemView.findViewById(R.id.tvCategory);
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvDates = itemView.findViewById(R.id.tvDates);
+            ivBadgeIcon = itemView.findViewById(R.id.ivBadgeIcon);
 
             itemView.setOnClickListener(this);
         }
@@ -87,21 +95,45 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             }
 
             if (group.getIcon() != null) {
+                RequestOptions requestOptions = new RequestOptions();
+                requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(16));
                 Glide.with(context)
                         .load(group.getIcon().getUrl())
+                        .apply(requestOptions)
                         .into(ivGroupProf);
             }
+
+            if (group.getShowCheckInReminderBadge()) {
+                ivBadgeIcon.setVisibility(View.VISIBLE);
+            } else {
+                ivBadgeIcon.setVisibility(View.INVISIBLE);
+            }
+
             String startDateUgly = group.getStartDate();
             String endDateUgly = group.getEndDate();
             String startDate = startDateUgly.substring(4, 10).concat(", " + startDateUgly.substring(24));
             String endDate = endDateUgly.substring(4, 10).concat(", " + endDateUgly.substring(24));
 
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+            Date start = null;
+            Calendar cal = Calendar.getInstance();
+            try {
+                start = sdf.parse(startDateUgly);
+                cal.add(Calendar.DATE, group.getNumWeeks() * 7);
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
+            Date currentDate = Calendar.getInstance().getTime();
+
             if(group.getIsActive()) {
-                tvDates.setText("Active: " + startDate + " - " + endDate);
-                tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
-            } else {
-                tvDates.setText("Inactive: " + startDate + " - " + endDate);
+                tvDates.setText("Active: Ends on " + endDate);
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            } else if (currentDate.before(start)){
+                tvDates.setText("Inactive: Starts on " + startDate);
+                tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
+            } else if (currentDate.after(cal.getTime())) {
+                tvDates.setText("Inactive: Completed on " + endDate);
+                tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             }
         }
 
