@@ -7,17 +7,17 @@
     tools:context=".fragments.LeaderboardFragment">
 
     <ImageView
-        android:id="@+id/ivServicePoints2"
+        android:id="@+id/ivServicePoints"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginEnd="32dp"
         android:src="@drawable/sharp_local_florist_black_18dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivGetTogetherPoints2"
+        app:layout_constraintBottom_toBottomOf="@+id/ivGetTogetherPoints"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/ivGetTogetherPoints2" />
+        app:layout_constraintTop_toTopOf="@+id/ivGetTogetherPoints" />
 
     <ImageView
-        android:id="@+id/ivFitnessPoints2"
+        android:id="@+id/ivFitnessPoints"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginStart="32dp"
@@ -27,14 +27,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/ivGetTogetherPoints2"
+        android:id="@+id/ivGetTogetherPoints"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/sharp_people_black_18dp"
-        app:layout_constraintBottom_toBottomOf="@+id/ivFitnessPoints2"
-        app:layout_constraintEnd_toStartOf="@+id/ivServicePoints2"
-        app:layout_constraintStart_toEndOf="@+id/ivFitnessPoints2"
-        app:layout_constraintTop_toTopOf="@+id/ivFitnessPoints2" />
+        app:layout_constraintBottom_toBottomOf="@+id/ivFitnessPoints"
+        app:layout_constraintEnd_toStartOf="@+id/ivServicePoints"
+        app:layout_constraintStart_toEndOf="@+id/ivFitnessPoints"
+        app:layout_constraintTop_toTopOf="@+id/ivFitnessPoints" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barchart"
@@ -42,7 +42,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivFitnessPoints2"
+        app:layout_constraintTop_toBottomOf="@+id/ivFitnessPoints"
         tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
