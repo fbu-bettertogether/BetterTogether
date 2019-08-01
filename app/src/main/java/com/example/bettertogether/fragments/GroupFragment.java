@@ -222,7 +222,7 @@ public class GroupFragment extends Fragment {
             public void onClick(View view) {
                 Toast.makeText(getContext(), "title clicked", Toast.LENGTH_LONG).show();
                 FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance("Some Title");
+                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
                 groupDetailFragment.show(fm, "fragment_edit_name");
 
             }

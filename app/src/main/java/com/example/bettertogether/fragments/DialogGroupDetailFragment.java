@@ -7,15 +7,38 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.MemberAdapter;
 import com.example.bettertogether.R;
+import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
+import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 // ...
 
 public class DialogGroupDetailFragment extends DialogFragment {
 
-    private EditText mEditText;
+    private TextView tvGroupName;
+    private RecyclerView rvMembers;
+    private FriendAdapter adapter;
+    private TextView tvDates;
+    private TextView tvDescription;
+    private ImageView ivClose;
 
     public DialogGroupDetailFragment() {
         // Empty constructor is required for DialogFragment
@@ -23,10 +46,10 @@ public class DialogGroupDetailFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static DialogGroupDetailFragment newInstance(String title) {
+    public static DialogGroupDetailFragment newInstance(Group group) {
         DialogGroupDetailFragment frag = new DialogGroupDetailFragment();
         Bundle args = new Bundle();
-        args.putString("title", title);
+        args.putSerializable("group", group);
         frag.setArguments(args);
         return frag;
     }
@@ -41,13 +64,42 @@ public class DialogGroupDetailFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Get field from view
-        mEditText = (EditText) view.findViewById(R.id.txt_your_name);
+        tvGroupName = view.findViewById(R.id.tvGroupName);
+        rvMembers = view.findViewById(R.id.rvMembers);
+        tvDates = view.findViewById(R.id.tvDates);
+        tvDescription = view.findViewById(R.id.tvDescription);
+        ivClose = view.findViewById(R.id.ivClose);
+
         // Fetch arguments from bundle and set title
-        String title = getArguments().getString("title", "Enter Name");
-        getDialog().setTitle(title);
-        // Show soft keyboard automatically and request focus to field
-        mEditText.requestFocus();
-        getDialog().getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        Group group = (Group) getArguments().getSerializable("group");
+        getDialog().setTitle(group.getName());
+        tvGroupName.setText(group.getName());
+        String initialStartDate = group.getStartDate();
+        String startDate = initialStartDate.substring(0, 10) + "," + initialStartDate.substring(23);
+        String initialEndDate = group.getEndDate();
+        String endDate = initialEndDate.substring(0, 10) + "," + initialEndDate.substring(23);
+        tvDates.setText(endDate + " - " + startDate);
+        tvDescription.setText(group.getDescription());
+
+        // query for members
+        ParseQuery<Membership> membersQuery = new ParseQuery<Membership>(Membership.class);
+        membersQuery.whereEqualTo("group", group);
+        membersQuery.include("user");
+        membersQuery.findInBackground(new FindCallback<Membership>() {
+            @Override
+            public void done(List<Membership> objects, ParseException e) {
+                List<ParseUser> members = Membership.getAllUsers(objects);
+                adapter = new FriendAdapter(members, getFragmentManager());
+                rvMembers.setAdapter(adapter);
+                rvMembers.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+            }
+        });
+
+        ivClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+            }
+        });
     }
 }
