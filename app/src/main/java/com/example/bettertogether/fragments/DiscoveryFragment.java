@@ -85,7 +85,6 @@ public class DiscoveryFragment extends Fragment {
                             queryGroups(mCategories.get(i));
                         }
                     }
-                    //rvDiscovery.scrollToPosition(0);
                 } else {
                     e.printStackTrace();
                 }
@@ -172,7 +171,7 @@ public class DiscoveryFragment extends Fragment {
 
                             position = mRecyclerView.getChildAdapterPosition(mRecyclerView.findChildViewUnder(500, targetBottomPosition2));
                         }
-                        mRecyclerView.scrollToPosition(position);
+                        //mRecyclerView.scrollToPosition(position);
                         break;
                     case RecyclerView.SCROLL_STATE_DRAGGING:
                         break;
