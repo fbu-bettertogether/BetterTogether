@@ -40,7 +40,8 @@
                 android:layout_height="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvEndDate">
+                tools:layout_editor_absoluteY="145dp"
+                app:layout_constraintTop_toBottomOf="@+id/tvDate">
 
             </FrameLayout>
 
@@ -54,28 +55,14 @@
                 app:srcCompat="@drawable/account" />
 
             <TextView
-                android:id="@+id/tvStartDate"
+                android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TextView"
-                app:layout_constraintBottom_toBottomOf="@+id/tvEndDate"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.215"
                 app:layout_constraintStart_toStartOf="@+id/btnCheckIn"
-                app:layout_constraintTop_toTopOf="@+id/tvEndDate"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/tvEndDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TextView"
-                app:layout_constraintBottom_toTopOf="@+id/rvTimeline"
-                app:layout_constraintEnd_toEndOf="@+id/btnCheckIn"
-                app:layout_constraintHorizontal_bias="0.536"
-                app:layout_constraintStart_toEndOf="@+id/tvStartDate"
-                app:layout_constraintTop_toBottomOf="@+id/btnCheckIn"
-                app:layout_constraintVertical_bias="0.019" />
+                tools:layout_editor_absoluteY="126dp"
+                app:layout_constraintTop_toBottomOf="@+id/btnCheckIn"/>
 
             <TextView
                 android:id="@+id/tvTimer"
