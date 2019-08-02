@@ -188,7 +188,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         sendRegistrationToServer(token);
                         // Log and toast
                         Log.d(TAG, token);
-                        Toast.makeText(context, token, Toast.LENGTH_SHORT).show();
                     }
                 });
     }

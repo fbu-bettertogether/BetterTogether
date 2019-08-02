@@ -53,6 +53,7 @@ import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.Messaging;
+import com.example.bettertogether.MyFirebaseMessagingService;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -549,12 +550,15 @@ public class GroupFragment extends Fragment {
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
             addedUsers.addAll(addedMembers);
             saveMemberships(addedMembers);
+            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+            mfms.logToken(getContext());
             if (addedMembers != null) {
                 for (int i = 0; i < addedMembers.size(); i++) {
                     Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just added you to their group!");
                 }
             }
         }
+        addedMembers.clear();
         mPosts.clear();
         queryPosts();
     }

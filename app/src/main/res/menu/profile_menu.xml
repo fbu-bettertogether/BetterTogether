@@ -3,27 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_prof_pending"
-        android:title="show pending requests"
+        android:title="Show Pending Requests"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_prof_history"
-        android:title="show profile history"
+        android:title="Show Profile History"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_prof_pic"
-        android:title="change profile picture"
+        android:title="Change Profile Picture"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_prof_notif"
-        android:title="toggle notifications"
+        android:title="Toggle Notifications"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_prof_logout"
-        android:title="log out"
+        android:title="Log Out"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_prof_del"
-        android:title="delete account"
+        android:title="Delete Account"
         app:showAsAction="never" />
 
 </menu>
