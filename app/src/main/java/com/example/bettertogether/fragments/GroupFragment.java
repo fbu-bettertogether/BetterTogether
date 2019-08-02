@@ -313,7 +313,6 @@ public class GroupFragment extends Fragment {
                         } else {
                             try {
                                 checkPlace(category.getLocationTypesList());
-                                drawButton();
                             } catch (JSONException e1) {
                                 e1.printStackTrace();
                             }
@@ -348,23 +347,6 @@ public class GroupFragment extends Fragment {
                                                     btnCheckIn.setText("Request Pending");
                                                 }
                                             });
-
-//                                Membership membership = new Membership();
-//                                membership.setGroup(group);
-//                                membership.setUser(ParseUser.getCurrentUser());
-//                                membership.saveInBackground();
-//                                btnCheckIn.setOnClickListener(null);
-//                                currMem = membership;
-//                                numCheckIns = currMem.getNumCheckIns();
-//                                if (numCheckIns == null) {
-//                                    numCheckIns = new ArrayList<>();
-//                                    numCheckIns.add(0);
-//                                }
-//                                try {
-//                                    checkPlace(category.getLocationTypesList());
-//                                } catch (JSONException e1) {
-//                                    e1.printStackTrace();
-//                                }
 
                                         }
                                     });
@@ -603,8 +585,9 @@ public class GroupFragment extends Fragment {
                     if (task.isSuccessful()) {
                         FindCurrentPlaceResponse response = task.getResult();
                         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                            double likelihood = placeLikelihood.getLikelihood();
                             for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
-                                if (types.contains(type.toString())) {
+                                if (types.contains(type.toString()) & likelihood > 0.05) {
                                     drawButton();
                                     return;
                                 }
