@@ -82,11 +82,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     final private String FCM_API = "https://fcm.googleapis.com/fcm/send";
     final private String serverKey = "key=" + "AAAArU_ed7A:APA91bHInx5XEXefgNJI83z6_kCcryuj_LqFrz-9kHPLb-MEClcwIMt_XI9HVTb4AreIxonQuOAEG5_UZDTCgkY1SykbUbE_fOobhRv6WehEF6TuMUmiKofMQjUPGoF1zz7WQTwyIEj9";
     final private String contentType = "application/json";
-    final String TAG = "NOTIFICATION TAG";
-
-    String notificationTitle;
-    String notificationMsg;
-    String notificationTopic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +143,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MakeNewGroupActivity.this, AddUsersActivity.class);
                 //Keeps track of which users have already been added, so that they cannot be added again.
+                intent.putExtra("situation", R.string.add_friend_to_new_group);
                 intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
                 startActivityForResult(intent, ADD_REQUEST_CODE);
             }

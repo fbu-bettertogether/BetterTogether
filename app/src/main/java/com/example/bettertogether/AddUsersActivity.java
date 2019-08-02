@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +32,7 @@ public class AddUsersActivity extends AppCompatActivity {
     private ArrayList<String> objIds;
     private ArrayList<ParseUser> addedMembers;
     private ArrayList<ParseUser> users;
+    private int situation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,18 @@ public class AddUsersActivity extends AppCompatActivity {
                 for (ParseUser curr : friends) {
                     if (alreadyAdded == null || alreadyAdded.size() == 0 || !objIds.contains(curr.getObjectId())) {
                         unaddedFriends.add(curr);
+                    }
+                }
+                if (unaddedFriends.size() == 0) {
+                    situation = getIntent().getExtras().getInt("situation");
+                    switch (situation) {
+                        case R.string.invite_friend_to_group:
+                            Toast.makeText(getApplicationContext(), "All your friends are already in this group!", Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.string.add_friend_to_new_group:
+                            Toast.makeText(getApplicationContext(), "All your friends have already been added this group!", Toast.LENGTH_SHORT).show();
+                        default:
+                            break;
                     }
                 }
                 users.addAll(unaddedFriends);
