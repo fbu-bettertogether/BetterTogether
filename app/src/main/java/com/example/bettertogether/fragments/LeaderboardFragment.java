@@ -89,7 +89,7 @@ public class LeaderboardFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
+                ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.orange, getActivity().getTheme()));
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 drawGraph(groupsToPoints, idsToGroups, "Fitness");
@@ -102,7 +102,7 @@ public class LeaderboardFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
+                ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.orange, getActivity().getTheme()));
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 drawGraph(groupsToPoints, idsToGroups, "Get-Togethers");
@@ -115,7 +115,7 @@ public class LeaderboardFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
+                ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.orange, getActivity().getTheme()));
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 drawGraph(groupsToPoints, idsToGroups, "Fitness");
@@ -193,7 +193,7 @@ public class LeaderboardFragment extends Fragment {
         });
         dataSet.setBarBorderWidth(0.9f);
         List<Integer> colors = new ArrayList<>();
-        colors.add(getResources().getColor(R.color.colorPrimary));
+        colors.add(getResources().getColor(R.color.orange));
         colors.add(getResources().getColor(R.color.o4));
         colors.add(getResources().getColor(R.color.o8));
         colors.add(getResources().getColor(R.color.colorPrimaryDark));
@@ -237,7 +237,7 @@ public class LeaderboardFragment extends Fragment {
         });
         dataSet.setBarBorderWidth(0.9f);
         List<Integer> colors = new ArrayList<>();
-        colors.add(getResources().getColor(R.color.colorPrimary));
+        colors.add(getResources().getColor(R.color.orange));
         colors.add(getResources().getColor(R.color.o4));
         colors.add(getResources().getColor(R.color.o8));
         colors.add(getResources().getColor(R.color.colorPrimaryDark));

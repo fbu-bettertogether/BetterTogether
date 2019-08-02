@@ -165,7 +165,7 @@ public class Messaging extends FirebaseMessagingService {
         adminChannel = new NotificationChannel(ADMIN_CHANNEL_ID, adminChannelName, NotificationManager.IMPORTANCE_HIGH);
         adminChannel.setDescription(adminChannelDescription);
         adminChannel.enableLights(true);
-        adminChannel.setLightColor(R.color.colorPrimary);
+        adminChannel.setLightColor(R.color.orange);
         adminChannel.enableVibration(true);
         if (notificationManager != null) {
             notificationManager.createNotificationChannel(adminChannel);

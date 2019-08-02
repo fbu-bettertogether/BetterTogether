@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,16 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.bettertogether.fragments.AwardFragment;
 import com.example.bettertogether.fragments.DialogAwardFragment;
-import com.example.bettertogether.fragments.DialogGroupDetailFragment;
 import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.UserAward;
 import com.parse.ParseFile;
 
 import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder> {
 

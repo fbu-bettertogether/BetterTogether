@@ -1,9 +1,13 @@
 package com.example.bettertogether.fragments;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -11,6 +15,9 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +25,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bettertogether.DiscoveryAdapter;
 import com.example.bettertogether.MakeNewGroupActivity;
 import com.example.bettertogether.R;
+import com.example.bettertogether.ResultsAdapter;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +67,9 @@ public class DiscoveryFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         ParseQuery<Category> query = ParseQuery.getQuery(Category.class);
-
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
         queryCategories();
         btnLeaderboard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +81,7 @@ public class DiscoveryFragment extends Fragment {
 
     private void queryCategories() {
         final Category.Query catQuery = new Category.Query();
+        catQuery.addDescendingOrder("createdAt");
         catQuery.findInBackground(new FindCallback<Category>() {
             @Override
             public void done(List<Category> objects, ParseException e) {
@@ -116,6 +128,80 @@ public class DiscoveryFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        // Inflate the options menu from XML
+        inflater.inflate(R.menu.search_view, menu);
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        final androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) menu.findItem(R.id.action_search).getActionView();
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(final String query) {
+                // perform query here
+
+                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+                // see https://code.google.com/p/android/issues/detail?id=24599
+                if (query.isEmpty()) {
+                    mRecyclerView.setAdapter(mainRecyclerAdapter);
+                    return false;
+                }
+                searchView.clearFocus();
+                ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
+                userParseQuery.whereContains("username", query);
+                userParseQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(final List<ParseUser> users, ParseException e) {
+                        ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
+                        userParseQuery.whereContains("name", query);
+                        userParseQuery.findInBackground(new FindCallback<Group>() {
+                            @Override
+                            public void done(List<Group> groups, ParseException e) {
+                                mRecyclerView.setAdapter(new ResultsAdapter(getContext(), groups, users));
+                            }
+                        });
+
+                    }
+                });
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String newText) {
+                if (newText.isEmpty()) {
+                    mRecyclerView.setAdapter(mainRecyclerAdapter);
+                    return false;
+                }
+                ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
+                userParseQuery.whereContains("username", newText);
+                userParseQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(final List<ParseUser> users, ParseException e) {
+                        ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
+                        userParseQuery.whereContains("name", newText);
+                        userParseQuery.findInBackground(new FindCallback<Group>() {
+                            @Override
+                            public void done(List<Group> groups, ParseException e) {
+                                mRecyclerView.setAdapter(new ResultsAdapter(getContext(), groups, users));
+                            }
+                        });
+
+                    }
+                });
+
+                return false;
+            }
+        });
+
+    }
+
+
 
     private void display() {
         mainRecyclerAdapter = new DiscoveryAdapter(listOfListOfItems, getContext());

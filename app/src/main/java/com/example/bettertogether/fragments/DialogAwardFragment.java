@@ -1,50 +1,25 @@
 package com.example.bettertogether.fragments;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
-
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
-import com.example.bettertogether.FriendAdapter;
-import com.example.bettertogether.MemberAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.Group;
-import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.UserAward;
-import com.parse.FindCallback;
-import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
-import org.w3c.dom.Text;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.parse.ParseUser.getCurrentUser;
 // ...
 
 public class DialogAwardFragment extends DialogFragment {

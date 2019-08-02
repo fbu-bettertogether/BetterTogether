@@ -2,12 +2,7 @@ package com.example.bettertogether.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,14 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,8 +40,6 @@ import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.example.bettertogether.models.UserAward;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -272,7 +262,7 @@ public class ProfileFragment extends Fragment {
                                             invitation.saveInBackground();
                                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                                             mfms.logToken(getContext());
-                                            Messaging.sendNotification((String)user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
+                                            Messaging.sendNotification((String) user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
                                             ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                                             query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
                                                 public void done(ParseObject object, ParseException e) {
@@ -303,7 +293,7 @@ public class ProfileFragment extends Fragment {
 
         ivServicePoints.setColorFilter(getResources().getColor(R.color.o9));
         ivGetTogetherPoints.setColorFilter(getResources().getColor(R.color.o4));
-        ivFitnessPoints.setColorFilter(getResources().getColor(R.color.colorPrimary));
+        ivFitnessPoints.setColorFilter(getResources().getColor(R.color.orange));
         tvServicePoints.setText(Integer.toString(user.getInt("servicePoints")));
         tvGetTogetherPoints.setText(Integer.toString(user.getInt("getTogetherPoints")));
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));

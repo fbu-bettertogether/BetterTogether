@@ -215,7 +215,7 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                         invitation.setAccepted("accepted");
                         MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                         mfms.logToken(getApplicationContext());
-                        Messaging.sendNotification((String)invitation.getInviter().get("deviceId"), invitation.getReceiver().getUsername() + " just accepted your invitation!");
+                        Messaging.sendNotification((String) invitation.getInviter().get("deviceId"), invitation.getReceiver().getUsername() + " just accepted your invitation!");
                         invitation.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {

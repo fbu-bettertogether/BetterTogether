@@ -71,7 +71,7 @@
                 android:layout_marginRight="8dp"
                 android:gravity="center_horizontal"
                 android:text="TextView"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/orange"
                 android:textSize="36sp"
                 android:textStyle="bold"
                 android:visibility="invisible"
@@ -133,7 +133,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="@color/colorPrimary"
+            app:contentScrim="@color/orange"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">

@@ -375,23 +375,6 @@ public class GroupFragment extends Fragment {
                                                 }
                                             });
 
-//                                Membership membership = new Membership();
-//                                membership.setGroup(group);
-//                                membership.setUser(ParseUser.getCurrentUser());
-//                                membership.saveInBackground();
-//                                btnCheckIn.setOnClickListener(null);
-//                                currMem = membership;
-//                                numCheckIns = currMem.getNumCheckIns();
-//                                if (numCheckIns == null) {
-//                                    numCheckIns = new ArrayList<>();
-//                                    numCheckIns.add(0);
-//                                }
-//                                try {
-//                                    checkPlace(category.getLocationTypesList());
-//                                } catch (JSONException e1) {
-//                                    e1.printStackTrace();
-//                                }
-
                                         }
                                     });
                                 }
@@ -531,11 +514,11 @@ public class GroupFragment extends Fragment {
                     // add to pie chart
                     PieDataSet dataSet = new PieDataSet(entries, "group stats");
                     List<Integer> colors = new ArrayList<>();
-                    colors.add(getResources().getColor(R.color.colorPrimary));
+                    colors.add(getResources().getColor(R.color.orange));
                     colors.add(getResources().getColor(R.color.o4));
                     colors.add(getResources().getColor(R.color.o8));
                     colors.add(getResources().getColor(R.color.colorPrimaryDark));
-                    dataSet.setValueLineColor(R.color.colorPrimary);
+                    dataSet.setValueLineColor(R.color.orange);
                     dataSet.setColors(colors);
                     dataSet.setDrawValues(true);
                     dataSet.setSliceSpace(3);
