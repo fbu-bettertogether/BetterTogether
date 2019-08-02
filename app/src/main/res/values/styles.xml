@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="CustomActionBarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <!-- OverFlow Menu Text Color -->
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>
