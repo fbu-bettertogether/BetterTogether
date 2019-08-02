@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="pink">#ba274a</color>
-    <color name="colorPrimary">#FF7F34</color>
+    <color name="colorPrimary">#ffa500</color>
+    <color name="originalOrange">#FF7F20</color>
     <color name="o1">#ff8842</color>
     <color name="o2">#ff9151</color>
     <color name="o3">#ff9a5f</color>
@@ -18,9 +19,15 @@
     <color name="colorAccent">#FF9533</color>
     <color name="rose">#FFE9E1</color>
     <color name="blue">#05b2dc</color>
+    <color name="skyBlue">#87ceeb</color>
+    <color name="lightSkyBlue">#87cefa</color>
+    <color name="azure">#f0ffff</color>
+    <color name="lavender">#e6e6fa</color>
     <color name="grey">#D3D3D3</color>
     <color name="gold">#d4af37</color>
     <color name="gray">#a9a9a9</color>
     <color name="light_gray">#F5F5F5</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 
 </resources>

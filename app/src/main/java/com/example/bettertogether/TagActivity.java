@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
@@ -75,6 +76,9 @@ public class TagActivity extends AppCompatActivity {
                     if (alreadyTagged == null || alreadyTagged.size() == 0 || !objIds.contains(curr.getObjectId())) {
                         untaggedFriends.add(curr);
                     }
+                }
+                if (untaggedFriends.size() == 0) {
+                    Toast.makeText(getApplicationContext(), "All your friends have already been tagged in this post!", Toast.LENGTH_SHORT).show();
                 }
                 groupMembers.addAll(untaggedFriends);
                 adapter.notifyDataSetChanged();

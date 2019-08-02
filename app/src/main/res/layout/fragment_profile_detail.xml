@@ -5,7 +5,19 @@
     android:id="@+id/contstrainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileDetailFragment" >
+    tools:context=".HomeActivity" >
+
+    <TextView
+        android:id="@+id/tvSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnPendingRequests"
@@ -19,25 +31,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tvSettings" />
 
     <Button
-        android:id="@+id/btnNotifications"
+        android:id="@+id/btnGroupHistory"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Toggle Notifications"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnProfilePicture" />
-
-    <Button
-        android:id="@+id/btnLeaveGroup"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Log Out"
+        android:text="Show Group History"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnNotifications" />
+        app:layout_constraintTop_toBottomOf="@+id/btnPendingRequests" />
 
     <Button
         android:id="@+id/btnProfilePicture"
@@ -51,27 +53,15 @@
         app:layout_constraintTop_toBottomOf="@+id/btnGroupHistory" />
 
     <Button
-        android:id="@+id/btnGroupHistory"
+        android:id="@+id/btnLeaveGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Show Group History"
+        android:text="Log Out"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnPendingRequests" />
-
-    <TextView
-        android:id="@+id/tvSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Settings"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/btnProfilePicture" />
 
     <Button
         android:id="@+id/btnDeleteGroup"

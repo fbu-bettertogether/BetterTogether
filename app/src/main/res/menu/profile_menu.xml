@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_prof_pending"
+        android:title="show pending requests"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_prof_history"
+        android:title="show profile history"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_prof_pic"
+        android:title="change profile picture"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_prof_notif"
+        android:title="toggle notifications"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_prof_logout"
+        android:title="log out"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_prof_del"
+        android:title="delete account"
+        app:showAsAction="never" />
+
+</menu>

@@ -40,6 +40,8 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="TextView"
+        android:typeface="serif"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,6 +53,8 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:text="TextView"
+        android:textSize="16sp"
+        android:typeface="serif"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivGroupProf"
         app:layout_constraintTop_toBottomOf="@+id/tvGroupName" />
@@ -62,6 +66,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="4dp"
         android:text="TextView"
+        android:textStyle="italic"
+        android:typeface="serif"
         app:layout_constraintStart_toEndOf="@+id/ivGroupProf"
         app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
 

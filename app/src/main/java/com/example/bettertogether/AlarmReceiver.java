@@ -28,8 +28,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Bundle bundle = intent.getBundleExtra("bundle");
         if (bundle != null) {
-            int notificationId = intent.getIntExtra("notificationId", 0);
-            createNotification(context, "BetterTogether", "Check out this new gorup!", "Alert", notificationId);
             Group group = (Group) bundle.getSerializable("group");
             Intent i = new Intent(context, WeeklyIntentService.class);
             i.putExtra("bundle", bundle);

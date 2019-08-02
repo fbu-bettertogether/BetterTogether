@@ -52,7 +52,7 @@ public class AwardFragment extends Fragment {
     public final String APP_TAG = "BetterTogether";
     private static final String ARG_AWARD = "award";
     private Award award;
-    private Award newAward = new Award();
+    private static Award newAward = new Award();
     private UserAward userAward;
     private ParseUser user = getCurrentUser();
     private OnAwardFragmentInteractionListener mListener;
@@ -143,7 +143,7 @@ public class AwardFragment extends Fragment {
         });
     }
 
-    private void setAwardStatus(List<UserAward> objects) {
+    public void setAwardStatus(List<UserAward> objects) {
         if (objects != null && objects.size() != 0) {
             userAward = objects.get(0);
             if (userAward.getIfAchieved()) {
@@ -165,7 +165,7 @@ public class AwardFragment extends Fragment {
         }
     }
 
-    public void queryAward (Award awd, final Boolean setStatus, final Boolean checkAward, final Context con) {
+    public void queryAward(Award awd, final Boolean setStatus, final Boolean checkAward, final Context con) {
         newAward = awd;
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");
