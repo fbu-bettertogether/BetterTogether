@@ -247,6 +247,7 @@
             android:layout_marginEnd="32dp"
             android:layout_marginRight="24dp"
             android:text="Create Group"
+            android:background="@color/orange"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"

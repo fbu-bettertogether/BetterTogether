@@ -99,7 +99,7 @@
         android:layout_below="@+id/ivCamera"
         android:layout_marginStart="8dp"
         android:theme="@style/AppTheme"
-        android:tint="@color/colorPrimary"
+        android:tint="@color/orange"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilPost"
         app:srcCompat="@drawable/tag" />

@@ -85,7 +85,7 @@ public class DialogGroupDetailFragment extends DialogFragment {
                 ivCatIcon.setImageResource(R.drawable.sharp_local_florist_black_18dp);
                 break;
         }
-        ivCatIcon.setColorFilter(getResources().getColor(R.color.colorPrimary));
+        ivCatIcon.setColorFilter(getResources().getColor(R.color.orange));
 
         String initialStartDate = group.getStartDate();
         String startDate = initialStartDate.substring(0, 10) + "," + initialStartDate.substring(23);
