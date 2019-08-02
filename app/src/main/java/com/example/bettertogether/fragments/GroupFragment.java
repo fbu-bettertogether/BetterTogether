@@ -232,16 +232,6 @@ public class GroupFragment extends Fragment {
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
         setHasOptionsMenu(true);
-        collapsingToolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "title clicked", Toast.LENGTH_LONG).show();
-                FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
-                groupDetailFragment.show(fm, "fragment_group_detail");
-
-            }
-        });
 
         final ImageView imageView = view.findViewById(R.id.backdrop);
         if (group.getIcon() != null) {
@@ -999,16 +989,19 @@ public class GroupFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case android.R.id.home:
                 FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
                 GroupsFragment fragment = new GroupsFragment();
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                 break;
+
             case R.id.action_requests:
                 Intent intent = new Intent(getContext(), InvitationActivity.class);
                 intent.putExtra("group", (Parcelable) group);
                 startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
                 break;
+
             case R.id.action_leave:
                 if (group.getIsActive()) {
                     Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
@@ -1033,6 +1026,7 @@ public class GroupFragment extends Fragment {
                     });
                 }
                 break;
+
             case R.id.action_invite_to_group:
                 ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
                 parseQuery.whereEqualTo("group", group);
@@ -1060,6 +1054,13 @@ public class GroupFragment extends Fragment {
                     }
                 });
                 break;
+
+            case R.id.action_more:
+                FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
+                groupDetailFragment.show(fm, "fragment_group_detail");
+                break;
+
             default:
                 break;
         }
