@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,6 +49,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         rvPosts = view.findViewById(R.id.rvPosts);
         swipeContainerPosts = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainerPosts);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
 
         // initializing list of posts, adapter, and attaching adapter to recyclerview
         mPosts = new ArrayList<>();
@@ -97,36 +99,6 @@ public class HomeFragment extends Fragment {
                 }
 
                 final List<Group> groups = Membership.getAllGroups(objects);
-
-//                for (int i = 0; i < groups.size(); i++) {
-//                    ParseQuery<Post> postQuery = new ParseQuery<Post>(Post.class);
-//                    postQuery.whereEqualTo("group", groups.get(i));
-//                    postQuery.setLimit(3);
-//                    postQuery.addDescendingOrder("createdAt");
-//                    postQuery.include("user");
-//
-//                    postQuery.findInBackground(new FindCallback<Post>() {
-//                        @Override
-//                        public void done(List<Post> posts, ParseException e) {
-//                            if (e != null) {
-//                                Log.e("querying posts", "error with query");
-//                                e.printStackTrace();
-//                                return;
-//                            }
-//
-//                            // add new posts to the list and notify adapter
-//                            mPosts.addAll(posts);
-//                            Collections.sort(mPosts, new Comparator<Post>() {
-//                                @Override
-//                                public int compare(Post post1, Post post2) {
-//                                    return post2.getCreatedAt().compareTo(post1.getCreatedAt());
-//                                }
-//                            });
-//
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                    });
-//                }
                 ParseQuery friendQuery = null;
                 try {
                     friendQuery = ((ParseRelation) ParseUser.getCurrentUser().fetchIfNeeded().get("friends")).getQuery();

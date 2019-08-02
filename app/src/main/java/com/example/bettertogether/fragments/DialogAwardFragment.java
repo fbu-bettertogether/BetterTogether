@@ -1,47 +1,25 @@
 package com.example.bettertogether.fragments;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
-
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.EditText;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.DialogFragment;
 
 import com.bumptech.glide.Glide;
-import com.example.bettertogether.FriendAdapter;
-import com.example.bettertogether.MemberAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.Group;
-import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.UserAward;
-import com.parse.FindCallback;
-import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
-import org.w3c.dom.Text;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.parse.ParseUser.getCurrentUser;
 // ...
 
 public class DialogAwardFragment extends DialogFragment {
@@ -53,6 +31,7 @@ public class DialogAwardFragment extends DialogFragment {
     private TextView tvAwardDescription;
     private List<Award> achievedAwards = new ArrayList<>();
     private List<UserAward> userAwards = new ArrayList<UserAward>();
+    private Boolean isAchieved;
 
     public DialogAwardFragment() {
         // Empty constructor is required for DialogFragment
@@ -60,10 +39,11 @@ public class DialogAwardFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static DialogAwardFragment newInstance(Award award) {
+    public static DialogAwardFragment newInstance(Award award, boolean isAchieved) {
         DialogAwardFragment frag = new DialogAwardFragment();
         Bundle args = new Bundle();
         args.putSerializable("award", award);
+        args.putBoolean("isAchieved", isAchieved);
         frag.setArguments(args);
         return frag;
     }
@@ -71,6 +51,8 @@ public class DialogAwardFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         return inflater.inflate(R.layout.fragment_dialog_award, container);
     }
 
@@ -83,6 +65,7 @@ public class DialogAwardFragment extends DialogFragment {
 
         // Fetch arguments from bundle and set title
         award = (Award) getArguments().getSerializable("award");
+        isAchieved = (Boolean) getArguments().getBoolean("isAchieved");
         getDialog().setTitle(award.getName());
 
         if (award.getIcon() != null) {
@@ -92,34 +75,8 @@ public class DialogAwardFragment extends DialogFragment {
         tvAwardName.setText(award.getName());
         tvAwardDescription.setText(award.getDescription());
 
-        ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
-        query.include("award");
-        query.whereEqualTo("user", getCurrentUser());
-        query.findInBackground(new FindCallback<UserAward>() {
-            @Override
-            public void done(List<UserAward> objects, ParseException e) {
-                if (e != null) {
-                    Log.e("Querying groups", "error with query");
-                    e.printStackTrace();
-                    return;
-                }
-                if (objects != null) {
-                    for (int i = 0; i < objects.size(); i++) {
-                        if (objects.get(i).getIfAchieved()) {
-                            achievedAwards.add(objects.get(i).getAward());
-                        }
-                    }
-                    ArrayList<String> awardNames = new ArrayList<>();
-                    for (Award a : achievedAwards) {
-                        awardNames.add(a.get("name").toString());
-                    }
-                    if (!awardNames.contains(award.get("name").toString())) {
-                        Resources res = getContext().getResources();
-                        final int greyTint = res.getColor(R.color.grey);
-                        ivAwardImage.setColorFilter(greyTint);
-                    }
-                }
-            }
-        });
+        if (!isAchieved) {
+            ivAwardImage.setColorFilter(getContext().getResources().getColor(R.color.grey));
+        }
     }
 }

@@ -18,7 +18,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.GroupFragment;
-import com.example.bettertogether.fragments.GroupsFragment;
 import com.example.bettertogether.models.Group;
 
 import java.text.SimpleDateFormat;
@@ -56,6 +55,11 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         return groups.size();
     }
 
+
+    public void clear() {
+        groups.clear();
+        notifyDataSetChanged();
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
@@ -153,9 +157,5 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
             }
         }
-    }
-    public void clear() {
-        groups.clear();
-        notifyDataSetChanged();
     }
 }
