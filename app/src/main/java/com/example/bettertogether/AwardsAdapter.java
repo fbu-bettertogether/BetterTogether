@@ -118,7 +118,6 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
                     }
                 }
                 // switch to award-detail view fragment
-                Toast.makeText(context, "title clicked", Toast.LENGTH_LONG).show();
                 FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
                 DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award, isAchieved);
                 awardFragment.show(fm, "fragment_group_detail");
