@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
 
@@ -119,11 +120,10 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
             String startDateUgly = group.getStartDate();
             String endDateUgly = group.getEndDate();
-            String startDate = startDateUgly.substring(4, 10).concat(", " + startDateUgly.substring(24));
-            String endDate = endDateUgly.substring(4, 10).concat(", " + endDateUgly.substring(24));
 
             SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
             Date start = null;
+            Date end = null;
             Calendar cal = Calendar.getInstance();
             try {
                 start = sdf.parse(startDateUgly);
@@ -131,16 +131,43 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             } catch (java.text.ParseException e) {
                 e.printStackTrace();
             }
+            try {
+                end = sdf.parse(endDateUgly);
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+            }
             Date currentDate = Calendar.getInstance().getTime();
 
+            Date now = Calendar.getInstance().getTime();
+            final boolean nowBeforeStart = now.before(start);
+
+            long diffInMillis = 0;
+            if (group.getIsActive()) {
+                diffInMillis = end.getTime() - now.getTime();
+            } else if (nowBeforeStart) {
+                diffInMillis = start.getTime() - now.getTime();
+            } else {
+                diffInMillis = end.getTime() - now.getTime();
+            }
+
+            long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+            int weekDiff = (int) diff / 7;
+            String unit = "weeks";
+            int time = weekDiff;
+
+            if (weekDiff == 0) {
+                unit = "days";
+                time = (int) diff;
+            }
+
             if(group.getIsActive()) {
-                tvDates.setText("Active: Ends on " + endDate);
+                tvDates.setText(String.format("Active: %d %s left!", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.orange));
             } else if (currentDate.before(start)){
-                tvDates.setText("Inactive: Starts on " + startDate);
+                tvDates.setText(String.format("Inactive: starts in %d %s!", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             } else if (currentDate.after(cal.getTime())) {
-                tvDates.setText("Inactive: Completed on " + endDate);
+                tvDates.setText(String.format("Inactive: completed %d %s ago!", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             }
         }

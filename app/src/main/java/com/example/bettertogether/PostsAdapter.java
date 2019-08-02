@@ -19,6 +19,7 @@ import com.example.bettertogether.fragments.ProfileFragment;
 import com.example.bettertogether.models.Like;
 import com.example.bettertogether.models.Post;
 import com.parse.DeleteCallback;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -100,22 +101,21 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.ivMedia.getLayoutParams().height = 0;
             holder.ivMedia.getLayoutParams().width = 0;
         }
-
+        holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
         ParseQuery<Like> query = new ParseQuery<Like>(Like.class);
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
         query.whereEqualTo("post", post);
-        query.getFirstInBackground(new GetCallback<Like>() {
-                                       @Override
-                                       public void done(Like object, ParseException e) {
-                                           if (object == null) {
-                                                       holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
-                                           } else {
-                                               holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
-                                                   }
-                                               }
+        query.findInBackground(new FindCallback<Like>() {
+            @Override
+            public void done(List<Like> objects, ParseException e) {
+                for (Like like : objects) {
+                    if (like.getUser().hasSameId(ParseUser.getCurrentUser())) {
+                        holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
+                    }
+                }
+                holder.tvNumLikes.setText(String.valueOf(objects.size()));
+            }
+        });
 
-                                           }
-                                   );
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,6 +130,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 @Override
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
+                                    holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) - 1));
                                 }
                             });
                         } else {
@@ -140,6 +141,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 @Override
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
+                                    holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) + 1));
                                 }
                             });
 
@@ -163,6 +165,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public TextView tvTime;
         public ImageButton btnLike;
         public ImageView ivMedia;
+        public TextView tvNumLikes;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -172,6 +175,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvUsername = (TextView) itemView.findViewById(R.id.tvUsername);
             tvBody = (TextView) itemView.findViewById(R.id.tvBody);
             tvTime = (TextView) itemView.findViewById(R.id.tvTime);
+            tvNumLikes = (TextView) itemView.findViewById(R.id.tvNumLikes);
             btnLike = (ImageButton) itemView.findViewById(R.id.ivLike);
             ivMedia = (ImageView) itemView.findViewById(R.id.ivMedia);
         }

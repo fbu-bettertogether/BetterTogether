@@ -3,15 +3,14 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorAccent</item>
+        <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="CustomActionBarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <!-- OverFlow Menu Text Color -->
         <item name="android:textColor">@color/black</item>
-
     </style>
 
 </resources>
