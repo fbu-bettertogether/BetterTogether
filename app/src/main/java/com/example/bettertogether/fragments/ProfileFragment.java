@@ -318,6 +318,11 @@ public class ProfileFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                GroupsFragment fragment = new GroupsFragment();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                break;
             case R.id.action_prof_logout:
                 ParseUser.logOut();
                 Intent intent = new Intent(getContext(), MainActivity.class);
@@ -327,9 +332,6 @@ public class ProfileFragment extends Fragment {
                 Intent i = new Intent(getContext(), InvitationActivity.class);
                 startActivityForResult(i, INVITATION_REQUEST_CODE);
         }
-
-        Toast.makeText(getContext(), "itemId: " + item.toString(), Toast.LENGTH_LONG).show();
-        Log.d("itemId", item.toString());
         return true;
     }
 
