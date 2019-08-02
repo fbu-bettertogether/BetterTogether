@@ -132,7 +132,6 @@ public class GroupFragment extends Fragment {
     private ParseGeoPoint location;
     private ImageView ivBanner;
     private ImageView ivUserIcon;
-    private ImageView ivSettings;
     private TextView tvGroupName;
     private Button btnCheckIn;
     private TextView tvDate;
@@ -214,7 +213,6 @@ public class GroupFragment extends Fragment {
         scrollView = view.findViewById(R.id.scrollView);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
-        ivSettings = view.findViewById(R.id.ivSettings);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
@@ -346,7 +344,6 @@ public class GroupFragment extends Fragment {
                         chart.getLayoutParams().width = 0;
                     }
                 } else {
-                    ivSettings.setVisibility(View.INVISIBLE);
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
                         ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
                         query.whereEqualTo("receiver", ParseUser.getCurrentUser());
