@@ -12,4 +12,7 @@
     <string name="one_week_streak_award">5BbbXUZn1B</string>
     <string name="first_complete_award">9qgMgRKb7l</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="invite_friend_to_group">Invite friend to group</string>
+    <string name="add_friend_to_new_group">Add friend to new group</string>
 </resources>

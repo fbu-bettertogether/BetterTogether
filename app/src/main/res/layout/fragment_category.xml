@@ -12,7 +12,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Category Name"
-        android:textSize="30dp"
+        android:typeface="serif"
+        android:textSize="26dp"
+        android:textColor="@color/o4"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,8 +27,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="Show More"
+        android:textColor="@color/quantum_white_text"
         android:textSize="8dp"
-        android:backgroundTint="@color/blue"
+        android:typeface="serif"
+        android:textStyle="bold"
+        android:backgroundTint="@color/skyBlue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

@@ -78,7 +78,7 @@ public class GroupDetailFragment extends Fragment {
     private ArrayList<ParseUser> addedMembers;
     private List<ParseUser> addedUsers = new ArrayList<ParseUser>();
     private Date start;
-    List<Membership> memberships = new ArrayList<Membership>();
+    private List<Membership> memberships = new ArrayList<Membership>();
 
     public GroupDetailFragment() {
         // Required empty public constructor

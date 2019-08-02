@@ -143,6 +143,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MakeNewGroupActivity.this, AddUsersActivity.class);
                 //Keeps track of which users have already been added, so that they cannot be added again.
+                intent.putExtra("situation", R.string.add_friend_to_new_group);
                 intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
                 startActivityForResult(intent, ADD_REQUEST_CODE);
             }

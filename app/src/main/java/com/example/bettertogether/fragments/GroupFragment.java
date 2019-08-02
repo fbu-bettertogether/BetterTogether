@@ -1,7 +1,9 @@
 package com.example.bettertogether.fragments;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -42,10 +45,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.bettertogether.AddUsersActivity;
+import com.example.bettertogether.AlarmReceiver;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.InvitationActivity;
+import com.example.bettertogether.Messaging;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -84,12 +91,14 @@ import com.parse.SaveCallback;
 import org.json.JSONException;
 import org.parceler.Parcels;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -97,6 +106,7 @@ import nl.dionsegijn.konfetti.KonfettiView;
 import nl.dionsegijn.konfetti.models.Shape;
 import nl.dionsegijn.konfetti.models.Size;
 
+import static android.app.Activity.RESULT_OK;
 import static com.parse.ParseUser.getCurrentUser;
 
 /**
@@ -117,6 +127,7 @@ public class GroupFragment extends Fragment {
     private static final String ARG_GROUP = "group";
     private Group group;
     private OnGroupFragmentInteractionListener mListener;
+    private final int ADD_REQUEST_CODE = 20;
     public static final int REQUEST_CODE = 45;
     private ParseGeoPoint location;
     private ImageView ivBanner;
@@ -148,7 +159,10 @@ public class GroupFragment extends Fragment {
     private ImageView ivProfPic;
     private ScrollView scrollView;
     private KonfettiView viewKonfetti;
-
+    private Date start;
+    private ArrayList<ParseUser> addedMembers;
+    private List<ParseUser> addedUsers;
+    List<Membership> memberships;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -169,6 +183,9 @@ public class GroupFragment extends Fragment {
             this.group = (Group) getArguments().getParcelable(ARG_GROUP);
         }
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        addedMembers = new ArrayList<>();
+        memberships = new ArrayList<>();
+        addedUsers = new ArrayList<>();
         try {
             category = group.getParseObject("category").fetch();
         } catch (ParseException e) {
@@ -506,9 +523,73 @@ public class GroupFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if  (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
+            addedMembers = data.getParcelableArrayListExtra("addedMembers");
+            addedUsers.addAll(addedMembers);
+            saveMemberships(addedMembers);
+            if (addedMembers != null) {
+                for (int i = 0; i < addedMembers.size(); i++) {
+                    Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just added you to their group!");
+                }
+            }
+        }
         mPosts.clear();
         queryPosts();
     }
+
+    private void saveMemberships(final ArrayList<ParseUser> addedMembers) {
+        List<Membership> memberships = new ArrayList<>();
+        for (int i = 0; i < addedMembers.size(); i++) {
+            memberships.add(new Membership());
+            memberships.get(i).setGroup(group);
+            memberships.get(i).setUser(addedMembers.get(i));
+            ArrayList<Integer> numCheckIns = new ArrayList<Integer>();
+            memberships.get(i).setNumCheckIns(numCheckIns);
+            memberships.get(i).setPoints(0);
+            final int finalI = i;
+            memberships.get(i).saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        e.printStackTrace();
+                    }
+                    if (finalI == addedMembers.size() - 1) {
+                        try {
+                            scheduleAlarm(group);
+                        } catch (java.text.ParseException ex) {
+                            ex.printStackTrace();
+                        }
+                        Intent i = new Intent(getContext(), HomeActivity.class);
+                        startActivityForResult(i, REQUEST_CODE);
+                    }
+                }
+            });
+        }
+    }
+
+    // set up recurring alarm so that numCheckIns gets moved to new entry each week
+    // will also check if group is active
+    public void scheduleAlarm(Group group) throws java.text.ParseException {
+        // construct an intent to execute the AlarmReceiver
+        Intent intent = new Intent(getContext(), AlarmReceiver.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("group", (Serializable) group);
+        intent.putExtra("bundle", bundle);
+        // create a pending intent to be triggered when the alarm goes off
+        final PendingIntent pIntent = PendingIntent.getBroadcast(getContext(), AlarmReceiver.REQUEST_CODE,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // setup periodic alarm every week from the start day onwards
+        AlarmManager alarm = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CUPCAKE) {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+            cal.setTime(sdf.parse(group.getStartDate()));
+            start = cal.getTime();
+            alarm.setInexactRepeating(AlarmManager.RTC, start.getTime(), AlarmManager.INTERVAL_DAY * 7, pIntent);
+        }
+    }
+
+
     private void queryMembers() {
             ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
             parseQuery.addDescendingOrder("updatedAt");
@@ -910,6 +991,32 @@ public class GroupFragment extends Fragment {
                     }
                 });
             }
+        } else if (item.getItemId() == R.id.action_invite_to_group) {
+            ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+            parseQuery.whereEqualTo("group", group);
+            parseQuery.include("group");
+            parseQuery.include("user");
+            parseQuery.findInBackground(new FindCallback<Membership>() {
+                @Override
+                public void done(List<Membership> objects, ParseException e) {
+                    if (e != null) {
+                        Log.e("Querying memberships", "error with query");
+                        e.printStackTrace();
+                        return;
+                    } else if (objects == null || objects.size() == 0) {
+                        Log.e("membership querying", "no membership objects found with this group");
+                    }
+                    memberships.addAll(objects);
+                    for (Membership mem : memberships) {
+                        addedUsers.add(mem.getUser());
+                    }
+                    Intent intent = new Intent(getContext(), AddUsersActivity.class);
+                    //Keeps track of which users have already been added, so that they cannot be added again.
+                    intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
+                    intent.putExtra("situation", R.string.invite_friend_to_group);
+                    startActivityForResult(intent, ADD_REQUEST_CODE);
+                }
+            });
         }
 
         Log.d("itemId", item.toString());
