@@ -19,20 +19,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bettertogether.DiscoveryAdapter;
 import com.example.bettertogether.MakeNewGroupActivity;
 import com.example.bettertogether.R;
+import com.example.bettertogether.ResultsAdapter;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,22 +141,59 @@ public class DiscoveryFragment extends Fragment {
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
+            public boolean onQueryTextSubmit(final String query) {
                 // perform query here
 
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
                 // see https://code.google.com/p/android/issues/detail?id=24599
+                if (query.isEmpty()) {
+                    mRecyclerView.setAdapter(mainRecyclerAdapter);
+                    return false;
+                }
                 searchView.clearFocus();
-                SearchFragment fragment = SearchFragment.newInstance(query);
-                FragmentManager manager = getChildFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction().add(R.id.frameLayout, fragment, "Better_together");
-                ft.commitAllowingStateLoss();
+                ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
+                userParseQuery.whereContains("username", query);
+                userParseQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(final List<ParseUser> users, ParseException e) {
+                        ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
+                        userParseQuery.whereContains("name", query);
+                        userParseQuery.findInBackground(new FindCallback<Group>() {
+                            @Override
+                            public void done(List<Group> groups, ParseException e) {
+                                mRecyclerView.setAdapter(new ResultsAdapter(getContext(), groups, users));
+                            }
+                        });
+
+                    }
+                });
 
                 return true;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onQueryTextChange(final String newText) {
+                if (newText.isEmpty()) {
+                    mRecyclerView.setAdapter(mainRecyclerAdapter);
+                    return false;
+                }
+                ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
+                userParseQuery.whereContains("username", newText);
+                userParseQuery.findInBackground(new FindCallback<ParseUser>() {
+                    @Override
+                    public void done(final List<ParseUser> users, ParseException e) {
+                        ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
+                        userParseQuery.whereContains("name", newText);
+                        userParseQuery.findInBackground(new FindCallback<Group>() {
+                            @Override
+                            public void done(List<Group> groups, ParseException e) {
+                                mRecyclerView.setAdapter(new ResultsAdapter(getContext(), groups, users));
+                            }
+                        });
+
+                    }
+                });
+
                 return false;
             }
         });
