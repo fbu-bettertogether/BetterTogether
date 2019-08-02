@@ -81,6 +81,7 @@ public class DiscoveryFragment extends Fragment {
 
     private void queryCategories() {
         final Category.Query catQuery = new Category.Query();
+        catQuery.addDescendingOrder("createdAt");
         catQuery.findInBackground(new FindCallback<Category>() {
             @Override
             public void done(List<Category> objects, ParseException e) {

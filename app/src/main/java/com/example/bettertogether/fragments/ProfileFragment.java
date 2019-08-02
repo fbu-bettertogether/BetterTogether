@@ -293,7 +293,7 @@ public class ProfileFragment extends Fragment {
 
         ivServicePoints.setColorFilter(getResources().getColor(R.color.o9));
         ivGetTogetherPoints.setColorFilter(getResources().getColor(R.color.o4));
-        ivFitnessPoints.setColorFilter(getResources().getColor(R.color.colorPrimary));
+        ivFitnessPoints.setColorFilter(getResources().getColor(R.color.orange));
         tvServicePoints.setText(Integer.toString(user.getInt("servicePoints")));
         tvGetTogetherPoints.setText(Integer.toString(user.getInt("getTogetherPoints")));
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
