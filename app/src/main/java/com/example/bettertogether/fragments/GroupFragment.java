@@ -135,8 +135,7 @@ public class GroupFragment extends Fragment {
     private ImageView ivSettings;
     private TextView tvGroupName;
     private Button btnCheckIn;
-    private TextView tvStartDate;
-    private TextView tvEndDate;
+    private TextView tvDate;
     private TextView tvTimer;
     private int counter;
     private List<Integer> numCheckIns;
@@ -206,8 +205,7 @@ public class GroupFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         tvGroupName = view.findViewById(R.id.tvGroupName);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
-        tvStartDate = view.findViewById(R.id.tvStartDate);
-        tvEndDate = view.findViewById(R.id.tvEndDate);
+        tvDate = view.findViewById(R.id.tvDate);
         tvTimer = view.findViewById(R.id.tvTimer);
         chart = view.findViewById(R.id.chart);
         chart.setVisibility(View.INVISIBLE);
@@ -234,6 +232,16 @@ public class GroupFragment extends Fragment {
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
         setHasOptionsMenu(true);
+        collapsingToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "title clicked", Toast.LENGTH_LONG).show();
+                FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
+                groupDetailFragment.show(fm, "fragment_edit_name");
+
+            }
+        });
 
         final ImageView imageView = view.findViewById(R.id.backdrop);
         if (group.getIcon() != null) {
@@ -257,12 +265,11 @@ public class GroupFragment extends Fragment {
             }
         });
 
-
+        // getting date from string stored in group
         String startDateUgly = group.getStartDate();
         String endDateUgly = group.getEndDate();
-        tvStartDate.setText(startDateUgly.substring(0, 10).concat(", " + startDateUgly.substring(24)));
-        tvEndDate.setText(endDateUgly.substring(0, 10).concat(", " + endDateUgly.substring(24)));
 
+        // translating string into Java Date
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
         Date start = null;
         Date end = null;
@@ -273,22 +280,30 @@ public class GroupFragment extends Fragment {
             e.printStackTrace();
         }
 
+        // turning dates into relative time from now
         Date now = Calendar.getInstance().getTime();
         final boolean nowBeforeStart = now.before(start);
 
-        if (now.after(end)) {
-            Toast.makeText(getContext(), "Group is no longer active!", Toast.LENGTH_LONG).show();
-        } else if (nowBeforeStart) {
-
-        }
-
+        long diffInMillis = 0;
         if (group.getIsActive()) {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o7));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o7));
+            diffInMillis = end.getTime() - now.getTime();
+        } else if (nowBeforeStart) {
+            diffInMillis = start.getTime() - now.getTime();
         } else {
-            tvStartDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o9));
-            tvEndDate.setTextColor(ContextCompat.getColor(getContext(), R.color.o9));
+            diffInMillis = end.getTime() - now.getTime();
         }
+
+        long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+        int weekDiff = (int) diff / 7;
+
+        if(group.getIsActive()) {
+            tvDate.setText(String.format("Active: %d weeks left!", weekDiff));
+        } else if (nowBeforeStart){
+            tvDate.setText(String.format("Inactive: starts in %d weeks!", weekDiff));
+        } else {
+            tvDate.setText(String.format("Inactive: completed %d weeks ago!", weekDiff));
+        }
+        tvDate.setTextColor(getResources().getColor(R.color.gray));
 
         ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
         parseQuery.whereEqualTo("user", getCurrentUser());
@@ -441,8 +456,15 @@ public class GroupFragment extends Fragment {
     private void configChart(final boolean checkingIn) {
 
         if (!group.getIsActive()) {
+            chart.requestLayout();
+            chart.getLayoutParams().height = 0;
+            chart.getLayoutParams().width = 0;
             return;
         }
+
+        chart.requestLayout();
+        chart.getLayoutParams().height = 700;
+        chart.getLayoutParams().width = 0;
 
         // query for membership objects with this group
         ParseQuery<Membership> membershipQuery = ParseQuery.getQuery(Membership.class);

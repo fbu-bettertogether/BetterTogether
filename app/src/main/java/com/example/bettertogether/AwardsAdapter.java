@@ -63,15 +63,20 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
                     .into(holder.ivAwardImage);
         }
 
-        // decide to tint the medal to gold or not depending on whether the user has gotten the award
+        boolean isAchieved = false;
+
         for (int i = 0; i < achievedAwards.size(); i++) {
-            if (achievedAwards.get(i).get("name").toString().equalsIgnoreCase(award.get("name").toString())) {
-                holder.ivAwardImage.setColorFilter(Color.TRANSPARENT);
-            } else {
-                Resources res = context.getResources();
-                final int grayTint = res.getColor(R.color.gray);
-                holder.ivAwardImage.setColorFilter(grayTint);
+            if (award.getName().equalsIgnoreCase(achievedAwards.get(i).getName())) {
+                isAchieved = true;
             }
+        }
+
+        if (isAchieved) {
+            holder.ivAwardImage.setColorFilter(Color.TRANSPARENT);
+        } else {
+            Resources res = context.getResources();
+            final int grayTint = res.getColor(R.color.gray);
+            holder.ivAwardImage.setColorFilter(grayTint);
         }
     }
 

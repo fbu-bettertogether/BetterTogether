@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +45,11 @@ public class LeaderboardFragment extends Fragment {
     private ImageView ivFitnessPoints;
     private ImageView ivGetTogetherPoints;
     private OnFragmentInteractionListener mListener;
+    Map<String, Integer> groupsToPoints;
+    Map<String, Group> idsToGroups;
+    BarChart chart;
+    ProgressBar progressBar;
+
 
     public LeaderboardFragment() {
         // Required empty public constructor
@@ -73,35 +79,48 @@ public class LeaderboardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        chart = view.findViewById(R.id.barchart);
+        progressBar = view.findViewById(R.id.progressBar);
         ivFitnessPoints = view.findViewById(R.id.ivFitnessPoints);
         ivServicePoints = view.findViewById(R.id.ivServicePoints);
         ivGetTogetherPoints = view.findViewById(R.id.ivGetTogetherPoints);
-
         ivFitnessPoints.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+                drawGraph(groupsToPoints, idsToGroups, "Fitness");
+                progressBar.setVisibility(View.INVISIBLE);
+
             }
         });
         ivGetTogetherPoints.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+                drawGraph(groupsToPoints, idsToGroups, "Get-Togethers");
+                progressBar.setVisibility(View.INVISIBLE);
+
             }
         });
         ivServicePoints.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.colorPrimary, getActivity().getTheme()));
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
+                drawGraph(groupsToPoints, idsToGroups, "Fitness");
+                progressBar.setVisibility(View.INVISIBLE);
+
             }
         });
         queryMembers();
@@ -133,8 +152,8 @@ public class LeaderboardFragment extends Fragment {
             @Override
             public void done(List<Membership> objects, ParseException e) {
                 List<Group> groups = new ArrayList<>();
-                Map<String, Integer> groupsToPoints = new HashMap<>();
-                Map<String, Group> idsToGroups = new HashMap<>();
+                groupsToPoints = new HashMap<>();
+                idsToGroups = new HashMap<>();
                 List<String> groupIds = new ArrayList<>();
                 for (int i = 0; i < objects.size(); i++) {
                     if (!idsToGroups.containsKey(objects.get(i).getGroup().getObjectId())) {
@@ -151,8 +170,6 @@ public class LeaderboardFragment extends Fragment {
     }
 
     private void drawGraph(Map<String, Integer> groupsToPoints, Map<String, Group> idsToGroups) {
-        View view = getView();
-        BarChart chart = view.findViewById(R.id.barchart);
         ArrayList<Bitmap> imageList = new ArrayList<>();
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground);
 
@@ -187,9 +204,52 @@ public class LeaderboardFragment extends Fragment {
         chart.getDescription().setEnabled(false);
         chart.animateXY(2000, 2000);
         chart.invalidate();
+        progressBar.setVisibility(View.INVISIBLE);
 
     }
 
+    private void drawGraph(Map<String, Integer> groupsToPoints, Map<String, Group> idsToGroups, String categoryName) {
+        ArrayList<Bitmap> imageList = new ArrayList<>();
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground);
+
+        int i = 0;
+        final ArrayList<String> xLabels = new ArrayList<>();
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        for (Map.Entry<String, Group> element : idsToGroups.entrySet()) {
+            if (element.getValue().getCategory().equals(categoryName)) {
+                if (0 < groupsToPoints.get(element.getKey())) {
+                    entries.add(new BarEntry(i, groupsToPoints.get(element.getKey())));
+                    xLabels.add(element.getValue().getName());
+                    imageList.add(bitmap);
+                    i++;
+                }
+            }
+        }
+        BarDataSet dataSet = new BarDataSet(entries, "Groups");
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (xLabels.size() > value) {
+                    return xLabels.get((int) value);
+                } else return "";
+            }
+        });
+        dataSet.setBarBorderWidth(0.9f);
+        List<Integer> colors = new ArrayList<>();
+        colors.add(getResources().getColor(R.color.colorPrimary));
+        colors.add(getResources().getColor(R.color.o4));
+        colors.add(getResources().getColor(R.color.o8));
+        colors.add(getResources().getColor(R.color.colorPrimaryDark));
+        dataSet.setColors(colors);
+        BarData data = new BarData(dataSet);
+        chart.setData(data);
+        chart.setDrawBarShadow(true);
+        chart.getDescription().setEnabled(false);
+        chart.animateXY(500, 500);
+        chart.invalidate();
+
+    }
 
     public int sum(List<Integer> list) {
         int sum = 0;
