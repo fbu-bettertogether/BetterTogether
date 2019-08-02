@@ -294,14 +294,21 @@ public class GroupFragment extends Fragment {
 
         long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
         int weekDiff = (int) diff / 7;
+        String unit = "weeks";
+        int time = weekDiff;
+
+        if (weekDiff == 0) {
+            unit = "days";
+            time = (int) diff;
+        }
 
         if(group.getIsActive()) {
-            tvDate.setText(String.format("Active: %d weeks left!", weekDiff));
+            tvDate.setText(String.format("Active: %d %s left!", time, unit));
             correctNumCheckIns = group.getNumWeeks() - weekDiff;
         } else if (nowBeforeStart){
-            tvDate.setText(String.format("Inactive: starts in %d weeks!", weekDiff));
+            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
         } else {
-            tvDate.setText(String.format("Inactive: completed %d weeks ago!", weekDiff));
+            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
         }
         tvDate.setTextColor(getResources().getColor(R.color.gray));
 
@@ -330,7 +337,6 @@ public class GroupFragment extends Fragment {
                         } else {
                             try {
                                 checkPlace(category.getLocationTypesList());
-//                                configChart(false);
                             } catch (JSONException e1) {
                                 e1.printStackTrace();
                             }
@@ -398,7 +404,6 @@ public class GroupFragment extends Fragment {
         });
         queryMembers();
         queryPosts();
-//        configChart(false);
     }
 
     private void checkProximity() {
