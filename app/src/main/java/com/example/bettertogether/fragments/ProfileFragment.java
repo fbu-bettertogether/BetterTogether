@@ -310,8 +310,6 @@ public class ProfileFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         ((AppCompatActivity) getActivity()).getMenuInflater().inflate(R.menu.profile_menu, menu);
-
-
     }
 
     @Override

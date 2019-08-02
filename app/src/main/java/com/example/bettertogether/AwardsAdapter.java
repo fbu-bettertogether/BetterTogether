@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,11 +18,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.AwardFragment;
+import com.example.bettertogether.fragments.DialogAwardFragment;
+import com.example.bettertogether.fragments.DialogGroupDetailFragment;
 import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.UserAward;
 import com.parse.ParseFile;
 
 import java.util.List;
+
+import static java.security.AccessController.getContext;
 
 public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder> {
 
@@ -105,9 +110,10 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
             if (position != RecyclerView.NO_POSITION) {
                 Award award = awards.get(position);
                 // switch to award-detail view fragment
-                FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
-                AwardFragment fragment = AwardFragment.newInstance(award);
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                Toast.makeText(context, "title clicked", Toast.LENGTH_LONG).show();
+                FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
+                DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award);
+                awardFragment.show(fm, "fragment_group_detail");
             }
         }
     }
