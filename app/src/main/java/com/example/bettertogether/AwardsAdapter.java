@@ -109,10 +109,17 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Award award = awards.get(position);
+
+                boolean isAchieved = false;
+
+                for (int i = 0; i < achievedAwards.size(); i++) {
+                    if (award.getName().equalsIgnoreCase(achievedAwards.get(i).getName())) {
+                        isAchieved = true;
+                    }
+                }
                 // switch to award-detail view fragment
-                Toast.makeText(context, "title clicked", Toast.LENGTH_LONG).show();
                 FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award);
+                DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award, isAchieved);
                 awardFragment.show(fm, "fragment_group_detail");
             }
         }

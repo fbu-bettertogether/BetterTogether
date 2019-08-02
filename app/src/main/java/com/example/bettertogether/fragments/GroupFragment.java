@@ -133,7 +133,6 @@ public class GroupFragment extends Fragment {
     private ParseGeoPoint location;
     private ImageView ivBanner;
     private ImageView ivUserIcon;
-    private ImageView ivSettings;
     private TextView tvGroupName;
     private Button btnCheckIn;
     private TextView tvDate;
@@ -163,6 +162,7 @@ public class GroupFragment extends Fragment {
     private ArrayList<ParseUser> addedMembers;
     private List<ParseUser> addedUsers;
     List<Membership> memberships;
+    int correctNumCheckIns = 0;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -214,7 +214,6 @@ public class GroupFragment extends Fragment {
         scrollView = view.findViewById(R.id.scrollView);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
-        ivSettings = view.findViewById(R.id.ivSettings);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
@@ -296,13 +295,21 @@ public class GroupFragment extends Fragment {
 
         long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
         int weekDiff = (int) diff / 7;
+        String unit = "weeks";
+        int time = weekDiff;
+
+        if (weekDiff == 0) {
+            unit = "days";
+            time = (int) diff;
+        }
 
         if(group.getIsActive()) {
-            tvDate.setText(String.format("Active: %d weeks left!", weekDiff));
+            tvDate.setText(String.format("Active: %d %s left!", time, unit));
+            correctNumCheckIns = group.getNumWeeks() - weekDiff;
         } else if (nowBeforeStart){
-            tvDate.setText(String.format("Inactive: starts in %d weeks!", weekDiff));
+            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
         } else {
-            tvDate.setText(String.format("Inactive: completed %d weeks ago!", weekDiff));
+            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
         }
         tvDate.setTextColor(getResources().getColor(R.color.gray));
 
@@ -331,7 +338,6 @@ public class GroupFragment extends Fragment {
                         } else {
                             try {
                                 checkPlace(category.getLocationTypesList());
-                                drawButton();
                             } catch (JSONException e1) {
                                 e1.printStackTrace();
                             }
@@ -340,9 +346,11 @@ public class GroupFragment extends Fragment {
                         btnCheckIn.setVisibility(View.INVISIBLE);
                         tvTimer.setVisibility(View.VISIBLE);
                         tvTimer.setText("Group has not started yet! Hang tight!");
+                        chart.requestLayout();
+                        chart.getLayoutParams().height = 0;
+                        chart.getLayoutParams().width = 0;
                     }
                 } else {
-                    ivSettings.setVisibility(View.INVISIBLE);
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
                         ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
                         query.whereEqualTo("receiver", ParseUser.getCurrentUser());
@@ -397,7 +405,6 @@ public class GroupFragment extends Fragment {
         });
         queryMembers();
         queryPosts();
-        configChart(false);
     }
 
     private void checkProximity() {
@@ -410,6 +417,7 @@ public class GroupFragment extends Fragment {
                 if (objects.size() == 1) {
                     btnCheckIn.setVisibility(View.VISIBLE);
                     btnCheckIn.setText("Click to search for a group member");
+                    configChart(false, false);
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -424,7 +432,7 @@ public class GroupFragment extends Fragment {
                         }
                     });
                 } else {
-                    drawButton();
+                    configChart(false, true);
                 }
             }
         });
@@ -454,7 +462,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    private void configChart(final boolean checkingIn) {
+    private void configChart(final boolean checkingIn, final boolean enableButton) {
 
         if (!group.getIsActive()) {
             chart.requestLayout();
@@ -491,6 +499,17 @@ public class GroupFragment extends Fragment {
                             if (numCheckIns.isEmpty()) {
                                 numCheckIns.add(0);
                             }
+
+                            if (numCheckIns.size() < correctNumCheckIns) {
+                                numCheckIns.add(0);
+                                currMem.setNumCheckIns(numCheckIns);
+                                currMem.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("saved memb", "yay");
+                                    }
+                                });
+                            }
                             int currWeek = numCheckIns.get(numCheckIns.size() - 1);
                             weekNumber = numCheckIns.size();
                             if (currWeek > 0) {
@@ -525,7 +544,7 @@ public class GroupFragment extends Fragment {
                     data.setValueTextSize(20f);
                     data.setValueFormatter(new Formatter());
                     chart.setData(data);
-                    chart.setCenterText("Week " + Integer.toString(weekNumber));
+                    chart.setCenterText("Week " + Integer.toString(correctNumCheckIns));
                     chart.getDescription().setEnabled(false);
                     chart.getLegend().setEnabled(false);
 
@@ -533,6 +552,10 @@ public class GroupFragment extends Fragment {
                         chart.spin(3000, 0, 360f, Easing.EaseInQuad);
                     } else {
                         chart.animateY(1500, Easing.EaseInOutQuad);
+                    }
+
+                    if (enableButton) {
+                        drawButton();
                     }
 
                     chart.invalidate();
@@ -688,9 +711,13 @@ public class GroupFragment extends Fragment {
                     if (task.isSuccessful()) {
                         FindCurrentPlaceResponse response = task.getResult();
                         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                            double likelihood = placeLikelihood.getLikelihood();
                             for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
-                                if (types.contains(type.toString())) {
-                                    drawButton();
+                                if (types.contains(type.toString()) & likelihood > 0.05) {
+                                    configChart(false, true);
+                                    return;
+                                } else {
+                                    configChart(false, false);
                                     return;
                                 }
                             }
@@ -718,6 +745,9 @@ public class GroupFragment extends Fragment {
         if (numCheckIns.isEmpty()) {
             hasCheckInLeft = true;
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+            hasCheckInLeft = true;
+            group.setShowCheckInReminderBadge(true);
+        } else if (numCheckIns.size() < correctNumCheckIns) {
             hasCheckInLeft = true;
             group.setShowCheckInReminderBadge(true);
         } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
@@ -808,7 +838,7 @@ public class GroupFragment extends Fragment {
                                 @Override
                                 public void done(ParseException e) {
                                     Log.d("checking in", "saved check in");
-                                    configChart(true);
+                                    configChart(true, false);
                                     final Handler handler = new Handler();
                                     handler.postDelayed(new Runnable() {
                                         @Override

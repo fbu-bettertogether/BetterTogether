@@ -26,14 +26,13 @@
         android:id="@+id/tvGroupName"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textSize="10dp"
+        android:gravity="center_horizontal"
+        android:padding="4dp"
+        android:textSize="12dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivGroupProf"
         app:layout_constraintLeft_toLeftOf="@id/ivGroupProf"
         app:layout_constraintRight_toRightOf="@id/ivGroupProf"
-        android:padding="4dp"
-        android:gravity="center_horizontal"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivGroupProf" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

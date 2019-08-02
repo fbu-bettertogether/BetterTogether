@@ -91,7 +91,7 @@ public class DialogGroupDetailFragment extends DialogFragment {
         String startDate = initialStartDate.substring(0, 10) + "," + initialStartDate.substring(23);
         String initialEndDate = group.getEndDate();
         String endDate = initialEndDate.substring(0, 10) + "," + initialEndDate.substring(23);
-        tvDates.setText(endDate + " - " + startDate);
+        tvDates.setText(startDate + " - " + endDate);
         tvDescription.setText(group.getDescription());
 
         // query for members
