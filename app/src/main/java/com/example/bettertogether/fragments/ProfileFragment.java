@@ -177,7 +177,8 @@ public class ProfileFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setTitle(user.getUsername());
-        setHasOptionsMenu(true);
+        if (user.hasSameId(ParseUser.getCurrentUser()))
+            setHasOptionsMenu(true);
 
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
