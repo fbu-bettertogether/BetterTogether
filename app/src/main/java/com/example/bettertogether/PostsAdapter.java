@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.ProfileFragment;
+import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Like;
 import com.example.bettertogether.models.Post;
 import com.parse.DeleteCallback;
@@ -179,5 +180,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             btnLike = (ImageButton) itemView.findViewById(R.id.ivLike);
             ivMedia = (ImageView) itemView.findViewById(R.id.ivMedia);
         }
+    }
+    public void clear() {
+        posts.clear();
+        notifyDataSetChanged();
     }
 }

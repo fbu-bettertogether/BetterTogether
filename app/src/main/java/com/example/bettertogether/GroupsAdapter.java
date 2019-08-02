@@ -18,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.GroupFragment;
+import com.example.bettertogether.fragments.GroupsFragment;
 import com.example.bettertogether.models.Group;
 
 import java.text.SimpleDateFormat;
@@ -55,6 +56,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         return groups.size();
     }
 
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private ImageView ivGroupProf;
@@ -63,6 +65,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         private TextView tvCategory;
         private TextView tvDescription;
         private TextView tvDates;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,6 +79,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
             itemView.setOnClickListener(this);
         }
+
 
         public void bind(Group group) {
 
@@ -149,5 +153,9 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
             }
         }
+    }
+    public void clear() {
+        groups.clear();
+        notifyDataSetChanged();
     }
 }
