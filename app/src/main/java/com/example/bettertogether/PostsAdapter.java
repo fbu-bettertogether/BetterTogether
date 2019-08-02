@@ -101,8 +101,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             holder.ivMedia.getLayoutParams().height = 0;
             holder.ivMedia.getLayoutParams().width = 0;
         }
+        holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
         ParseQuery<Like> query = new ParseQuery<Like>(Like.class);
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
         query.whereEqualTo("post", post);
         query.findInBackground(new FindCallback<Like>() {
             @Override
@@ -116,21 +116,6 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             }
         });
 
-//        ParseQuery<Like> likeParseQuery = new ParseQuery<Like>(Like.class);
-//        likeParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-//        likeParseQuery.whereEqualTo("post", post);
-//        likeParseQuery.getFirstInBackground(new GetCallback<Like>() {
-//                                       @Override
-//                                       public void done(Like object, ParseException e) {
-//                                           if (object == null) {
-//                                                       holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
-//                                           } else {
-//                                               holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
-//                                                   }
-//                                               }
-//
-//                                           }
-//                                   );
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -145,6 +130,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 @Override
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
+                                    holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) - 1));
                                 }
                             });
                         } else {
@@ -155,6 +141,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 @Override
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
+                                    holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) + 1));
                                 }
                             });
 
