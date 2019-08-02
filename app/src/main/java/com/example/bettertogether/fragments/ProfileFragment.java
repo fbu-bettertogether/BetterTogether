@@ -1,19 +1,32 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +35,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.AwardsAdapter;
 import com.example.bettertogether.FriendAdapter;
+import com.example.bettertogether.InvitationActivity;
+import com.example.bettertogether.MainActivity;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
@@ -32,6 +47,7 @@ import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.example.bettertogether.models.UserAward;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -57,6 +73,7 @@ public class ProfileFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String param_user = "param_user";
     public final String APP_TAG = "BetterTogether";
+    public final int INVITATION_REQUEST_CODE = 232;
 
     private ParseUser user;
     private Award friendshipGoals;
@@ -71,7 +88,6 @@ public class ProfileFragment extends Fragment {
     private ImageView ivFitnessPoints;
     private ImageView ivGetTogetherPoints;
     private ImageView ivServicePoints;
-    private ImageView ivSettings;
     private TextView tvFitnessPoints;
     private TextView tvGetTogetherPoints;
     private TextView tvServicePoints;
@@ -138,7 +154,6 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ivUserIcon = view.findViewById(R.id.ivUserIcon);
         tvUsername = view.findViewById(R.id.tvUsername);
-        ivSettings = view.findViewById(R.id.ivSettings);
         rvPosts = view.findViewById(R.id.rvPosts);
         rvGroups = view.findViewById(R.id.rvGroups);
         rvFriends = view.findViewById(R.id.rvFriends);
@@ -163,10 +178,14 @@ public class ProfileFragment extends Fragment {
         rvAwards.setAdapter(awardsAdapter);
         rvAwards.setLayoutManager(new GridLayoutManager(getContext(), 4));
 
-        drawSettings();
+//        drawSettings();
 
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setTitle(user.getUsername());
+        setHasOptionsMenu(true);
 
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
@@ -287,16 +306,30 @@ public class ProfileFragment extends Fragment {
         tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
     }
 
-    private void drawSettings() {
-        if (user.hasSameId(ParseUser.getCurrentUser())) {
-            ivSettings.setVisibility(View.VISIBLE);
-            ivSettings.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    getFragmentManager().beginTransaction().replace(R.id.flContainer, ProfileDetailFragment.newInstance(user)).commit();
-                }
-            });
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        ((AppCompatActivity) getActivity()).getMenuInflater().inflate(R.menu.profile_menu, menu);
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_prof_logout:
+                ParseUser.logOut();
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_prof_pending:
+                Intent i = new Intent(getContext(), InvitationActivity.class);
+                startActivityForResult(i, INVITATION_REQUEST_CODE);
         }
+
+        Toast.makeText(getContext(), "itemId: " + item.toString(), Toast.LENGTH_LONG).show();
+        Log.d("itemId", item.toString());
+        return true;
     }
 
     public void onFriendUpdate() {
