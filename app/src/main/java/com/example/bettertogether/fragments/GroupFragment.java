@@ -504,10 +504,10 @@ public class GroupFragment extends Fragment {
                     // add to pie chart
                     PieDataSet dataSet = new PieDataSet(entries, "group stats");
                     List<Integer> colors = new ArrayList<>();
-                    colors.add(getResources().getColor(R.color.orange));
+                    colors.add(getResources().getColor(R.color.o1));
                     colors.add(getResources().getColor(R.color.o4));
                     colors.add(getResources().getColor(R.color.o8));
-                    colors.add(getResources().getColor(R.color.colorPrimaryDark));
+                    colors.add(getResources().getColor(R.color.originalOrange));
                     dataSet.setValueLineColor(R.color.orange);
                     dataSet.setColors(colors);
                     dataSet.setDrawValues(true);
