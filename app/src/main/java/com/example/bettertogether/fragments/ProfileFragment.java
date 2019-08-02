@@ -37,6 +37,8 @@ import com.example.bettertogether.AwardsAdapter;
 import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.MainActivity;
+import com.example.bettertogether.Messaging;
+import com.example.bettertogether.MyFirebaseMessagingService;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.SimpleGroupAdapter;
@@ -249,11 +251,9 @@ public class ProfileFragment extends Fragment {
                                                                 }
                                                             }
                                                         });
-
                                                     }
                                                 }
                                             });
-
                                         }
                                     }
                                 });
@@ -270,6 +270,9 @@ public class ProfileFragment extends Fragment {
                                             invitation.setReceiver(user);
                                             invitation.setAccepted("sent");
                                             invitation.saveInBackground();
+                                            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+                                            mfms.logToken(getContext());
+                                            Messaging.sendNotification((String)user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
                                             ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
                                             query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
                                                 public void done(ParseObject object, ParseException e) {
@@ -366,6 +369,7 @@ public class ProfileFragment extends Fragment {
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
             public void done(List<ParseUser> objects, ParseException e) {
+                if (objects == null) return;
                 for (int i = 0; i < objects.size(); i++) {
                     if (objects.get(i).getObjectId().equals(user.getObjectId())) {
                         tvUsername.setText(String.format("☺️%s", user.getUsername()));

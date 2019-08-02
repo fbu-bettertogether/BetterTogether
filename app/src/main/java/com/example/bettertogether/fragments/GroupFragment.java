@@ -981,64 +981,70 @@ public class GroupFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            // return to groups fragment
-            FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-            GroupsFragment fragment = new GroupsFragment();
-            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-        } else if (item.getItemId() == R.id.action_requests) {
-            Intent intent = new Intent(getContext(), InvitationActivity.class);
-            intent.putExtra("group", (Parcelable) group);
-            startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
-        } else if (item.getItemId() == R.id.action_leave) {
-            if (group.getIsActive()) {
-                Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
-            } else {
-                ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
-                membershipParseQuery.whereEqualTo("group", group);
-                membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
-                    @Override
-                    public void done(Membership object, ParseException e) {
-                        if (e != null) {
-                            e.printStackTrace();
-                        } else if (object != null) {
-                            try {
-                                object.delete();
-                                Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
-                            } catch (ParseException ex) {
-                                ex.printStackTrace();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                GroupsFragment fragment = new GroupsFragment();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                break;
+            case R.id.action_requests:
+                Intent intent = new Intent(getContext(), InvitationActivity.class);
+                intent.putExtra("group", (Parcelable) group);
+                startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
+                break;
+            case R.id.action_leave:
+                if (group.getIsActive()) {
+                    Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
+                } else {
+                    ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
+                    membershipParseQuery.whereEqualTo("group", group);
+                    membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                    membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
+                        @Override
+                        public void done(Membership object, ParseException e) {
+                            if (e != null) {
+                                e.printStackTrace();
+                            } else if (object != null) {
+                                try {
+                                    object.delete();
+                                    Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
+                                } catch (ParseException ex) {
+                                    ex.printStackTrace();
+                                }
                             }
                         }
+                    });
+                }
+                break;
+            case R.id.action_invite_to_group:
+                ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+                parseQuery.whereEqualTo("group", group);
+                parseQuery.include("group");
+                parseQuery.include("user");
+                parseQuery.findInBackground(new FindCallback<Membership>() {
+                    @Override
+                    public void done(List<Membership> objects, ParseException e) {
+                        if (e != null) {
+                            Log.e("Querying memberships", "error with query");
+                            e.printStackTrace();
+                            return;
+                        } else if (objects == null || objects.size() == 0) {
+                            Log.e("membership querying", "no membership objects found with this group");
+                        }
+                        memberships.addAll(objects);
+                        for (Membership mem : memberships) {
+                            addedUsers.add(mem.getUser());
+                        }
+                        Intent intent = new Intent(getContext(), AddUsersActivity.class);
+                        //Keeps track of which users have already been added, so that they cannot be added again.
+                        intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
+                        intent.putExtra("situation", R.string.invite_friend_to_group);
+                        startActivityForResult(intent, ADD_REQUEST_CODE);
                     }
                 });
-            }
-        } else if (item.getItemId() == R.id.action_invite_to_group) {
-            ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
-            parseQuery.whereEqualTo("group", group);
-            parseQuery.include("group");
-            parseQuery.include("user");
-            parseQuery.findInBackground(new FindCallback<Membership>() {
-                @Override
-                public void done(List<Membership> objects, ParseException e) {
-                    if (e != null) {
-                        Log.e("Querying memberships", "error with query");
-                        e.printStackTrace();
-                        return;
-                    } else if (objects == null || objects.size() == 0) {
-                        Log.e("membership querying", "no membership objects found with this group");
-                    }
-                    memberships.addAll(objects);
-                    for (Membership mem : memberships) {
-                        addedUsers.add(mem.getUser());
-                    }
-                    Intent intent = new Intent(getContext(), AddUsersActivity.class);
-                    //Keeps track of which users have already been added, so that they cannot be added again.
-                    intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
-                    intent.putExtra("situation", R.string.invite_friend_to_group);
-                    startActivityForResult(intent, ADD_REQUEST_CODE);
-                }
-            });
+                break;
+            default:
+                break;
         }
 
         Log.d("itemId", item.toString());
