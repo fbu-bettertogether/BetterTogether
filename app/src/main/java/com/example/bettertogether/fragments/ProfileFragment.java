@@ -176,14 +176,22 @@ public class ProfileFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(user.get("profileImage").getUrl);
         toolbar.setTitle(user.getUsername());
         setHasOptionsMenu(true);
+        TextView tvUserActionBar = view.findViewById(R.id.tvUserActionBar);
+        ImageView ivPhotoActionBar = view.findViewById(R.id.ivPhotoActionBar);
+        tvUserActionBar.setText(user.getUsername());
 
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivUserIcon);
+            Glide.with(view.getContext())
+                    .load(((ParseFile) user.get("profileImage")).getUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivPhotoActionBar);
         }
         onFriendUpdate();
         ivUserIcon.setOnClickListener(new View.OnClickListener() {
