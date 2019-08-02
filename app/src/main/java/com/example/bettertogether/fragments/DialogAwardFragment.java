@@ -53,6 +53,7 @@ public class DialogAwardFragment extends DialogFragment {
     private TextView tvAwardDescription;
     private List<Award> achievedAwards = new ArrayList<>();
     private List<UserAward> userAwards = new ArrayList<UserAward>();
+    private Boolean isAchieved;
 
     public DialogAwardFragment() {
         // Empty constructor is required for DialogFragment
@@ -60,10 +61,11 @@ public class DialogAwardFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static DialogAwardFragment newInstance(Award award) {
+    public static DialogAwardFragment newInstance(Award award, boolean isAchieved) {
         DialogAwardFragment frag = new DialogAwardFragment();
         Bundle args = new Bundle();
         args.putSerializable("award", award);
+        args.putBoolean("isAchieved", isAchieved);
         frag.setArguments(args);
         return frag;
     }
@@ -83,6 +85,7 @@ public class DialogAwardFragment extends DialogFragment {
 
         // Fetch arguments from bundle and set title
         award = (Award) getArguments().getSerializable("award");
+        isAchieved = (Boolean) getArguments().getBoolean("isAchieved");
         getDialog().setTitle(award.getName());
 
         if (award.getIcon() != null) {
@@ -92,34 +95,8 @@ public class DialogAwardFragment extends DialogFragment {
         tvAwardName.setText(award.getName());
         tvAwardDescription.setText(award.getDescription());
 
-        ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
-        query.include("award");
-        query.whereEqualTo("user", getCurrentUser());
-        query.findInBackground(new FindCallback<UserAward>() {
-            @Override
-            public void done(List<UserAward> objects, ParseException e) {
-                if (e != null) {
-                    Log.e("Querying groups", "error with query");
-                    e.printStackTrace();
-                    return;
-                }
-                if (objects != null) {
-                    for (int i = 0; i < objects.size(); i++) {
-                        if (objects.get(i).getIfAchieved()) {
-                            achievedAwards.add(objects.get(i).getAward());
-                        }
-                    }
-                    ArrayList<String> awardNames = new ArrayList<>();
-                    for (Award a : achievedAwards) {
-                        awardNames.add(a.get("name").toString());
-                    }
-                    if (!awardNames.contains(award.get("name").toString())) {
-                        Resources res = getContext().getResources();
-                        final int greyTint = res.getColor(R.color.grey);
-                        ivAwardImage.setColorFilter(greyTint);
-                    }
-                }
-            }
-        });
+        if (!isAchieved) {
+            ivAwardImage.setColorFilter(getContext().getResources().getColor(R.color.grey));
+        }
     }
 }
