@@ -53,6 +53,7 @@ import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.Messaging;
+import com.example.bettertogether.MyFirebaseMessagingService;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
@@ -132,7 +133,6 @@ public class GroupFragment extends Fragment {
     private ParseGeoPoint location;
     private ImageView ivBanner;
     private ImageView ivUserIcon;
-    private ImageView ivSettings;
     private TextView tvGroupName;
     private Button btnCheckIn;
     private TextView tvDate;
@@ -162,6 +162,7 @@ public class GroupFragment extends Fragment {
     private ArrayList<ParseUser> addedMembers;
     private List<ParseUser> addedUsers;
     List<Membership> memberships;
+    int correctNumCheckIns = 0;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -213,7 +214,6 @@ public class GroupFragment extends Fragment {
         scrollView = view.findViewById(R.id.scrollView);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
-        ivSettings = view.findViewById(R.id.ivSettings);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
@@ -295,13 +295,21 @@ public class GroupFragment extends Fragment {
 
         long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
         int weekDiff = (int) diff / 7;
+        String unit = "weeks";
+        int time = weekDiff;
+
+        if (weekDiff == 0) {
+            unit = "days";
+            time = (int) diff;
+        }
 
         if(group.getIsActive()) {
-            tvDate.setText(String.format("Active: %d weeks left!", weekDiff));
+            tvDate.setText(String.format("Active: %d %s left!", time, unit));
+            correctNumCheckIns = group.getNumWeeks() - weekDiff;
         } else if (nowBeforeStart){
-            tvDate.setText(String.format("Inactive: starts in %d weeks!", weekDiff));
+            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
         } else {
-            tvDate.setText(String.format("Inactive: completed %d weeks ago!", weekDiff));
+            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
         }
         tvDate.setTextColor(getResources().getColor(R.color.gray));
 
@@ -338,9 +346,11 @@ public class GroupFragment extends Fragment {
                         btnCheckIn.setVisibility(View.INVISIBLE);
                         tvTimer.setVisibility(View.VISIBLE);
                         tvTimer.setText("Group has not started yet! Hang tight!");
+                        chart.requestLayout();
+                        chart.getLayoutParams().height = 0;
+                        chart.getLayoutParams().width = 0;
                     }
                 } else {
-                    ivSettings.setVisibility(View.INVISIBLE);
                     if (!group.getPrivacy().equals("private") & nowBeforeStart) {
                         ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
                         query.whereEqualTo("receiver", ParseUser.getCurrentUser());
@@ -378,7 +388,6 @@ public class GroupFragment extends Fragment {
         });
         queryMembers();
         queryPosts();
-        configChart(false);
     }
 
     private void checkProximity() {
@@ -391,6 +400,7 @@ public class GroupFragment extends Fragment {
                 if (objects.size() == 1) {
                     btnCheckIn.setVisibility(View.VISIBLE);
                     btnCheckIn.setText("Click to search for a group member");
+                    configChart(false, false);
                     btnCheckIn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -405,7 +415,7 @@ public class GroupFragment extends Fragment {
                         }
                     });
                 } else {
-                    drawButton();
+                    configChart(false, true);
                 }
             }
         });
@@ -435,7 +445,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    private void configChart(final boolean checkingIn) {
+    private void configChart(final boolean checkingIn, final boolean enableButton) {
 
         if (!group.getIsActive()) {
             chart.requestLayout();
@@ -472,6 +482,17 @@ public class GroupFragment extends Fragment {
                             if (numCheckIns.isEmpty()) {
                                 numCheckIns.add(0);
                             }
+
+                            if (numCheckIns.size() < correctNumCheckIns) {
+                                numCheckIns.add(0);
+                                currMem.setNumCheckIns(numCheckIns);
+                                currMem.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("saved memb", "yay");
+                                    }
+                                });
+                            }
                             int currWeek = numCheckIns.get(numCheckIns.size() - 1);
                             weekNumber = numCheckIns.size();
                             if (currWeek > 0) {
@@ -506,7 +527,7 @@ public class GroupFragment extends Fragment {
                     data.setValueTextSize(20f);
                     data.setValueFormatter(new Formatter());
                     chart.setData(data);
-                    chart.setCenterText("Week " + Integer.toString(weekNumber));
+                    chart.setCenterText("Week " + Integer.toString(correctNumCheckIns));
                     chart.getDescription().setEnabled(false);
                     chart.getLegend().setEnabled(false);
 
@@ -514,6 +535,10 @@ public class GroupFragment extends Fragment {
                         chart.spin(3000, 0, 360f, Easing.EaseInQuad);
                     } else {
                         chart.animateY(1500, Easing.EaseInOutQuad);
+                    }
+
+                    if (enableButton) {
+                        drawButton();
                     }
 
                     chart.invalidate();
@@ -531,12 +556,15 @@ public class GroupFragment extends Fragment {
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
             addedUsers.addAll(addedMembers);
             saveMemberships(addedMembers);
+            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+            mfms.logToken(getContext());
             if (addedMembers != null) {
                 for (int i = 0; i < addedMembers.size(); i++) {
                     Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just added you to their group!");
                 }
             }
         }
+        addedMembers.clear();
         mPosts.clear();
         queryPosts();
     }
@@ -669,7 +697,10 @@ public class GroupFragment extends Fragment {
                             double likelihood = placeLikelihood.getLikelihood();
                             for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
                                 if (types.contains(type.toString()) & likelihood > 0.05) {
-                                    drawButton();
+                                    configChart(false, true);
+                                    return;
+                                } else {
+                                    configChart(false, false);
                                     return;
                                 }
                             }
@@ -697,6 +728,9 @@ public class GroupFragment extends Fragment {
         if (numCheckIns.isEmpty()) {
             hasCheckInLeft = true;
         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+            hasCheckInLeft = true;
+            group.setShowCheckInReminderBadge(true);
+        } else if (numCheckIns.size() < correctNumCheckIns) {
             hasCheckInLeft = true;
             group.setShowCheckInReminderBadge(true);
         } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
@@ -787,7 +821,7 @@ public class GroupFragment extends Fragment {
                                 @Override
                                 public void done(ParseException e) {
                                     Log.d("checking in", "saved check in");
-                                    configChart(true);
+                                    configChart(true, false);
                                     final Handler handler = new Handler();
                                     handler.postDelayed(new Runnable() {
                                         @Override
@@ -964,64 +998,70 @@ public class GroupFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            // return to groups fragment
-            FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-            GroupsFragment fragment = new GroupsFragment();
-            fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-        } else if (item.getItemId() == R.id.action_requests) {
-            Intent intent = new Intent(getContext(), InvitationActivity.class);
-            intent.putExtra("group", (Parcelable) group);
-            startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
-        } else if (item.getItemId() == R.id.action_leave) {
-            if (group.getIsActive()) {
-                Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
-            } else {
-                ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
-                membershipParseQuery.whereEqualTo("group", group);
-                membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
-                membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
-                    @Override
-                    public void done(Membership object, ParseException e) {
-                        if (e != null) {
-                            e.printStackTrace();
-                        } else if (object != null) {
-                            try {
-                                object.delete();
-                                Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
-                            } catch (ParseException ex) {
-                                ex.printStackTrace();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                GroupsFragment fragment = new GroupsFragment();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                break;
+            case R.id.action_requests:
+                Intent intent = new Intent(getContext(), InvitationActivity.class);
+                intent.putExtra("group", (Parcelable) group);
+                startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
+                break;
+            case R.id.action_leave:
+                if (group.getIsActive()) {
+                    Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
+                } else {
+                    ParseQuery<Membership> membershipParseQuery = new ParseQuery<Membership>("Membership");
+                    membershipParseQuery.whereEqualTo("group", group);
+                    membershipParseQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+                    membershipParseQuery.getFirstInBackground(new GetCallback<Membership>() {
+                        @Override
+                        public void done(Membership object, ParseException e) {
+                            if (e != null) {
+                                e.printStackTrace();
+                            } else if (object != null) {
+                                try {
+                                    object.delete();
+                                    Toast.makeText(getContext(), "You have left group.", Toast.LENGTH_LONG).show();
+                                } catch (ParseException ex) {
+                                    ex.printStackTrace();
+                                }
                             }
                         }
+                    });
+                }
+                break;
+            case R.id.action_invite_to_group:
+                ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+                parseQuery.whereEqualTo("group", group);
+                parseQuery.include("group");
+                parseQuery.include("user");
+                parseQuery.findInBackground(new FindCallback<Membership>() {
+                    @Override
+                    public void done(List<Membership> objects, ParseException e) {
+                        if (e != null) {
+                            Log.e("Querying memberships", "error with query");
+                            e.printStackTrace();
+                            return;
+                        } else if (objects == null || objects.size() == 0) {
+                            Log.e("membership querying", "no membership objects found with this group");
+                        }
+                        memberships.addAll(objects);
+                        for (Membership mem : memberships) {
+                            addedUsers.add(mem.getUser());
+                        }
+                        Intent intent = new Intent(getContext(), AddUsersActivity.class);
+                        //Keeps track of which users have already been added, so that they cannot be added again.
+                        intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
+                        intent.putExtra("situation", R.string.invite_friend_to_group);
+                        startActivityForResult(intent, ADD_REQUEST_CODE);
                     }
                 });
-            }
-        } else if (item.getItemId() == R.id.action_invite_to_group) {
-            ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
-            parseQuery.whereEqualTo("group", group);
-            parseQuery.include("group");
-            parseQuery.include("user");
-            parseQuery.findInBackground(new FindCallback<Membership>() {
-                @Override
-                public void done(List<Membership> objects, ParseException e) {
-                    if (e != null) {
-                        Log.e("Querying memberships", "error with query");
-                        e.printStackTrace();
-                        return;
-                    } else if (objects == null || objects.size() == 0) {
-                        Log.e("membership querying", "no membership objects found with this group");
-                    }
-                    memberships.addAll(objects);
-                    for (Membership mem : memberships) {
-                        addedUsers.add(mem.getUser());
-                    }
-                    Intent intent = new Intent(getContext(), AddUsersActivity.class);
-                    //Keeps track of which users have already been added, so that they cannot be added again.
-                    intent.putParcelableArrayListExtra("alreadyAdded", (ArrayList<? extends Parcelable>) addedUsers);
-                    intent.putExtra("situation", R.string.invite_friend_to_group);
-                    startActivityForResult(intent, ADD_REQUEST_CODE);
-                }
-            });
+                break;
+            default:
+                break;
         }
 
         Log.d("itemId", item.toString());

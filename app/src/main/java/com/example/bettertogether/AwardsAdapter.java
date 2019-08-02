@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,16 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.bettertogether.fragments.AwardFragment;
 import com.example.bettertogether.fragments.DialogAwardFragment;
-import com.example.bettertogether.fragments.DialogGroupDetailFragment;
 import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.UserAward;
 import com.parse.ParseFile;
 
 import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder> {
 
@@ -109,10 +103,17 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Award award = awards.get(position);
+
+                boolean isAchieved = false;
+
+                for (int i = 0; i < achievedAwards.size(); i++) {
+                    if (award.getName().equalsIgnoreCase(achievedAwards.get(i).getName())) {
+                        isAchieved = true;
+                    }
+                }
                 // switch to award-detail view fragment
-                Toast.makeText(context, "title clicked", Toast.LENGTH_LONG).show();
                 FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award);
+                DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award, isAchieved);
                 awardFragment.show(fm, "fragment_group_detail");
             }
         }

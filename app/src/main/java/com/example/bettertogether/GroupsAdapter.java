@@ -55,6 +55,12 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         return groups.size();
     }
 
+
+    public void clear() {
+        groups.clear();
+        notifyDataSetChanged();
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private ImageView ivGroupProf;
@@ -63,6 +69,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
         private TextView tvCategory;
         private TextView tvDescription;
         private TextView tvDates;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,6 +83,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
             itemView.setOnClickListener(this);
         }
+
 
         public void bind(Group group) {
 

@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
@@ -34,6 +35,7 @@ import static com.parse.ParseUser.getCurrentUser;
 public class HomeFragment extends Fragment {
 
     private RecyclerView rvPosts;
+    private SwipeRefreshLayout swipeContainerPosts;
     private PostsAdapter adapter;
     private List<Post> mPosts;
 
@@ -46,6 +48,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         rvPosts = view.findViewById(R.id.rvPosts);
+        swipeContainerPosts = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainerPosts);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
 
         // initializing list of posts, adapter, and attaching adapter to recyclerview
@@ -55,7 +58,30 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         rvPosts.setLayoutManager(linearLayoutManager);
 
+        // Lookup the swipe container view
+        // Setup refresh listener which triggers new data loading
+        swipeContainerPosts.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false) once the refresh completed successfully.
+                fetchPostsAgain(0);
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainerPosts.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         queryPosts();
+    }
+
+    public void fetchPostsAgain(int page) {
+        adapter.clear();
+        queryPosts();
+        // Now we call setRefreshing(false) to signal refresh has finished
+        swipeContainerPosts.setRefreshing(false);
     }
 
     private void queryPosts() {
