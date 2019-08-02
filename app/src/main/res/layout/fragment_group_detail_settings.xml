@@ -5,7 +5,7 @@
     android:id="@+id/contstrainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileDetailFragment">
+    tools:context=".HomeActivity">
 
     <Button
         android:id="@+id/btnPendingRequests"
@@ -19,11 +19,11 @@
         app:layout_constraintTop_toBottomOf="@+id/tvSettings" />
 
     <Button
-        android:id="@+id/btnNotifications"
+        android:id="@+id/btnInviteToGroup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Toggle Notifications"
+        android:text="Invite Friends to Join Group"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnProfilePicture" />
@@ -37,7 +37,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnNotifications" />
+        app:layout_constraintTop_toBottomOf="@+id/btnInviteToGroup" />
 
     <Button
         android:id="@+id/btnProfilePicture"
