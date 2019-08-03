@@ -40,15 +40,15 @@ import java.util.List;
 public class DiscoveryFragment extends Fragment {
     public static final String LOGTAG ="carousels";
 
-    private RecyclerView mRecyclerView;
+    protected RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     boolean scrolling;
-    private RecyclerView rvDiscovery;
-    private DiscoveryAdapter mainRecyclerAdapter;
+    protected DiscoveryAdapter mainRecyclerAdapter;
     private List<Category> mCategories = new ArrayList<>();
     private ProgressBar progressBar = null;
     private Button createGroupBtn;
     private Button btnLeaderboard;
+    private Button btnShowMore;
     private List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
     private final int REQUEST_CODE = 20;
 
@@ -63,6 +63,7 @@ public class DiscoveryFragment extends Fragment {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_rootview);
         createGroupBtn = (Button) view.findViewById(R.id.create_group_btn);
         btnLeaderboard = view.findViewById(R.id.btnLeaderboard);
+        btnShowMore = (Button)view.findViewById(R.id.show_more_btn);
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -75,6 +76,12 @@ public class DiscoveryFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getFragmentManager().beginTransaction().replace(R.id.flContainer, new LeaderboardFragment()).commit();
+            }
+        });
+        btnShowMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getFragmentManager().beginTransaction().replace(R.id.flContainer, new CategoryFragment()).commit();
             }
         });
     }
