@@ -179,7 +179,9 @@ public class ProfileFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
 //        ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(user.get("profileImage").getUrl);
         toolbar.setTitle(user.getUsername());
-        setHasOptionsMenu(true);
+        if (user.hasSameId(ParseUser.getCurrentUser()))
+            setHasOptionsMenu(true);
+
         TextView tvUserActionBar = view.findViewById(R.id.tvUserActionBar);
         ImageView ivPhotoActionBar = view.findViewById(R.id.ivPhotoActionBar);
         tvUserActionBar.setText(user.getUsername());
