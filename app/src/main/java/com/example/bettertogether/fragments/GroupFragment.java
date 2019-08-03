@@ -232,17 +232,8 @@ public class GroupFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
-        collapsingToolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "title clicked", Toast.LENGTH_LONG).show();
-                FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
-                groupDetailFragment.show(fm, "fragment_group_detail");
-
-            }
-        });
         setHasOptionsMenu(true);
+
         final ImageView imageView = view.findViewById(R.id.backdrop);
         if (group.getIcon() != null) {
             Glide.with(view.getContext())
@@ -515,10 +506,10 @@ public class GroupFragment extends Fragment {
                     // add to pie chart
                     PieDataSet dataSet = new PieDataSet(entries, "group stats");
                     List<Integer> colors = new ArrayList<>();
-                    colors.add(getResources().getColor(R.color.orange));
+                    colors.add(getResources().getColor(R.color.o1));
                     colors.add(getResources().getColor(R.color.o4));
                     colors.add(getResources().getColor(R.color.o8));
-                    colors.add(getResources().getColor(R.color.colorPrimaryDark));
+                    colors.add(getResources().getColor(R.color.originalOrange));
                     dataSet.setValueLineColor(R.color.orange);
                     dataSet.setColors(colors);
                     dataSet.setDrawValues(true);
@@ -1001,16 +992,19 @@ public class GroupFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (inGroup) {
             switch (item.getItemId()) {
+
                 case android.R.id.home:
                     FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
                     GroupsFragment fragment = new GroupsFragment();
                     fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                     break;
+
                 case R.id.action_requests:
                     Intent intent = new Intent(getContext(), InvitationActivity.class);
                     intent.putExtra("group", (Parcelable) group);
                     startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
                     break;
+
                 case R.id.action_leave:
                     if (group.getIsActive()) {
                         Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
@@ -1035,6 +1029,7 @@ public class GroupFragment extends Fragment {
                         });
                     }
                     break;
+
                 case R.id.action_invite_to_group:
                     ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
                     parseQuery.whereEqualTo("group", group);
@@ -1062,9 +1057,17 @@ public class GroupFragment extends Fragment {
                         }
                     });
                     break;
+
+                case R.id.action_more:
+                    FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                    DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
+                    groupDetailFragment.show(fm, "fragment_group_detail");
+                    break;
+
                 default:
                     break;
-            }
+                }
+
         } else {
             if (item.getItemId() == android.R.id.home) {
                 FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
@@ -1073,7 +1076,6 @@ public class GroupFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "You are not a member of the group.", Toast.LENGTH_SHORT).show();
             }
-
         }
 
         Log.d("itemId", item.toString());

@@ -161,13 +161,13 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             }
 
             if(group.getIsActive()) {
-                tvDates.setText(String.format("Active: %d %s left!", time, unit));
+                tvDates.setText(String.format("%d %s left", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.orange));
             } else if (currentDate.before(start)){
-                tvDates.setText(String.format("Inactive: starts in %d %s!", time, unit));
+                tvDates.setText(String.format("starts in %d %s", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             } else if (currentDate.after(cal.getTime())) {
-                tvDates.setText(String.format("Inactive: completed %d %s ago!", time, unit));
+                tvDates.setText(String.format("completed %d %s ago", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             }
         }

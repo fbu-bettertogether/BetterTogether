@@ -17,7 +17,13 @@ import com.bumptech.glide.Glide;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.UserAward;
+import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 // ...
@@ -29,9 +35,11 @@ public class DialogAwardFragment extends DialogFragment {
     private ImageView ivAwardImage;
     private TextView tvAwardName;
     private TextView tvAwardDescription;
+    private TextView tvAwardStatus;
     private List<Award> achievedAwards = new ArrayList<>();
     private List<UserAward> userAwards = new ArrayList<UserAward>();
     private Boolean isAchieved;
+    private String username;
 
     public DialogAwardFragment() {
         // Empty constructor is required for DialogFragment
@@ -39,11 +47,12 @@ public class DialogAwardFragment extends DialogFragment {
         // Use `newInstance` instead as shown below
     }
 
-    public static DialogAwardFragment newInstance(Award award, boolean isAchieved) {
+    public static DialogAwardFragment newInstance(Award award, boolean isAchieved, String username) {
         DialogAwardFragment frag = new DialogAwardFragment();
         Bundle args = new Bundle();
         args.putSerializable("award", award);
         args.putBoolean("isAchieved", isAchieved);
+        args.putString("username", username);
         frag.setArguments(args);
         return frag;
     }
@@ -62,10 +71,13 @@ public class DialogAwardFragment extends DialogFragment {
         ivAwardImage = view.findViewById(R.id.ivAwardImage);
         tvAwardName = view.findViewById(R.id.tvAwardName);
         tvAwardDescription = view.findViewById(R.id.tvAwardDescription);
+        tvAwardStatus = view.findViewById(R.id.tvAwardStatus);
 
         // Fetch arguments from bundle and set title
         award = (Award) getArguments().getSerializable("award");
         isAchieved = (Boolean) getArguments().getBoolean("isAchieved");
+        username = (String) getArguments().getString("username");
+
         getDialog().setTitle(award.getName());
 
         if (award.getIcon() != null) {
@@ -78,5 +90,37 @@ public class DialogAwardFragment extends DialogFragment {
         if (!isAchieved) {
             ivAwardImage.setColorFilter(getContext().getResources().getColor(R.color.grey));
         }
+
+        ParseQuery<ParseUser> userQuery = new ParseQuery<ParseUser>(ParseUser.class);
+        userQuery.whereEqualTo("username", username);
+        userQuery.findInBackground(new FindCallback<ParseUser>() {
+            @Override
+            public void done(List<ParseUser> objects, ParseException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                final ParseUser user = objects.get(0);
+                ParseQuery<UserAward> userAwardQuery = new ParseQuery<UserAward>(UserAward.class);
+                userAwardQuery.whereEqualTo("user", user);
+                userAwardQuery.whereEqualTo("award", award);
+                userAwardQuery.include("numCompleted");
+                userAwardQuery.include("numRequired");
+                userAwardQuery.findInBackground(new FindCallback<UserAward>() {
+                    @Override
+                    public void done(List<UserAward> objects, ParseException e) {
+                        UserAward userAward = objects.get(0);
+                        if (userAward.getIfAchieved()) {
+                            SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
+                            String dateString = format.format(userAward.getDateCompleted());
+                            tvAwardStatus.setText("Completed on " + dateString);
+                        } else {
+                            tvAwardStatus.setText(userAward.getNumCompleted() + " / " + userAward.getNumRequired() + " completed");
+                        }
+                    }
+                });
+            }
+        });
     }
 }

@@ -25,4 +25,11 @@
         android:id="@+id/action_delete"
         android:title="Delete Group"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_more"
+        android:title="info"
+        android:icon="@drawable/baseline_chevron_right_black_18dp"
+        app:iconTint="@color/white"
+        app:showAsAction="ifRoom" />
 </menu>
