@@ -126,7 +126,7 @@ public class ProfileFragment extends Fragment {
         postsAdapter = new PostsAdapter(getContext(), posts, getFragmentManager());
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
         simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
-        awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards);
+        awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards, user);
         af = new AwardFragment();
         queryPosts();
         queryFriends();

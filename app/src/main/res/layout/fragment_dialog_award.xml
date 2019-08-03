@@ -49,7 +49,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvAwardName" />
+            app:layout_constraintTop_toBottomOf="@+id/tvAwardStatus" />
 
         <TextView
             android:id="@+id/filler"
@@ -58,6 +58,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvAwardStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="47dp"
+            android:textColor="@color/gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvAwardName" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -70,8 +80,8 @@
 
         <ImageView
             android:id="@+id/ivAwardImage"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="175dp"
+            android:layout_height="175dp"
             android:layout_gravity="center|top"
             android:layout_marginEnd="8dp"
             android:foregroundGravity="center_horizontal"
