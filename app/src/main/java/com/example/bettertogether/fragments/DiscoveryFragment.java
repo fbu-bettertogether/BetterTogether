@@ -153,12 +153,12 @@ public class DiscoveryFragment extends Fragment {
                 }
                 searchView.clearFocus();
                 ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
-                userParseQuery.whereContains("username", query);
+                userParseQuery.whereMatches("username", query, "i");
                 userParseQuery.findInBackground(new FindCallback<ParseUser>() {
                     @Override
                     public void done(final List<ParseUser> users, ParseException e) {
                         ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
-                        userParseQuery.whereContains("name", query);
+                        userParseQuery.whereMatches("name", query, "i");
                         userParseQuery.findInBackground(new FindCallback<Group>() {
                             @Override
                             public void done(List<Group> groups, ParseException e) {
@@ -179,12 +179,12 @@ public class DiscoveryFragment extends Fragment {
                     return false;
                 }
                 ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
-                userParseQuery.whereContains("username", newText);
+                userParseQuery.whereMatches("username", newText, "i");
                 userParseQuery.findInBackground(new FindCallback<ParseUser>() {
                     @Override
                     public void done(final List<ParseUser> users, ParseException e) {
                         ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
-                        userParseQuery.whereContains("name", newText);
+                        userParseQuery.whereMatches("name", newText, "i");
                         userParseQuery.findInBackground(new FindCallback<Group>() {
                             @Override
                             public void done(List<Group> groups, ParseException e) {
