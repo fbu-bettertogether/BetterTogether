@@ -815,7 +815,7 @@ public class GroupFragment extends Fragment {
             tvTimer.setVisibility(View.INVISIBLE);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setEnabled(true);
-            btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
+//            btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
