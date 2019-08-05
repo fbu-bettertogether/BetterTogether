@@ -728,136 +728,129 @@ public class GroupFragment extends Fragment {
         } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
             group.setShowCheckInReminderBadge(false);
         }
-        if (hasCheckInLeft) {
+
+        final Calendar now = Calendar.getInstance();
+        Calendar prevCheckIn = Calendar.getInstance();
+        Date lastCheckIn = currMem.getLastCheckIn();
+        prevCheckIn.setTime(lastCheckIn);
+        boolean checkedInToday = (now.get(Calendar.DAY_OF_YEAR) == prevCheckIn.get(Calendar.DAY_OF_YEAR))
+                && (now.get(Calendar.YEAR) == prevCheckIn.get(Calendar.YEAR));
+
+        if (hasCheckInLeft && !checkedInToday) {
             final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
+            tvTimer.setVisibility(View.INVISIBLE);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("Check in button", "Success");
-                    btnCheckIn.setVisibility(View.INVISIBLE);
+                    tvTimer.setText("Checked-in for the day!");
+                    currMem.setLastCheckIn(now.getTime());
                     tvTimer.setVisibility(View.VISIBLE);
-                    final long timeInMillis = TimeUnit.MINUTES.toMillis(group.getInt("minTime"));
+                    btnCheckIn.setVisibility(View.INVISIBLE);
+                    viewKonfetti.build()
+                            .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                            .setDirection(0.0, 359.0)
+                            .setSpeed(1f, 5f)
+                            .setFadeOutEnabled(true)
+                            .setTimeToLive(2000L)
+                            .addShapes(Shape.RECT, Shape.CIRCLE)
+                            .addSizes(new Size(12, 5))
+                            .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                            .streamFor(300, 5000L);
 
-                    new CountDownTimer(timeInMillis, 1000) {
-
+                    int currNum = numCheckIns.remove(numCheckIns.size() - 1);
+                    numCheckIns.add(currNum + 1);
+                    currMem.setNumCheckIns(numCheckIns);
+                    final int addedPoints = currMem.getGroup().getMinTime();
+                    currMem.setPoints(currMem.getPoints() + addedPoints);
+                    ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
+                    groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
+                    groupQuery.include("category");
+                    groupQuery.findInBackground(new FindCallback<Group>() {
                         @Override
-                        public void onTick(long l) {
-                            long timeInS = TimeUnit.MILLISECONDS.toSeconds(timeInMillis) - counter;
-                            tvTimer.setText(String.format("%02d : %02d", TimeUnit.SECONDS.toMinutes(timeInS), timeInS - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(timeInS))));
-                            counter++;
+                        public void done(List<Group> objects, ParseException e) {
+                            if (e != null) {
+                                e.printStackTrace();
+                                return;
+                            } else {
+                                Group g = objects.get(0);
+                                String cat = g.getCategory();
+                                String basePoints = "";
+                                // updating the appropriate points category of the user based on the category
+                                switch(cat) {
+                                    case "Fitness":
+                                        basePoints = "fitness";
+                                        break;
+                                    case "Get-Togethers":
+                                        basePoints = "getTogether";
+                                        break;
+                                    case "Service":
+                                        basePoints = "service";
+                                        break;
+                                }
+
+                                String pointsKey = basePoints + "Points";
+                                ParseUser user = currMem.getUser();
+                                int currPoints = user.getInt(pointsKey);
+                                user.put(pointsKey, currPoints + addedPoints);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("points", "user points updated");
+                                    }
+                                });
+                            }
                         }
+                    });
 
+                    currMem.saveInBackground(new SaveCallback() {
                         @Override
-                        public void onFinish() {
-                            tvTimer.setText("Finished!");
-//                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
-                            viewKonfetti.build()
-                                    .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
-                                    .setDirection(0.0, 359.0)
-                                    .setSpeed(1f, 5f)
-                                    .setFadeOutEnabled(true)
-                                    .setTimeToLive(2000L)
-                                    .addShapes(Shape.RECT, Shape.CIRCLE)
-                                    .addSizes(new Size(12, 5))
-                                    .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
-                                    .streamFor(300, 5000L);
-
-                            int currNum = numCheckIns.remove(numCheckIns.size() - 1);
-                            numCheckIns.add(currNum + 1);
-                            currMem.setNumCheckIns(numCheckIns);
-                            final int addedPoints = currMem.getGroup().getMinTime();
-                            currMem.setPoints(currMem.getPoints() + addedPoints);
-                            ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
-                            groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
-                            groupQuery.include("category");
-                            groupQuery.findInBackground(new FindCallback<Group>() {
+                        public void done(ParseException e) {
+                            Log.d("checking in", "saved check in");
+                            configChart(true, false);
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
                                 @Override
-                                public void done(List<Group> objects, ParseException e) {
-                                    if (e != null) {
-                                        e.printStackTrace();
-                                        return;
-                                    } else {
-                                        Group g = objects.get(0);
-                                        String cat = g.getCategory();
-                                        String basePoints = "";
-                                        // updating the appropriate points category of the user based on the category
-                                        switch(cat) {
-                                            case "Fitness":
-                                                basePoints = "fitness";
-                                                break;
-                                            case "Get-Togethers":
-                                                basePoints = "getTogether";
-                                                break;
-                                            case "Service":
-                                                basePoints = "service";
-                                                break;
-                                        }
+                                public void run() {
+//                                            checkInPost();
+                                    doAlerts(currWeekCheckIns);
+                                }
+                            }, 6000);
 
-                                        String pointsKey = basePoints + "Points";
-                                        ParseUser user = currMem.getUser();
-                                        int currPoints = user.getInt(pointsKey);
-                                        user.put(pointsKey, currPoints + addedPoints);
-                                        user.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                Log.d("points", "user points updated");
-                                            }
-                                        });
+                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                            query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        first = (Award) object;
+                                        af.queryAward(first, false, true, getContext());
+                                    } else {
+                                        e.printStackTrace();
                                     }
                                 }
                             });
-
-                            currMem.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    Log.d("checking in", "saved check in");
-                                    configChart(true, false);
-                                    final Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-//                                            checkInPost();
-                                            doAlerts(currWeekCheckIns);
-                                        }
-                                    }, 6000);
-
-                                    ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
-                                    query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
-                                        public void done(ParseObject object, ParseException e) {
-                                            if (e == null) {
-                                                first = (Award) object;
-                                                af.queryAward(first, false, true, getContext());
-                                            } else {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-                                    query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
-                                        public void done(ParseObject object, ParseException e) {
-                                            if (e == null) {
-                                                oneWeek = (Award) object;
-                                                af.queryAward(oneWeek, false, true, getContext());
-                                            } else {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-                                    query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
-                                        public void done(ParseObject object, ParseException e) {
-                                            if (e == null) {
-                                                tenacity = (Award) object;
-                                                af.queryAward(tenacity, false, true, getContext());
-                                            } else {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
+                            query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        oneWeek = (Award) object;
+                                        af.queryAward(oneWeek, false, true, getContext());
+                                    } else {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        tenacity = (Award) object;
+                                        af.queryAward(tenacity, false, true, getContext());
+                                    } else {
+                                        e.printStackTrace();
+                                    }
                                 }
                             });
                         }
-                    }.start();
+                    });
                 }
 
             });
@@ -865,7 +858,11 @@ public class GroupFragment extends Fragment {
         } else {
             btnCheckIn.setVisibility(View.INVISIBLE);
             tvTimer.setVisibility(View.VISIBLE);
-            tvTimer.setText("You're done for the week!");
+            if (hasCheckInLeft) {
+                tvTimer.setText("Checked-In today!");
+            } else {
+                tvTimer.setText("You're done for the week!");
+            }
         }
     }
 

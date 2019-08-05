@@ -5,7 +5,10 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @ParseClassName("Membership")
@@ -15,6 +18,7 @@ public class Membership extends ParseObject {
     public static final String KEY_NUM_CHECK_INS = "numCheckIns";
     public static final String KEY_POINTS = "points";
     public static final String LOCATION = "location";
+    public static final String LAST_CHECK_IN = "lastCheckIn";
 
     public String getDate() {
         return String.valueOf(getCreatedAt());
@@ -74,6 +78,27 @@ public class Membership extends ParseObject {
 
     public void setLocation(ParseGeoPoint location) {
         put(LOCATION, location);
+    }
+
+    public Date getLastCheckIn() {
+        String str = getString(LAST_CHECK_IN);
+        if (str == null) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -1);
+            return cal.getTime();
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+        Date lastCheckIn = null;
+        try {
+            lastCheckIn = sdf.parse(str);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        return lastCheckIn;
+    }
+
+    public void setLastCheckIn(Date date) {
+        put(LAST_CHECK_IN, date.toString());
     }
 
 }
