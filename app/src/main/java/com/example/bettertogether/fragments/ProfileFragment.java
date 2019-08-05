@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -125,7 +126,7 @@ public class ProfileFragment extends Fragment {
         postsAdapter = new PostsAdapter(getContext(), posts, getFragmentManager());
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
         simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
-        awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards);
+        awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards, user);
         af = new AwardFragment();
         queryPosts();
         queryFriends();
@@ -176,15 +177,24 @@ public class ProfileFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(user.get("profileImage").getUrl);
         toolbar.setTitle(user.getUsername());
         if (user.hasSameId(ParseUser.getCurrentUser()))
             setHasOptionsMenu(true);
+
+        TextView tvUserActionBar = view.findViewById(R.id.tvUserActionBar);
+        ImageView ivPhotoActionBar = view.findViewById(R.id.ivPhotoActionBar);
+        tvUserActionBar.setText(user.getUsername());
 
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivUserIcon);
+            Glide.with(view.getContext())
+                    .load(((ParseFile) user.get("profileImage")).getUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivPhotoActionBar);
         }
         onFriendUpdate();
         ivUserIcon.setOnClickListener(new View.OnClickListener() {
@@ -309,6 +319,11 @@ public class ProfileFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                GroupsFragment fragment = new GroupsFragment();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                break;
             case R.id.action_prof_logout:
                 ParseUser.logOut();
                 Intent intent = new Intent(getContext(), MainActivity.class);
@@ -318,9 +333,6 @@ public class ProfileFragment extends Fragment {
                 Intent i = new Intent(getContext(), InvitationActivity.class);
                 startActivityForResult(i, INVITATION_REQUEST_CODE);
         }
-
-        Toast.makeText(getContext(), "itemId: " + item.toString(), Toast.LENGTH_LONG).show();
-        Log.d("itemId", item.toString());
         return true;
     }
 

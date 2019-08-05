@@ -61,7 +61,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private MaterialCalendarView cdStartDate;
     private Button createBtn;
     private Boolean active;
-    private NumberPicker npMinTime;
     private Button btnAddUsers;
     private NumberPicker npNumWeeks;
     private Date start;
@@ -98,7 +97,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         rvAddedMembers = (RecyclerView) findViewById(R.id.rvAddedMembers);
 
         createBtn = (Button) findViewById(R.id.create_btn);
-        npMinTime = (NumberPicker) findViewById(R.id.npMinTime);
         btnAddUsers = (Button) findViewById(R.id.btnAddUsers);
         npNumWeeks = (NumberPicker) findViewById(R.id.npNumWeeks);
 
@@ -108,12 +106,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         for (int i = 1; i <= 60; i++) {
             npVals[i-1] = Integer.toString(i * 10);
         }
-        npMinTime.setDisplayedValues(npVals);
-        npMinTime.setMaxValue(59);
-        npMinTime.setMinValue(0);
-        npMinTime.setWrapSelectorWheel(true);
-        // preventing keyboard from popping up
-        npMinTime.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
         npNumWeeks.setMaxValue(52);
         npNumWeeks.setMinValue(1);
@@ -159,7 +151,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 final String category = spCategory.getSelectedItem().toString();
                 final int frequency = Integer.parseInt(spFrequency.getSelectedItem().toString());
                 final ParseUser user = ParseUser.getCurrentUser();
-                final int minTime = Integer.parseInt(npVals[npMinTime.getValue()]);
 
                 final CalendarDay now = CalendarDay.today();
                 if (cdStartDate.getSelectedDate() == null) {
@@ -221,7 +212,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
                 }
 
                 final ParseFile parseFile = new ParseFile(file);
-                createGroup(description, parseFile, groupName, privacy, category, frequency, startDate, endDate, user, minTime);
+                createGroup(description, parseFile, groupName, privacy, category, frequency, startDate, endDate, user);
             }
         });
     }
@@ -315,7 +306,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         return file;
     }
 
-    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, final ParseUser user, int minTime) {
+    private void createGroup(String description, ParseFile imageFile, String groupName, String privacy, final String category, int frequency, String startDate, String endDate, final ParseUser user) {
         final Group newGroup = new Group();
         newGroup.setDescription(description);
         newGroup.setIcon(imageFile);
@@ -327,7 +318,6 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setEndDate(endDate);
         newGroup.setOwner(user);
         newGroup.setIsActive(active);
-        newGroup.setMinTime(minTime);
         newGroup.setNumWeeks(npNumWeeks.getValue());
         newGroup.saveInBackground();
 
