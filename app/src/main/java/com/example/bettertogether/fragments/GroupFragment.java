@@ -206,6 +206,7 @@ public class GroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
+        btnCheckIn.setVisibility(View.INVISIBLE);
         tvDate = view.findViewById(R.id.tvDate);
         tvTimer = view.findViewById(R.id.tvTimer);
         chart = view.findViewById(R.id.chart);
@@ -339,7 +340,6 @@ public class GroupFragment extends Fragment {
                             group.setShowCheckInReminderBadge(false);
                         }
 
-                        // TODO -- should not be checking this if no check-ins left for the week
                         if (hasCheckInLeft) {
                             if (category.getName().equals("Get-Togethers")) {
                                 saveCurrentUserLocation();
@@ -354,6 +354,7 @@ public class GroupFragment extends Fragment {
                         } else {
                             tvTimer.setText("You're done for the week!");
                             tvTimer.setVisibility(View.VISIBLE);
+                            setHelpMessage("done for week");
                             btnCheckIn.setVisibility(View.INVISIBLE);
                             configChart(false, false, false);
                         }
@@ -414,7 +415,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
                 if (objects.size() == 1) {
-                    setHelpMessage(false);
+                    setHelpMessage("proximity");
                     configChart(false, true, false);
                 } else {
                     configChart(false, true, true);
@@ -714,7 +715,7 @@ public class GroupFragment extends Fragment {
                     }
                 }
             });
-            setHelpMessage(true);
+            setHelpMessage("place");
         } else {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -723,45 +724,67 @@ public class GroupFragment extends Fragment {
     }
 
     // sets help message, place is true if the message pertains to place, otherwise is proximity issue
-    private void setHelpMessage(final boolean place) {
+    private void setHelpMessage(final String type) {
 
         ivHelp.setVisibility(View.VISIBLE);
         ivHelp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (place) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle("Get to a valid location");
-                    builder.setMessage("This group requires you to be in a specific type of location to check in!");
-                    builder.show();
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle("Search for a nearby group member");
-                    builder.setMessage("This group requires you to be nearby to another member to check in!");
-                    builder.setPositiveButton("Find a member!", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
-                            query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
-                            query.whereEqualTo("group", group);
-                            query.findInBackground(new FindCallback<Membership>() {
-                                @Override
-                                public void done(final List<Membership> objects, ParseException e) {
-                                    if (objects.size() == 1) {
-                                        FragmentManager manager = getChildFragmentManager();
-                                        FragmentTransaction ft = manager.beginTransaction();
-                                        ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
-                                        ft.commitAllowingStateLoss();
-                                        saveCurrentUserLocation();
-                                        checkProximity();
-                                        chartFrame.getLayoutParams().height = 500;
-                                        chartFrame.requestLayout();
+                switch (type) {
+
+                    case "place":
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("Get to a valid location");
+                        builder.setMessage("This group requires you to be in a specific type of location to check in!");
+                        builder.show();
+                        break;
+
+                    case "proximity":
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
+                        builder1.setTitle("Search for a nearby group member");
+                        builder1.setMessage("This group requires you to be nearby to another member to check in!");
+                        builder1.setPositiveButton("Find a member!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
+                                query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
+                                query.whereEqualTo("group", group);
+                                query.findInBackground(new FindCallback<Membership>() {
+                                    @Override
+                                    public void done(final List<Membership> objects, ParseException e) {
+                                        if (objects.size() == 1) {
+                                            FragmentManager manager = getChildFragmentManager();
+                                            FragmentTransaction ft = manager.beginTransaction();
+                                            ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
+                                            ft.commitAllowingStateLoss();
+                                            saveCurrentUserLocation();
+                                            checkProximity();
+                                            chartFrame.getLayoutParams().height = 500;
+                                            chartFrame.requestLayout();
+                                        }
                                     }
-                                }
-                            });
-                        }
-                    });
-                    builder.show();
+                                });
+                            }
+                        });
+                        builder1.show();
+                        break;
+
+                        case "already checked-in":
+                            AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                            builder2.setTitle("You already checked-in today");
+                            builder2.setMessage("You can only check in once per day, see you tomorrow!");
+                            builder2.show();
+                            break;
+
+                        case "done for week":
+                            AlertDialog.Builder builder3 = new AlertDialog.Builder(getActivity());
+                            builder3.setTitle("You are done for the week");
+                            builder3.setMessage("You completed all your check-ins for this week, congrats!");
+                            builder3.show();
+                            break;
+
+                        default:
+                            break;
                 }
             }
         });
@@ -770,6 +793,7 @@ public class GroupFragment extends Fragment {
     private void drawButton(boolean enabled) {
 
         if (!enabled) {
+            btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setEnabled(false);
             btnCheckIn.setBackgroundColor(getResources().getColor(R.color.gray));
             return;
@@ -797,11 +821,12 @@ public class GroupFragment extends Fragment {
                 public void onClick(View view) {
 
                     currMem.setLastCheckIn(now.getTime());
-                    tvTimer.setVisibility(View.VISIBLE);
                     btnCheckIn.setVisibility(View.INVISIBLE);
+
                     if (currWeekCheckIns == group.getFrequency() - 1) {
                         // final check-in for the week
                         tvTimer.setText("Done for the week!");
+                        setHelpMessage("done for week");
                         tvTimer.setVisibility(View.VISIBLE);
                         viewKonfetti.build()
                                 .addColors(Color.RED, getResources().getColor(R.color.white), getResources().getColor(R.color.gold), getResources().getColor(R.color.colorPrimary))
@@ -815,6 +840,7 @@ public class GroupFragment extends Fragment {
                                 .streamFor(300, 5000L);
 
                     } else {
+                        setHelpMessage("already checked-in");
                         tvTimer.setText("Checked-in for the day!");
                         tvTimer.setVisibility(View.VISIBLE);
                         viewKonfetti.build()
@@ -878,7 +904,7 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void done(ParseException e) {
                             Log.d("checking in", "saved check in");
-                            configChart(true, true, false);
+                            configChart(true, false, false);
                             final Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -926,9 +952,10 @@ public class GroupFragment extends Fragment {
             });
 
         } else {
-            btnCheckIn.setVisibility(View.INVISIBLE);
+//            btnCheckIn.setVisibility(View.INVISIBLE);
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("Checked-In today!");
+            setHelpMessage("already checked-in");
         }
     }
 
