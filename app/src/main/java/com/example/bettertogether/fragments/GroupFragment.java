@@ -131,13 +131,12 @@ public class GroupFragment extends Fragment {
     private final int ADD_REQUEST_CODE = 20;
     public static final int REQUEST_CODE = 45;
     private ParseGeoPoint location;
-    private ImageView ivBanner;
-    private ImageView ivUserIcon;
-    private TextView tvGroupName;
+
     private Button btnCheckIn;
     private TextView tvDate;
     private TextView tvTimer;
-    private int counter;
+    private ImageView ivHelp;
+
     private List<Integer> numCheckIns;
     private Membership currMem;
     private Category category;
@@ -164,6 +163,7 @@ public class GroupFragment extends Fragment {
     List<Membership> memberships;
     private boolean inGroup = false;
     int correctNumCheckIns = 0;
+    boolean hasCheckInLeft = false;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -205,8 +205,8 @@ public class GroupFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        tvGroupName = view.findViewById(R.id.tvGroupName);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
+        btnCheckIn.setVisibility(View.INVISIBLE);
         tvDate = view.findViewById(R.id.tvDate);
         tvTimer = view.findViewById(R.id.tvTimer);
         chart = view.findViewById(R.id.chart);
@@ -216,6 +216,9 @@ public class GroupFragment extends Fragment {
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
+        ivHelp = view.findViewById(R.id.ivHelp);
+        ivHelp.setColorFilter(getResources().getColor(R.color.gray));
+        ivHelp.setVisibility(View.INVISIBLE);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -232,17 +235,8 @@ public class GroupFragment extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
-        collapsingToolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(), "title clicked", Toast.LENGTH_LONG).show();
-                FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-                DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
-                groupDetailFragment.show(fm, "fragment_group_detail");
-
-            }
-        });
         setHasOptionsMenu(true);
+
         final ImageView imageView = view.findViewById(R.id.backdrop);
         if (group.getIcon() != null) {
             Glide.with(view.getContext())
@@ -333,16 +327,38 @@ public class GroupFragment extends Fragment {
                         } else if (numCheckIns.size() == 0) {
                             numCheckIns.add(0);
                         }
-                        if (category.getName().equals("Get-Togethers")) {
-                            saveCurrentUserLocation();
-                            checkProximity();
-                        } else {
-                            try {
-                                checkPlace(category.getLocationTypesList());
-                            } catch (JSONException e1) {
-                                e1.printStackTrace();
-                            }
+
+                        if (numCheckIns.isEmpty()) {
+                            hasCheckInLeft = true;
+                        } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+                            hasCheckInLeft = true;
+                            group.setShowCheckInReminderBadge(true);
+                        } else if (numCheckIns.size() < correctNumCheckIns) {
+                            hasCheckInLeft = true;
+                            group.setShowCheckInReminderBadge(true);
+                        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
+                            group.setShowCheckInReminderBadge(false);
                         }
+
+                        if (hasCheckInLeft) {
+                            if (category.getName().equals("Get-Togethers")) {
+                                saveCurrentUserLocation();
+                                checkProximity();
+                            } else {
+                                try {
+                                    checkPlace(category.getLocationTypesList());
+                                } catch (JSONException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        } else {
+                            tvTimer.setText("You're done for the week!");
+                            tvTimer.setVisibility(View.VISIBLE);
+                            setHelpMessage("done for week");
+                            btnCheckIn.setVisibility(View.INVISIBLE);
+                            configChart(false, false, false);
+                        }
+
                     } else {
                         btnCheckIn.setVisibility(View.INVISIBLE);
                         tvTimer.setVisibility(View.VISIBLE);
@@ -399,24 +415,10 @@ public class GroupFragment extends Fragment {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
                 if (objects.size() == 1) {
-                    btnCheckIn.setVisibility(View.VISIBLE);
-                    btnCheckIn.setText("Click to search for a group member");
-                    configChart(false, false);
-                    btnCheckIn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            FragmentManager manager = getChildFragmentManager();
-                            FragmentTransaction ft = manager.beginTransaction();
-                            ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
-                            ft.commitAllowingStateLoss();
-                            saveCurrentUserLocation();
-                            checkProximity();
-                            chartFrame.getLayoutParams().height = 500;
-                            chartFrame.requestLayout();
-                        }
-                    });
+                    setHelpMessage("proximity");
+                    configChart(false, true, false);
                 } else {
-                    configChart(false, true);
+                    configChart(false, true, true);
                 }
             }
         });
@@ -446,7 +448,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    private void configChart(final boolean checkingIn, final boolean enableButton) {
+    private void configChart(final boolean checkingIn, final boolean showButton, final boolean enableButton) {
 
         if (!group.getIsActive()) {
             chart.requestLayout();
@@ -515,10 +517,10 @@ public class GroupFragment extends Fragment {
                     // add to pie chart
                     PieDataSet dataSet = new PieDataSet(entries, "group stats");
                     List<Integer> colors = new ArrayList<>();
-                    colors.add(getResources().getColor(R.color.orange));
+                    colors.add(getResources().getColor(R.color.o1));
                     colors.add(getResources().getColor(R.color.o4));
                     colors.add(getResources().getColor(R.color.o8));
-                    colors.add(getResources().getColor(R.color.colorPrimaryDark));
+                    colors.add(getResources().getColor(R.color.originalOrange));
                     dataSet.setValueLineColor(R.color.orange);
                     dataSet.setColors(colors);
                     dataSet.setDrawValues(true);
@@ -538,8 +540,8 @@ public class GroupFragment extends Fragment {
                         chart.animateY(1500, Easing.EaseInOutQuad);
                     }
 
-                    if (enableButton) {
-                        drawButton();
+                    if (showButton) {
+                        drawButton(enableButton);
                     }
 
                     chart.invalidate();
@@ -698,10 +700,10 @@ public class GroupFragment extends Fragment {
                             double likelihood = placeLikelihood.getLikelihood();
                             for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
                                 if (types.contains(type.toString()) & likelihood > 0.05) {
-                                    configChart(false, true);
+                                    configChart(false, true, true);
                                     return;
                                 } else {
-                                    configChart(false, false);
+                                    configChart(false, true, false);
                                     return;
                                 }
                             }
@@ -713,7 +715,7 @@ public class GroupFragment extends Fragment {
                     }
                 }
             });
-            btnCheckIn.setText("Get to a valid location");
+            setHelpMessage("place");
         } else {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -721,160 +723,239 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    private void drawButton() {
+    // sets help message, place is true if the message pertains to place, otherwise is proximity issue
+    private void setHelpMessage(final String type) {
+
+        ivHelp.setVisibility(View.VISIBLE);
+        ivHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (type) {
+
+                    case "place":
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setTitle("Get to a valid location");
+                        builder.setMessage("This group requires you to be in a specific type of location to check in!");
+                        builder.show();
+                        break;
+
+                    case "proximity":
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
+                        builder1.setTitle("Search for a nearby group member");
+                        builder1.setMessage("This group requires you to be nearby to another member to check in!");
+                        builder1.setPositiveButton("Find a member!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
+                                query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
+                                query.whereEqualTo("group", group);
+                                query.findInBackground(new FindCallback<Membership>() {
+                                    @Override
+                                    public void done(final List<Membership> objects, ParseException e) {
+                                        if (objects.size() == 1) {
+                                            FragmentManager manager = getChildFragmentManager();
+                                            FragmentTransaction ft = manager.beginTransaction();
+                                            ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
+                                            ft.commitAllowingStateLoss();
+                                            saveCurrentUserLocation();
+                                            checkProximity();
+                                            chartFrame.getLayoutParams().height = 500;
+                                            chartFrame.requestLayout();
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        builder1.show();
+                        break;
+
+                        case "already checked-in":
+                            AlertDialog.Builder builder2 = new AlertDialog.Builder(getActivity());
+                            builder2.setTitle("You already checked-in today");
+                            builder2.setMessage("You can only check in once per day, see you tomorrow!");
+                            builder2.show();
+                            break;
+
+                        case "done for week":
+                            AlertDialog.Builder builder3 = new AlertDialog.Builder(getActivity());
+                            builder3.setTitle("You are done for the week");
+                            builder3.setMessage("You completed all your check-ins for this week, congrats!");
+                            builder3.show();
+                            break;
+
+                        default:
+                            break;
+                }
+            }
+        });
+    }
+
+    private void drawButton(boolean enabled) {
+
+        if (!enabled) {
+            btnCheckIn.setVisibility(View.VISIBLE);
+            btnCheckIn.setEnabled(false);
+            btnCheckIn.setBackgroundColor(getResources().getColor(R.color.gray));
+            return;
+        }
+
         if (!getChildFragmentManager().getFragments().isEmpty()) {
             getChildFragmentManager().beginTransaction().remove(getChildFragmentManager().getFragments().get(0));
         }
-        boolean hasCheckInLeft = false;
-        if (numCheckIns.isEmpty()) {
-            hasCheckInLeft = true;
-        } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
-            hasCheckInLeft = true;
-            group.setShowCheckInReminderBadge(true);
-        } else if (numCheckIns.size() < correctNumCheckIns) {
-            hasCheckInLeft = true;
-            group.setShowCheckInReminderBadge(true);
-        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
-            group.setShowCheckInReminderBadge(false);
-        }
-        if (hasCheckInLeft) {
+
+        final Calendar now = Calendar.getInstance();
+        Calendar prevCheckIn = Calendar.getInstance();
+        Date lastCheckIn = currMem.getLastCheckIn();
+        prevCheckIn.setTime(lastCheckIn);
+        boolean checkedInToday = (now.get(Calendar.DAY_OF_YEAR) == prevCheckIn.get(Calendar.DAY_OF_YEAR))
+                && (now.get(Calendar.YEAR) == prevCheckIn.get(Calendar.YEAR));
+
+        if (!checkedInToday) {
             final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
+            tvTimer.setVisibility(View.INVISIBLE);
             btnCheckIn.setVisibility(View.VISIBLE);
-            btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
+            btnCheckIn.setEnabled(true);
+//            btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("Check in button", "Success");
+
+                    currMem.setLastCheckIn(now.getTime());
                     btnCheckIn.setVisibility(View.INVISIBLE);
-                    tvTimer.setVisibility(View.VISIBLE);
-                    final long timeInMillis = TimeUnit.MINUTES.toMillis(group.getInt("minTime"));
 
-                    new CountDownTimer(timeInMillis, 1000) {
+                    if (currWeekCheckIns == group.getFrequency() - 1) {
+                        // final check-in for the week
+                        tvTimer.setText("Done for the week!");
+                        setHelpMessage("done for week");
+                        tvTimer.setVisibility(View.VISIBLE);
+                        viewKonfetti.build()
+                                .addColors(Color.RED, getResources().getColor(R.color.white), getResources().getColor(R.color.gold), getResources().getColor(R.color.colorPrimary))
+                                .setDirection(0.0, 359.0)
+                                .setSpeed(1f, 5f)
+                                .setFadeOutEnabled(true)
+                                .setTimeToLive(2000L)
+                                .addShapes(Shape.RECT, Shape.CIRCLE)
+                                .addSizes(new Size(12, 5))
+                                .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                                .streamFor(300, 5000L);
 
+                    } else {
+                        setHelpMessage("already checked-in");
+                        tvTimer.setText("Checked-in for the day!");
+                        tvTimer.setVisibility(View.VISIBLE);
+                        viewKonfetti.build()
+                                .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                                .setDirection(0.0, 359.0)
+                                .setSpeed(1f, 5f)
+                                .setFadeOutEnabled(true)
+                                .setTimeToLive(2000L)
+                                .addShapes(Shape.RECT, Shape.CIRCLE)
+                                .addSizes(new Size(12, 5))
+                                .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                                .streamFor(300, 2000L);
+                    }
+
+
+                    int currNum = numCheckIns.remove(numCheckIns.size() - 1);
+                    numCheckIns.add(currNum + 1);
+                    currMem.setNumCheckIns(numCheckIns);
+                    currMem.setPoints(currMem.getPoints() + 10);
+                    ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
+                    groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
+                    groupQuery.include("category");
+                    groupQuery.findInBackground(new FindCallback<Group>() {
                         @Override
-                        public void onTick(long l) {
-                            long timeInS = TimeUnit.MILLISECONDS.toSeconds(timeInMillis) - counter;
-                            tvTimer.setText(String.format("%02d : %02d", TimeUnit.SECONDS.toMinutes(timeInS), timeInS - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(timeInS))));
-                            counter++;
+                        public void done(List<Group> objects, ParseException e) {
+                            if (e != null) {
+                                e.printStackTrace();
+                                return;
+                            } else {
+                                Group g = objects.get(0);
+                                String cat = g.getCategory();
+                                String basePoints = "";
+                                // updating the appropriate points category of the user based on the category
+                                switch(cat) {
+                                    case "Fitness":
+                                        basePoints = "fitness";
+                                        break;
+                                    case "Get-Togethers":
+                                        basePoints = "getTogether";
+                                        break;
+                                    case "Service":
+                                        basePoints = "service";
+                                        break;
+                                }
+
+                                String pointsKey = basePoints + "Points";
+                                ParseUser user = currMem.getUser();
+                                int currPoints = user.getInt(pointsKey);
+                                user.put(pointsKey, currPoints + 10);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Log.d("points", "user points updated");
+                                    }
+                                });
+                            }
                         }
+                    });
 
+                    currMem.saveInBackground(new SaveCallback() {
                         @Override
-                        public void onFinish() {
-                            tvTimer.setText("Finished!");
-//                            CommonConfetti.rainingConfetti(constraintLayout, new int[] {R.color.colorPrimary}).oneShot();
-                            viewKonfetti.build()
-                                    .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
-                                    .setDirection(0.0, 359.0)
-                                    .setSpeed(1f, 5f)
-                                    .setFadeOutEnabled(true)
-                                    .setTimeToLive(2000L)
-                                    .addShapes(Shape.RECT, Shape.CIRCLE)
-                                    .addSizes(new Size(12, 5))
-                                    .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
-                                    .streamFor(300, 5000L);
-
-                            int currNum = numCheckIns.remove(numCheckIns.size() - 1);
-                            numCheckIns.add(currNum + 1);
-                            currMem.setNumCheckIns(numCheckIns);
-                            final int addedPoints = currMem.getGroup().getMinTime();
-                            currMem.setPoints(currMem.getPoints() + addedPoints);
-                            ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
-                            groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
-                            groupQuery.include("category");
-                            groupQuery.findInBackground(new FindCallback<Group>() {
+                        public void done(ParseException e) {
+                            Log.d("checking in", "saved check in");
+                            configChart(true, false, false);
+                            final Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
                                 @Override
-                                public void done(List<Group> objects, ParseException e) {
-                                    if (e != null) {
-                                        e.printStackTrace();
-                                        return;
-                                    } else {
-                                        Group g = objects.get(0);
-                                        String cat = g.getCategory();
-                                        String basePoints = "";
-                                        // updating the appropriate points category of the user based on the category
-                                        switch(cat) {
-                                            case "Fitness":
-                                                basePoints = "fitness";
-                                                break;
-                                            case "Get-Togethers":
-                                                basePoints = "getTogether";
-                                                break;
-                                            case "Service":
-                                                basePoints = "service";
-                                                break;
-                                        }
+                                public void run() {
+//                                            checkInPost();
+                                    doAlerts(currWeekCheckIns);
+                                }
+                            }, 6000);
 
-                                        String pointsKey = basePoints + "Points";
-                                        ParseUser user = currMem.getUser();
-                                        int currPoints = user.getInt(pointsKey);
-                                        user.put(pointsKey, currPoints + addedPoints);
-                                        user.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-                                                Log.d("points", "user points updated");
-                                            }
-                                        });
+                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                            query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        first = (Award) object;
+                                        af.queryAward(first, false, true, getContext());
+                                    } else {
+                                        e.printStackTrace();
                                     }
                                 }
                             });
-
-                            currMem.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    Log.d("checking in", "saved check in");
-                                    configChart(true, false);
-                                    final Handler handler = new Handler();
-                                    handler.postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-//                                            checkInPost();
-                                            doAlerts(currWeekCheckIns);
-                                        }
-                                    }, 6000);
-
-                                    ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
-                                    query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
-                                        public void done(ParseObject object, ParseException e) {
-                                            if (e == null) {
-                                                first = (Award) object;
-                                                af.queryAward(first, false, true, getContext());
-                                            } else {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-                                    query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
-                                        public void done(ParseObject object, ParseException e) {
-                                            if (e == null) {
-                                                oneWeek = (Award) object;
-                                                af.queryAward(oneWeek, false, true, getContext());
-                                            } else {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-                                    query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
-                                        public void done(ParseObject object, ParseException e) {
-                                            if (e == null) {
-                                                tenacity = (Award) object;
-                                                af.queryAward(tenacity, false, true, getContext());
-                                            } else {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
+                            query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        oneWeek = (Award) object;
+                                        af.queryAward(oneWeek, false, true, getContext());
+                                    } else {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        tenacity = (Award) object;
+                                        af.queryAward(tenacity, false, true, getContext());
+                                    } else {
+                                        e.printStackTrace();
+                                    }
                                 }
                             });
                         }
-                    }.start();
+                    });
                 }
 
             });
 
         } else {
-            btnCheckIn.setVisibility(View.INVISIBLE);
+//            btnCheckIn.setVisibility(View.INVISIBLE);
             tvTimer.setVisibility(View.VISIBLE);
-            tvTimer.setText("You're done for the week!");
+            tvTimer.setText("Checked-In today!");
+            setHelpMessage("already checked-in");
         }
     }
 
@@ -1001,16 +1082,19 @@ public class GroupFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (inGroup) {
             switch (item.getItemId()) {
+
                 case android.R.id.home:
                     FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
                     GroupsFragment fragment = new GroupsFragment();
                     fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                     break;
+
                 case R.id.action_requests:
                     Intent intent = new Intent(getContext(), InvitationActivity.class);
                     intent.putExtra("group", (Parcelable) group);
                     startActivityForResult(intent, GROUP_INVITATION_REQUEST_CODE);
                     break;
+
                 case R.id.action_leave:
                     if (group.getIsActive()) {
                         Toast.makeText(getContext(), "Can't leave active group", Toast.LENGTH_LONG).show();
@@ -1035,6 +1119,7 @@ public class GroupFragment extends Fragment {
                         });
                     }
                     break;
+
                 case R.id.action_invite_to_group:
                     ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
                     parseQuery.whereEqualTo("group", group);
@@ -1062,9 +1147,17 @@ public class GroupFragment extends Fragment {
                         }
                     });
                     break;
+
+                case R.id.action_more:
+                    FragmentManager fm = ((AppCompatActivity) getContext()).getSupportFragmentManager();
+                    DialogGroupDetailFragment groupDetailFragment = DialogGroupDetailFragment.newInstance(group);
+                    groupDetailFragment.show(fm, "fragment_group_detail");
+                    break;
+
                 default:
                     break;
-            }
+                }
+
         } else {
             if (item.getItemId() == android.R.id.home) {
                 FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
@@ -1073,7 +1166,6 @@ public class GroupFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "You are not a member of the group.", Toast.LENGTH_SHORT).show();
             }
-
         }
 
         Log.d("itemId", item.toString());

@@ -40,15 +40,15 @@ import java.util.List;
 public class DiscoveryFragment extends Fragment {
     public static final String LOGTAG ="carousels";
 
-    private RecyclerView mRecyclerView;
+    protected RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     boolean scrolling;
-    private RecyclerView rvDiscovery;
-    private DiscoveryAdapter mainRecyclerAdapter;
+    protected DiscoveryAdapter mainRecyclerAdapter;
     private List<Category> mCategories = new ArrayList<>();
     private ProgressBar progressBar = null;
     private Button createGroupBtn;
     private Button btnLeaderboard;
+    private Button btnShowMore;
     private List<List<Group>> listOfListOfItems = new ArrayList<List<Group>>();
     private final int REQUEST_CODE = 20;
 
@@ -63,6 +63,7 @@ public class DiscoveryFragment extends Fragment {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_rootview);
         createGroupBtn = (Button) view.findViewById(R.id.create_group_btn);
         btnLeaderboard = view.findViewById(R.id.btnLeaderboard);
+        btnShowMore = (Button)view.findViewById(R.id.show_more_btn);
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -153,12 +154,12 @@ public class DiscoveryFragment extends Fragment {
                 }
                 searchView.clearFocus();
                 ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
-                userParseQuery.whereContains("username", query);
+                userParseQuery.whereMatches("username", query, "i");
                 userParseQuery.findInBackground(new FindCallback<ParseUser>() {
                     @Override
                     public void done(final List<ParseUser> users, ParseException e) {
                         ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
-                        userParseQuery.whereContains("name", query);
+                        userParseQuery.whereMatches("name", query, "i");
                         userParseQuery.findInBackground(new FindCallback<Group>() {
                             @Override
                             public void done(List<Group> groups, ParseException e) {
@@ -179,12 +180,12 @@ public class DiscoveryFragment extends Fragment {
                     return false;
                 }
                 ParseQuery<ParseUser> userParseQuery = new ParseQuery<ParseUser>(ParseUser.class);
-                userParseQuery.whereContains("username", newText);
+                userParseQuery.whereMatches("username", newText, "i");
                 userParseQuery.findInBackground(new FindCallback<ParseUser>() {
                     @Override
                     public void done(final List<ParseUser> users, ParseException e) {
                         ParseQuery<Group> userParseQuery = new ParseQuery<Group>("Group");
-                        userParseQuery.whereContains("name", newText);
+                        userParseQuery.whereMatches("name", newText, "i");
                         userParseQuery.findInBackground(new FindCallback<Group>() {
                             @Override
                             public void done(List<Group> groups, ParseException e) {

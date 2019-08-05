@@ -26,19 +26,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
+public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
     private Context context;
     private List<Group> groups;
 
-    public GroupsAdapter(Context context, List<Group> groups) {
+    public CategoryAdapter(Context context, List<Group> groups) {
         this.context = context;
         this.groups = groups;
     }
 
     @NonNull
     @Override
-    public GroupsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CategoryAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_group, parent, false);
         return new ViewHolder(view);
     }
@@ -94,7 +94,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 //            if (group.getCategory() != null) {
 //                tvCategory.setText(group.getCategory());
 //            } else {
-                tvCategory.setText("");
+            tvCategory.setText("");
 //            }
 
             if (group.getDescription() != null) {
@@ -161,13 +161,13 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             }
 
             if(group.getIsActive()) {
-                tvDates.setText(String.format("%d %s left", time, unit));
+                tvDates.setText(String.format("Active: %d %s left!", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.orange));
             } else if (currentDate.before(start)){
-                tvDates.setText(String.format("starts in %d %s", time, unit));
+                tvDates.setText(String.format("Inactive: starts in %d %s!", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             } else if (currentDate.after(cal.getTime())) {
-                tvDates.setText(String.format("completed %d %s ago", time, unit));
+                tvDates.setText(String.format("Inactive: completed %d %s ago!", time, unit));
                 tvDates.setTextColor(ContextCompat.getColor(context, R.color.design_default_color_on_secondary));
             }
         }

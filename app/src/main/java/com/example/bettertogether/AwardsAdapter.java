@@ -19,6 +19,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.DialogAwardFragment;
 import com.example.bettertogether.models.Award;
 import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.util.List;
 
@@ -27,11 +28,13 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
     private Context context;
     private List<Award> awards;
     private List<Award> achievedAwards;
+    private ParseUser user;
 
-    public AwardsAdapter(Context context, List<Award> awards, List<Award> achievedAwards) {
+    public AwardsAdapter(Context context, List<Award> awards, List<Award> achievedAwards, ParseUser user) {
         this.context = context;
         this.awards = awards;
         this.achievedAwards = achievedAwards;
+        this.user = user;
     }
 
     @NonNull
@@ -113,7 +116,7 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
                 }
                 // switch to award-detail view fragment
                 FragmentManager fm = ((AppCompatActivity) context).getSupportFragmentManager();
-                DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award, isAchieved);
+                DialogAwardFragment awardFragment = DialogAwardFragment.newInstance(award, isAchieved, user.getUsername());
                 awardFragment.show(fm, "fragment_group_detail");
             }
         }
