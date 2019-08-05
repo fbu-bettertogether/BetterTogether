@@ -131,13 +131,12 @@ public class GroupFragment extends Fragment {
     private final int ADD_REQUEST_CODE = 20;
     public static final int REQUEST_CODE = 45;
     private ParseGeoPoint location;
-    private ImageView ivBanner;
-    private ImageView ivUserIcon;
-    private TextView tvGroupName;
+
     private Button btnCheckIn;
     private TextView tvDate;
     private TextView tvTimer;
-    private int counter;
+    private ImageView ivHelp;
+
     private List<Integer> numCheckIns;
     private Membership currMem;
     private Category category;
@@ -164,6 +163,7 @@ public class GroupFragment extends Fragment {
     List<Membership> memberships;
     private boolean inGroup = false;
     int correctNumCheckIns = 0;
+    boolean hasCheckInLeft = false;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -205,7 +205,6 @@ public class GroupFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        tvGroupName = view.findViewById(R.id.tvGroupName);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         tvDate = view.findViewById(R.id.tvDate);
         tvTimer = view.findViewById(R.id.tvTimer);
@@ -216,6 +215,9 @@ public class GroupFragment extends Fragment {
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
+        ivHelp = view.findViewById(R.id.ivHelp);
+        ivHelp.setColorFilter(getResources().getColor(R.color.gray));
+        ivHelp.setVisibility(View.INVISIBLE);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -324,16 +326,38 @@ public class GroupFragment extends Fragment {
                         } else if (numCheckIns.size() == 0) {
                             numCheckIns.add(0);
                         }
-                        if (category.getName().equals("Get-Togethers")) {
-                            saveCurrentUserLocation();
-                            checkProximity();
-                        } else {
-                            try {
-                                checkPlace(category.getLocationTypesList());
-                            } catch (JSONException e1) {
-                                e1.printStackTrace();
-                            }
+
+                        if (numCheckIns.isEmpty()) {
+                            hasCheckInLeft = true;
+                        } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
+                            hasCheckInLeft = true;
+                            group.setShowCheckInReminderBadge(true);
+                        } else if (numCheckIns.size() < correctNumCheckIns) {
+                            hasCheckInLeft = true;
+                            group.setShowCheckInReminderBadge(true);
+                        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
+                            group.setShowCheckInReminderBadge(false);
                         }
+
+                        // TODO -- should not be checking this if no check-ins left for the week
+                        if (hasCheckInLeft) {
+                            if (category.getName().equals("Get-Togethers")) {
+                                saveCurrentUserLocation();
+                                checkProximity();
+                            } else {
+                                try {
+                                    checkPlace(category.getLocationTypesList());
+                                } catch (JSONException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+                        } else {
+                            tvTimer.setText("You're done for the week!");
+                            tvTimer.setVisibility(View.VISIBLE);
+                            btnCheckIn.setVisibility(View.INVISIBLE);
+                            configChart(false, false, false);
+                        }
+
                     } else {
                         btnCheckIn.setVisibility(View.INVISIBLE);
                         tvTimer.setVisibility(View.VISIBLE);
@@ -390,24 +414,10 @@ public class GroupFragment extends Fragment {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
                 if (objects.size() == 1) {
-                    btnCheckIn.setVisibility(View.VISIBLE);
-                    btnCheckIn.setText("Click to search for a group member");
-                    configChart(false, false);
-                    btnCheckIn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            FragmentManager manager = getChildFragmentManager();
-                            FragmentTransaction ft = manager.beginTransaction();
-                            ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
-                            ft.commitAllowingStateLoss();
-                            saveCurrentUserLocation();
-                            checkProximity();
-                            chartFrame.getLayoutParams().height = 500;
-                            chartFrame.requestLayout();
-                        }
-                    });
+                    setHelpMessage(false);
+                    configChart(false, true, false);
                 } else {
-                    configChart(false, true);
+                    configChart(false, true, true);
                 }
             }
         });
@@ -437,7 +447,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    private void configChart(final boolean checkingIn, final boolean enableButton) {
+    private void configChart(final boolean checkingIn, final boolean showButton, final boolean enableButton) {
 
         if (!group.getIsActive()) {
             chart.requestLayout();
@@ -529,8 +539,8 @@ public class GroupFragment extends Fragment {
                         chart.animateY(1500, Easing.EaseInOutQuad);
                     }
 
-                    if (enableButton) {
-                        drawButton();
+                    if (showButton) {
+                        drawButton(enableButton);
                     }
 
                     chart.invalidate();
@@ -689,10 +699,10 @@ public class GroupFragment extends Fragment {
                             double likelihood = placeLikelihood.getLikelihood();
                             for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
                                 if (types.contains(type.toString()) & likelihood > 0.05) {
-                                    configChart(false, true);
+                                    configChart(false, true, true);
                                     return;
                                 } else {
-                                    configChart(false, false);
+                                    configChart(false, true, false);
                                     return;
                                 }
                             }
@@ -704,7 +714,7 @@ public class GroupFragment extends Fragment {
                     }
                 }
             });
-            btnCheckIn.setText("Get to a valid location");
+            setHelpMessage(true);
         } else {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -712,21 +722,61 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    private void drawButton() {
+    // sets help message, place is true if the message pertains to place, otherwise is proximity issue
+    private void setHelpMessage(final boolean place) {
+
+        ivHelp.setVisibility(View.VISIBLE);
+        ivHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (place) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Get to a valid location");
+                    builder.setMessage("This group requires you to be in a specific type of location to check in!");
+                    builder.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Search for a nearby group member");
+                    builder.setMessage("This group requires you to be nearby to another member to check in!");
+                    builder.setPositiveButton("Find a member!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
+                            query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
+                            query.whereEqualTo("group", group);
+                            query.findInBackground(new FindCallback<Membership>() {
+                                @Override
+                                public void done(final List<Membership> objects, ParseException e) {
+                                    if (objects.size() == 1) {
+                                        FragmentManager manager = getChildFragmentManager();
+                                        FragmentTransaction ft = manager.beginTransaction();
+                                        ft.replace(R.id.chartFrame, MapFragment.newInstance(objects), APP_TAG);
+                                        ft.commitAllowingStateLoss();
+                                        saveCurrentUserLocation();
+                                        checkProximity();
+                                        chartFrame.getLayoutParams().height = 500;
+                                        chartFrame.requestLayout();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    builder.show();
+                }
+            }
+        });
+    }
+
+    private void drawButton(boolean enabled) {
+
+        if (!enabled) {
+            btnCheckIn.setEnabled(false);
+            btnCheckIn.setBackgroundColor(getResources().getColor(R.color.gray));
+            return;
+        }
+
         if (!getChildFragmentManager().getFragments().isEmpty()) {
             getChildFragmentManager().beginTransaction().remove(getChildFragmentManager().getFragments().get(0));
-        }
-        boolean hasCheckInLeft = false;
-        if (numCheckIns.isEmpty()) {
-            hasCheckInLeft = true;
-        } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
-            hasCheckInLeft = true;
-            group.setShowCheckInReminderBadge(true);
-        } else if (numCheckIns.size() < correctNumCheckIns) {
-            hasCheckInLeft = true;
-            group.setShowCheckInReminderBadge(true);
-        } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
-            group.setShowCheckInReminderBadge(false);
         }
 
         final Calendar now = Calendar.getInstance();
@@ -736,20 +786,23 @@ public class GroupFragment extends Fragment {
         boolean checkedInToday = (now.get(Calendar.DAY_OF_YEAR) == prevCheckIn.get(Calendar.DAY_OF_YEAR))
                 && (now.get(Calendar.YEAR) == prevCheckIn.get(Calendar.YEAR));
 
-        if (hasCheckInLeft && !checkedInToday) {
+        if (!checkedInToday) {
             final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
             tvTimer.setVisibility(View.INVISIBLE);
             btnCheckIn.setVisibility(View.VISIBLE);
+            btnCheckIn.setEnabled(true);
             btnCheckIn.setText(String.format("%d check-ins left: check in now!", group.getFrequency() - currWeekCheckIns));
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    tvTimer.setText("Checked-in for the day!");
+
                     currMem.setLastCheckIn(now.getTime());
                     tvTimer.setVisibility(View.VISIBLE);
                     btnCheckIn.setVisibility(View.INVISIBLE);
                     if (currWeekCheckIns == group.getFrequency() - 1) {
                         // final check-in for the week
+                        tvTimer.setText("Done for the week!");
+                        tvTimer.setVisibility(View.VISIBLE);
                         viewKonfetti.build()
                                 .addColors(Color.RED, getResources().getColor(R.color.white), getResources().getColor(R.color.gold), getResources().getColor(R.color.colorPrimary))
                                 .setDirection(0.0, 359.0)
@@ -762,6 +815,8 @@ public class GroupFragment extends Fragment {
                                 .streamFor(300, 5000L);
 
                     } else {
+                        tvTimer.setText("Checked-in for the day!");
+                        tvTimer.setVisibility(View.VISIBLE);
                         viewKonfetti.build()
                                 .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
                                 .setDirection(0.0, 359.0)
@@ -823,7 +878,7 @@ public class GroupFragment extends Fragment {
                         @Override
                         public void done(ParseException e) {
                             Log.d("checking in", "saved check in");
-                            configChart(true, false);
+                            configChart(true, true, false);
                             final Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -873,11 +928,7 @@ public class GroupFragment extends Fragment {
         } else {
             btnCheckIn.setVisibility(View.INVISIBLE);
             tvTimer.setVisibility(View.VISIBLE);
-            if (hasCheckInLeft) {
-                tvTimer.setText("Checked-In today!");
-            } else {
-                tvTimer.setText("You're done for the week!");
-            }
+            tvTimer.setText("Checked-In today!");
         }
     }
 
