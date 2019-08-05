@@ -78,12 +78,6 @@ public class DiscoveryFragment extends Fragment {
                 getFragmentManager().beginTransaction().replace(R.id.flContainer, new LeaderboardFragment()).commit();
             }
         });
-        btnShowMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getFragmentManager().beginTransaction().replace(R.id.flContainer, new CategoryFragment()).commit();
-            }
-        });
     }
 
     private void queryCategories() {
