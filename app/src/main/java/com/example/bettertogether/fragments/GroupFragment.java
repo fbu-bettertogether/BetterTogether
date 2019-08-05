@@ -748,22 +748,37 @@ public class GroupFragment extends Fragment {
                     currMem.setLastCheckIn(now.getTime());
                     tvTimer.setVisibility(View.VISIBLE);
                     btnCheckIn.setVisibility(View.INVISIBLE);
-                    viewKonfetti.build()
-                            .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
-                            .setDirection(0.0, 359.0)
-                            .setSpeed(1f, 5f)
-                            .setFadeOutEnabled(true)
-                            .setTimeToLive(2000L)
-                            .addShapes(Shape.RECT, Shape.CIRCLE)
-                            .addSizes(new Size(12, 5))
-                            .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
-                            .streamFor(300, 5000L);
+                    if (currWeekCheckIns == group.getFrequency() - 1) {
+                        // final check-in for the week
+                        viewKonfetti.build()
+                                .addColors(Color.RED, getResources().getColor(R.color.white), getResources().getColor(R.color.gold), getResources().getColor(R.color.colorPrimary))
+                                .setDirection(0.0, 359.0)
+                                .setSpeed(1f, 5f)
+                                .setFadeOutEnabled(true)
+                                .setTimeToLive(2000L)
+                                .addShapes(Shape.RECT, Shape.CIRCLE)
+                                .addSizes(new Size(12, 5))
+                                .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                                .streamFor(300, 5000L);
+
+                    } else {
+                        viewKonfetti.build()
+                                .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
+                                .setDirection(0.0, 359.0)
+                                .setSpeed(1f, 5f)
+                                .setFadeOutEnabled(true)
+                                .setTimeToLive(2000L)
+                                .addShapes(Shape.RECT, Shape.CIRCLE)
+                                .addSizes(new Size(12, 5))
+                                .setPosition(-50f, viewKonfetti.getWidth() + 50f, -50f, -50f)
+                                .streamFor(300, 2000L);
+                    }
+
 
                     int currNum = numCheckIns.remove(numCheckIns.size() - 1);
                     numCheckIns.add(currNum + 1);
                     currMem.setNumCheckIns(numCheckIns);
-                    final int addedPoints = currMem.getGroup().getMinTime();
-                    currMem.setPoints(currMem.getPoints() + addedPoints);
+                    currMem.setPoints(currMem.getPoints() + 10);
                     ParseQuery<Group> groupQuery = ParseQuery.getQuery(Group.class);
                     groupQuery.whereEqualTo("objectId", currMem.getGroup().getObjectId());
                     groupQuery.include("category");
@@ -793,7 +808,7 @@ public class GroupFragment extends Fragment {
                                 String pointsKey = basePoints + "Points";
                                 ParseUser user = currMem.getUser();
                                 int currPoints = user.getInt(pointsKey);
-                                user.put(pointsKey, currPoints + addedPoints);
+                                user.put(pointsKey, currPoints + 10);
                                 user.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
