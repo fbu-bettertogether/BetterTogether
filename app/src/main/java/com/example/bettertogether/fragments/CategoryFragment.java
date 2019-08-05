@@ -24,15 +24,19 @@ import com.example.bettertogether.EndlessRecyclerViewScrollListener;
 import com.example.bettertogether.MainActivity;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.parse.ParseUser.getCurrentUser;
 
 public class CategoryFragment extends Fragment {
 
@@ -49,22 +53,19 @@ public class CategoryFragment extends Fragment {
     
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        rvPosts = view.findViewById(R.id.rvPosts);
+        rvGroups = view.findViewById(R.id.rvGroupsInCategory);
 
         user = ParseUser.getCurrentUser();
 
-        //find the RecyclerView
-        rvPosts = (RecyclerView) view.findViewById(R.id.rvPosts);
-        //init the arraylist (data source)
-        posts = new ArrayList<>();
+        groups = new ArrayList<>();
         //construct the adapter from this data source
-        postAdapter = new PostAdapter(posts);
+        categoryAdapter = new CategoryAdapter(getContext(), groups);
         //RecyclerView setup (layout manager, use adapter)
         //set the adapter
-        rvPosts.setAdapter(postAdapter);
+        rvGroups.setAdapter(categoryAdapter);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 3);
-        rvPosts.setLayoutManager(gridLayoutManager);
+        rvGroups.setLayoutManager(gridLayoutManager);
         scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore ( int page, int totalItemsCount, RecyclerView view){
@@ -72,7 +73,7 @@ public class CategoryFragment extends Fragment {
             }
         };
         // Adds the scroll listener to RecyclerView
-        rvPosts.addOnScrollListener(scrollListener);
+        rvGroups.addOnScrollListener(scrollListener);
 
         // Lookup the swipe container view
         swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
@@ -96,23 +97,52 @@ public class CategoryFragment extends Fragment {
         populateTimeline();
     }
 
-    protected void loadTopPosts() {
-        final Post.Query postQuery = new Post.Query();
-        postQuery.whereLessThan(Post.KEY_CREATED_AT, maxDate);
-        postQuery.getTop().withUser();
-        postQuery.addDescendingOrder(Post.KEY_CREATED_AT);
-        postQuery.findInBackground(new FindCallback<Post>() {
+    public void queryGroups() {
+        ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
+        parseQuery.addDescendingOrder("createdAt");
+        parseQuery.whereEqualTo("user", getCurrentUser());
+        parseQuery.include("group");
+        parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
-            public void done(List<Post> objects, ParseException e) {
+            public void done(List<Membership> memberships, ParseException e) {
+                if (e != null) {
+                    Log.e("Querying groups", "error with query");
+                    e.printStackTrace();
+                    return;
+                }
+                List<Group> activeGroups = new ArrayList<>();
+                List<Group> inactiveGroups = new ArrayList<>();
+
+                for (Group group : Membership.getAllGroups(memberships)) {
+                    if (group.getIsActive()) {
+                        activeGroups.add(group);
+                    } else {
+                        inactiveGroups.add(group);
+                    }
+                }
+                groups.addAll(activeGroups);
+                groups.addAll(inactiveGroups);
+                categoryAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    protected void loadTopPosts() {
+        final Group.Query groupQuery = new Group.Query();
+        groupQuery.whereLessThan(Group.KEY_CREATED_AT, maxDate);
+        postQuery.getTop().withUser();
+        postQuery.addDescendingOrder(Group.KEY_CREATED_AT);
+        postQuery.findInBackground(new FindCallback<Group>() {
+            @Override
+            public void done(List<Group> objects, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < objects.size(); ++i) {
-                        Log.d("HomeActivity", "Post[" + i + "] = "
+                        Log.d("CategoryFragment", "Group[" + i + "] = "
                                 + objects.get(i).getDescription()
-                                + "\nusername = " + objects.get(i).getUser().getUsername());
+                                + "\nusername = " + objects.get(i).getOwner().getUsername());
                     }
-                    posts.addAll(objects);
-                    postAdapter.notifyItemInserted(0);
-                    //rvPosts.scrollToPosition(0);
+                    groups.addAll(objects);
+                    categoryAdapter.notifyItemInserted(0);
                 } else {
                     e.printStackTrace();
                 }
@@ -154,9 +184,9 @@ public class CategoryFragment extends Fragment {
 
     public void fetchTimelineAsync(int page, boolean isRefreshed) {
         if (!isRefreshed) {
-            maxDate = posts.get(posts.size() - 1).getCreatedAt();
+            maxDate = groups.get(groups.size() - 1).getCreatedAt();
         } else {
-            postAdapter.clear();
+            categoryAdapter.clear();
             maxDate = new Date();
         }
         // ...the data has come back, add new items to your adapter...
