@@ -24,9 +24,12 @@
                 android:id="@+id/rvChecks"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="32dp"
+                app:layout_constraintBottom_toTopOf="@+id/chartFrame"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/chartFrame" />
+                app:layout_constraintTop_toBottomOf="@+id/btnCheckIn" />
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/chart"
@@ -34,7 +37,7 @@
                 android:layout_height="250dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rvChecks">
+                app:layout_constraintTop_toBottomOf="@+id/chartFrame">
 
             </com.github.mikephil.charting.charts.PieChart>
 
@@ -59,10 +62,10 @@
                 android:id="@+id/chartFrame"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnCheckIn">
+                app:layout_constraintTop_toBottomOf="@+id/rvChecks">
 
             </FrameLayout>
 
