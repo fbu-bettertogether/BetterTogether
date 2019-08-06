@@ -34,6 +34,7 @@
             android:layout_marginTop="8dp"
             android:paddingLeft="5dp"
             android:text="TextView"
+            android:typeface="serif"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
             card_view:layout_constraintTop_toTopOf="parent" />
 
@@ -43,6 +44,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
             android:text="TextView"
+            android:typeface="serif"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintHorizontal_bias="0.0"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
