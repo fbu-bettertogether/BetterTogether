@@ -510,7 +510,11 @@ public class GroupFragment extends Fragment {
 
                 if (currMem != null) {
                     currMem.put("location", currentUserLocation);
-                    currMem.saveInBackground();
+                    try {
+                        currMem.save();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             else {
@@ -805,6 +809,8 @@ public class GroupFragment extends Fragment {
                                             checkProximity();
                                             chartFrame.getLayoutParams().height = 500;
                                             chartFrame.requestLayout();
+                                        } else {
+                                            drawButton(true);
                                         }
                                     }
                                 });
@@ -836,12 +842,16 @@ public class GroupFragment extends Fragment {
 
     private void drawButton(boolean enabled) {
 
+        btnCheckIn.setVisibility(View.VISIBLE);
+
         if (!enabled) {
-            btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setEnabled(false);
             btnCheckIn.setBackgroundColor(getResources().getColor(R.color.gray));
             return;
         }
+
+        btnCheckIn.setEnabled(true);
+        btnCheckIn.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
         if (!getChildFragmentManager().getFragments().isEmpty()) {
             getChildFragmentManager().beginTransaction().remove(getChildFragmentManager().getFragments().get(0));

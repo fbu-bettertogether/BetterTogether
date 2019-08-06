@@ -110,7 +110,20 @@ public class DialogAwardFragment extends DialogFragment {
                 userAwardQuery.findInBackground(new FindCallback<UserAward>() {
                     @Override
                     public void done(List<UserAward> objects, ParseException e) {
-                        UserAward userAward = objects.get(0);
+                        UserAward userAward;
+                        if (objects.size() == 0) {
+                            userAward = new UserAward();
+                            userAward.setAward(award);
+                            userAward.setUser(user);
+                            userAward.setIfAchieved(false);
+                            userAward.setNumCompleted(0);
+                            userAward.setNumRequired((Integer) award.get("numRequired"));
+                            userAward.saveInBackground();
+                            userAwards.add(userAward);
+                            userAward.saveInBackground();
+                        } else {
+                            userAward = objects.get(0);
+                        }
                         if (userAward.getIfAchieved()) {
                             SimpleDateFormat format = new SimpleDateFormat("MMM dd, yyyy");
                             String dateString = format.format(userAward.getDateCompleted());
