@@ -186,14 +186,17 @@ public class ProfileFragment extends Fragment {
         ImageView ivPhotoActionBar = view.findViewById(R.id.ivPhotoActionBar);
         tvUserActionBar.setText(user.getUsername());
 
+        int placeholderId = R.drawable.account;
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
+                    .apply(new RequestOptions().placeholder(placeholderId).error(placeholderId))
                     .into(ivUserIcon);
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
+                    .apply(new RequestOptions().placeholder(placeholderId).error(placeholderId))
                     .into(ivPhotoActionBar);
         }
         onFriendUpdate();
@@ -345,24 +348,32 @@ public class ProfileFragment extends Fragment {
                 if (e != null) {
                     e.printStackTrace();
                 } else {
+                    ArrayList<ParseUser> toRemove = new ArrayList<>();
+                    ArrayList<ParseUser> toAdd = new ArrayList<>();
                     for (int i = 0; i < objects.size(); i++) {
                         if (objects.get(i) != null) {
                             if (objects.get(i).getGroup() == null) {
                                 if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("rejected")) {
-                                        relation.remove(objects.get(i).getReceiver());
+                                        toRemove.add(objects.get(i).getReceiver());
                                     } else {
-                                        relation.add(objects.get(i).getReceiver());
+                                        toAdd.add(objects.get(i).getReceiver());
                                     }
                                 } else if (objects.get(i).getReceiver() != null && objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted().equals("rejected")) {
-                                        relation.remove(objects.get(i).getInviter());
+                                        toRemove.remove(objects.get(i).getInviter());
                                     } else {
-                                        relation.add(objects.get(i).getInviter());
+                                        toAdd.add(objects.get(i).getInviter());
                                     }
                                 }
                             }
                         }
+                    }
+                    for (ParseUser user : toRemove) {
+                        relation.remove(user);
+                    }
+                    for (ParseUser user : toAdd) {
+                        relation.add(user);
                     }
                     ParseUser.getCurrentUser().saveInBackground();
                 }

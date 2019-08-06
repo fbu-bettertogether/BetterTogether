@@ -13,7 +13,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.util.Log;
@@ -47,6 +46,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.AddUsersActivity;
 import com.example.bettertogether.AlarmReceiver;
+import com.example.bettertogether.CheckAdapter;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
@@ -136,6 +136,9 @@ public class GroupFragment extends Fragment {
     private TextView tvDate;
     private TextView tvTimer;
     private ImageView ivHelp;
+
+    private CheckAdapter checkAdapter;
+    private RecyclerView rvChecks;
 
     private List<Integer> numCheckIns;
     private Membership currMem;
@@ -230,6 +233,85 @@ public class GroupFragment extends Fragment {
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
 
+        rvChecks = view.findViewById(R.id.rvChecks);
+
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(group.getName());
+        setHasOptionsMenu(true);
+
+        final ImageView imageView = view.findViewById(R.id.backdrop);
+        if (group.getIcon() != null) {
+            Glide.with(view.getContext())
+                    .load(group.getIcon().getUrl())
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(imageView);
+        }
+
+        if (getCurrentUser().getParseFile("profileImage") != null) {
+            Glide.with(view.getContext())
+                    .load(((ParseFile) getCurrentUser().get("profileImage")).getUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivProfPic);
+        }
+        tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
+        tvCreatePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkInPost();
+            }
+        });
+
+        // getting date from string stored in group
+        String startDateUgly = group.getStartDate();
+        String endDateUgly = group.getEndDate();
+
+        // translating string into Java Date
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+        Date start = null;
+        Date end = null;
+        try {
+            start = sdf.parse(startDateUgly);
+            end = sdf.parse(endDateUgly);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+
+        // turning dates into relative time from now
+        Date now = Calendar.getInstance().getTime();
+        final boolean nowBeforeStart = now.before(start);
+
+        long diffInMillis = 0;
+        if (group.getIsActive()) {
+            diffInMillis = end.getTime() - now.getTime();
+        } else if (nowBeforeStart) {
+            diffInMillis = start.getTime() - now.getTime();
+        } else {
+            diffInMillis = end.getTime() - now.getTime();
+        }
+
+        long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+        int weekDiff = (int) diff / 7;
+        String unit = "weeks";
+        int time = weekDiff;
+
+        if (weekDiff == 0) {
+            unit = "days";
+            time = (int) diff;
+        }
+
+        if(group.getIsActive()) {
+            tvDate.setText(String.format("Active: %d %s left!", time, unit));
+            correctNumCheckIns = group.getNumWeeks() - weekDiff;
+        } else if (nowBeforeStart){
+            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
+        } else {
+            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
+        }
+        tvDate.setTextColor(getResources().getColor(R.color.gray));
         setUpToolbar(view);
         setUpCreatePost(view);
         setUpRelativeDates();
@@ -281,6 +363,9 @@ public class GroupFragment extends Fragment {
                             configChart(false, false, false);
                         }
 
+                        checkAdapter = new CheckAdapter(numCheckIns.get(numCheckIns.size() - 1), group.getFrequency());
+                        rvChecks.setAdapter(checkAdapter);
+                        rvChecks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
                     } else {
                         btnCheckIn.setVisibility(View.INVISIBLE);
                         tvTimer.setVisibility(View.VISIBLE);
@@ -406,10 +491,10 @@ public class GroupFragment extends Fragment {
             time = (int) diff;
         }
 
-        if(group.getIsActive()) {
+        if (group.getIsActive()) {
             tvDate.setText(String.format("Active: %d %s left!", time, unit));
             correctNumCheckIns = group.getNumWeeks() - weekDiff;
-        } else if (nowBeforeStart){
+        } else if (nowBeforeStart) {
             tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
         } else {
             tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
@@ -467,7 +552,7 @@ public class GroupFragment extends Fragment {
             }
         });
     }
-    
+
     private void saveCurrentUserLocation() {
         // requesting permission to get user's location
         if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
