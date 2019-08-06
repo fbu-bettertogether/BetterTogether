@@ -9,6 +9,7 @@
 
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -24,6 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginRight="8dp"
                 android:gravity="center_horizontal"
                 android:text="Check In"
@@ -39,9 +41,9 @@
                 android:id="@+id/chartFrame"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:layout_editor_absoluteY="145dp"
                 app:layout_constraintTop_toBottomOf="@+id/btnCheckIn">
 
             </FrameLayout>
@@ -50,15 +52,17 @@
                 android:id="@+id/ivProfPic"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvDate"
+                app:layout_constraintTop_toBottomOf="@+id/divCreatePost"
                 app:srcCompat="@drawable/account" />
 
             <TextView
                 android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:text="TextView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -84,14 +88,42 @@
 
             <TextView
                 android:id="@+id/tvCreatePost"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/create_post_background"
                 android:text="TextView"
                 android:textSize="16dp"
-                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/ivProfPic"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ivProfPic"
+                app:layout_constraintTop_toTopOf="@+id/ivProfPic" />
+
+            <View
+                android:id="@+id/divCreatePost"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:background="@color/light_gray"
+                app:layout_anchorGravity="center"
+                app:layout_constraintBottom_toTopOf="@+id/tvCreatePost"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvDate" />
+
+            <View
+                android:id="@+id/divPosts"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/light_gray"
+                app:layout_anchorGravity="center"
+                app:layout_constraintBottom_toTopOf="@+id/rvPosts"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivProfPic" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvTimeline"
@@ -100,7 +132,7 @@
                 android:layout_marginTop="4dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ivProfPic" />
+                app:layout_constraintTop_toBottomOf="@+id/divPosts" />
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/chart"
@@ -121,11 +153,11 @@
                 android:id="@+id/ivHelp"
                 android:layout_width="23dp"
                 android:layout_height="26dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="24dp"
                 android:clickable="true"
-                app:layout_constraintBottom_toTopOf="@+id/chart"
                 app:layout_constraintStart_toEndOf="@+id/btnCheckIn"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.531"
                 app:srcCompat="@drawable/baseline_help_outline_black_18dp" />
 
 

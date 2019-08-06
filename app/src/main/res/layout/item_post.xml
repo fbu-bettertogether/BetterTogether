@@ -21,6 +21,8 @@
             android:id="@+id/ivProfileImage"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toTopOf="parent"
             card_view:srcCompat="@drawable/account" />
@@ -29,6 +31,7 @@
             android:id="@+id/tvUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:paddingLeft="5dp"
             android:text="TextView"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
