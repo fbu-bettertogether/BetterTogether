@@ -319,6 +319,11 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         newGroup.setOwner(user);
         newGroup.setIsActive(active);
         newGroup.setNumWeeks(npNumWeeks.getValue());
+        if (active) {
+            newGroup.setShowCheckInReminderBadge(true);
+        } else {
+            newGroup.setShowCheckInReminderBadge(false);
+        }
         newGroup.saveInBackground();
 
         final Category.Query catQuery = new Category.Query();
