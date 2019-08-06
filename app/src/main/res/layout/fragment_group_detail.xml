@@ -20,17 +20,6 @@
             android:layout_height="wrap_content"
             tools:context=".HomeActivity">
 
-            <ImageView
-                android:id="@+id/ivHelp"
-                android:layout_width="23dp"
-                android:layout_height="26dp"
-                android:clickable="true"
-                app:layout_constraintBottom_toTopOf="@+id/chartFrame"
-                app:layout_constraintStart_toEndOf="@+id/btnCheckIn"
-                app:layout_constraintTop_toTopOf="@+id/btnCheckIn"
-                app:layout_constraintVertical_bias="0.531"
-                app:srcCompat="@drawable/baseline_help_outline_black_18dp" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvChecks"
                 android:layout_width="wrap_content"
