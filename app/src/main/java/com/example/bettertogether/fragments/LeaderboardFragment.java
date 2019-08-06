@@ -203,7 +203,7 @@ public class LeaderboardFragment extends Fragment {
         chart.setData(data);
         chart.setDrawBarShadow(true);
         chart.getDescription().setEnabled(false);
-        chart.animateXY(2000, 2000);
+        chart.animateXY(300, 300);
         chart.invalidate();
         progressBar.setVisibility(View.INVISIBLE);
 
@@ -248,9 +248,8 @@ public class LeaderboardFragment extends Fragment {
         chart.setData(data);
         chart.setDrawBarShadow(true);
         chart.getDescription().setEnabled(false);
-        chart.animateXY(500, 500);
+        chart.animateXY(200, 200);
         chart.invalidate();
-
     }
 
     public int sum(List<Integer> list) {
