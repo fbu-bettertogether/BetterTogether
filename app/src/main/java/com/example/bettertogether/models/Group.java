@@ -137,15 +137,15 @@ public class Group extends ParseObject implements Serializable {
     public Boolean getIsActive() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
         Date start = null;
-        Calendar cal = Calendar.getInstance();
+        Date end = null;
         try {
             start = sdf.parse(getStartDate());
-            cal.add(Calendar.DATE, getNumWeeks() * 7);
+            end = sdf.parse(getEndDate());
         } catch (java.text.ParseException e) {
             e.printStackTrace();
         }
         Date currentDate = Calendar.getInstance().getTime();
-        return (currentDate.after(start) & currentDate.before(cal.getTime()));
+        return (currentDate.after(start) & currentDate.before(end));
     }
 
     public void setIsActive(boolean isActive) {
