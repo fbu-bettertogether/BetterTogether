@@ -13,7 +13,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.util.Log;
@@ -47,6 +46,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.AddUsersActivity;
 import com.example.bettertogether.AlarmReceiver;
+import com.example.bettertogether.CheckAdapter;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
@@ -136,6 +136,9 @@ public class GroupFragment extends Fragment {
     private TextView tvDate;
     private TextView tvTimer;
     private ImageView ivHelp;
+
+    private CheckAdapter checkAdapter;
+    private RecyclerView rvChecks;
 
     private List<Integer> numCheckIns;
     private Membership currMem;
@@ -230,9 +233,89 @@ public class GroupFragment extends Fragment {
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
 
+        rvChecks = view.findViewById(R.id.rvChecks);
+
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(group.getName());
+        setHasOptionsMenu(true);
+
+        final ImageView imageView = view.findViewById(R.id.backdrop);
+        if (group.getIcon() != null) {
+            Glide.with(view.getContext())
+                    .load(group.getIcon().getUrl())
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(imageView);
+        }
+
+        if (getCurrentUser().getParseFile("profileImage") != null) {
+            Glide.with(view.getContext())
+                    .load(((ParseFile) getCurrentUser().get("profileImage")).getUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivProfPic);
+        }
+        tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
+        tvCreatePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkInPost();
+            }
+        });
+
+        // getting date from string stored in group
+        String startDateUgly = group.getStartDate();
+        String endDateUgly = group.getEndDate();
+
+        // translating string into Java Date
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+        Date start = null;
+        Date end = null;
+        try {
+            start = sdf.parse(startDateUgly);
+            end = sdf.parse(endDateUgly);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+
+        // turning dates into relative time from now
+        Date now = Calendar.getInstance().getTime();
+        final boolean nowBeforeStart = now.before(start);
+
+        long diffInMillis = 0;
+        if (group.getIsActive()) {
+            diffInMillis = end.getTime() - now.getTime();
+        } else if (nowBeforeStart) {
+            diffInMillis = start.getTime() - now.getTime();
+        } else {
+            diffInMillis = end.getTime() - now.getTime();
+        }
+
+        long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+        int weekDiff = (int) diff / 7;
+        String unit = "weeks";
+        int time = weekDiff;
+
+        if (weekDiff == 0) {
+            unit = "days";
+            time = (int) diff;
+        }
+
+        if(group.getIsActive()) {
+            tvDate.setText(String.format("Active: %d %s left!", time, unit));
+            correctNumCheckIns = group.getNumWeeks() - weekDiff;
+        } else if (nowBeforeStart){
+            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
+        } else {
+            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
+        }
+        tvDate.setTextColor(getResources().getColor(R.color.gray));
         setUpToolbar(view);
         setUpCreatePost(view);
         setUpRelativeDates();
+        doubleCheckNumCheckIns();
 
         ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
         parseQuery.whereEqualTo("user", getCurrentUser());
@@ -243,24 +326,18 @@ public class GroupFragment extends Fragment {
         parseQuery.findInBackground(new FindCallback<Membership>() {
             @Override
             public void done(final List<Membership> objects, ParseException e) {
-                if (objects.size() > 0) {
+                if (objects.size() == 0) {
+                    // user is not in group
+                    notInGroupOptions();
+                } else {
                     if (group.getIsActive()) {
                         inGroup = true;
                         currMem = objects.get(0);
                         numCheckIns = currMem.getNumCheckIns();
-                        if (numCheckIns == null) {
-                            numCheckIns = new ArrayList<>();
-                            numCheckIns.add(0);
-                        } else if (numCheckIns.size() == 0) {
-                            numCheckIns.add(0);
-                        }
 
                         if (numCheckIns.isEmpty()) {
-                            hasCheckInLeft = true;
+                            hasCheckInLeft = false;
                         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
-                            hasCheckInLeft = true;
-                            group.setShowCheckInReminderBadge(true);
-                        } else if (numCheckIns.size() < correctNumCheckIns) {
                             hasCheckInLeft = true;
                             group.setShowCheckInReminderBadge(true);
                         } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
@@ -286,6 +363,9 @@ public class GroupFragment extends Fragment {
                             configChart(false, false, false);
                         }
 
+                        checkAdapter = new CheckAdapter(numCheckIns.get(numCheckIns.size() - 1), group.getFrequency());
+                        rvChecks.setAdapter(checkAdapter);
+                        rvChecks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
                     } else {
                         btnCheckIn.setVisibility(View.INVISIBLE);
                         tvTimer.setVisibility(View.VISIBLE);
@@ -294,44 +374,82 @@ public class GroupFragment extends Fragment {
                         chart.getLayoutParams().height = 0;
                         chart.getLayoutParams().width = 0;
                     }
-                } else {
-                    if (!group.getPrivacy().equals("private") && nowBeforeStart) {
-                        ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
-                        query.whereEqualTo("receiver", ParseUser.getCurrentUser());
-                        query.whereEqualTo("group", group);
-                        query.getFirstInBackground(new GetCallback<Invitation>() {
-                            @Override
-                            public void done(Invitation object, ParseException e) {
-                                if (object != null) {
-                                    btnCheckIn.setText("Request Pending");
-                                } else {
-                                    btnCheckIn.setText("Click to Join");
-                                    btnCheckIn.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            Invitation invitation = new Invitation();
-                                            invitation.setGroup(group);
-                                            invitation.setReceiver(ParseUser.getCurrentUser());
-                                            invitation.saveInBackground(new SaveCallback() {
-                                                @Override
-                                                public void done(ParseException e) {
-                                                    btnCheckIn.setText("Request Pending");
-                                                }
-                                            });
-
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    } else {
-                        btnCheckIn.setText("Group is Unavailable");
-                    }
                 }
             }
         });
         queryMembers();
         queryPosts();
+    }
+
+    private void notInGroupOptions() {
+        if (group.getPrivacy().equals("public") && nowBeforeStart) {
+            ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
+            query.whereEqualTo("receiver", ParseUser.getCurrentUser());
+            query.whereEqualTo("group", group);
+            query.getFirstInBackground(new GetCallback<Invitation>() {
+                @Override
+                public void done(Invitation object, ParseException e) {
+                    if (object != null) {
+                        btnCheckIn.setText("Request Pending");
+                    } else {
+                        btnCheckIn.setText("Click to Join");
+                        btnCheckIn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Invitation invitation = new Invitation();
+                                invitation.setGroup(group);
+                                invitation.setReceiver(ParseUser.getCurrentUser());
+                                invitation.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        btnCheckIn.setText("Request Pending");
+                                    }
+                                });
+
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            btnCheckIn.setText("Group is Unavailable");
+        }
+    }
+
+    private void doubleCheckNumCheckIns() {
+        ParseQuery<Membership> membershipQuery = ParseQuery.getQuery(Membership.class);
+        membershipQuery.whereEqualTo("group", group);
+        membershipQuery.include("numCheckIns");
+        membershipQuery.include("user");
+        membershipQuery.include("group");
+        try {
+            List<Membership> objects = membershipQuery.find();
+            // check that numCheckIns is correct size for all members
+            for (int i = 0; i < objects.size(); i++) {
+                Membership currMem = objects.get(i);
+                List<Integer> numCheckIns = currMem.getNumCheckIns();
+                if (numCheckIns != null) {
+
+                    while (numCheckIns.size() < correctNumCheckIns) {
+                        numCheckIns.add(0);
+                    }
+
+                    currMem.setNumCheckIns(numCheckIns);
+                    try {
+                        currMem.save();
+                    } catch (ParseException ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    currMem.setNumCheckIns(new ArrayList<Integer>()); // should not happen
+                    currMem.saveInBackground();
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+
     }
 
     private void setUpRelativeDates() {
@@ -373,10 +491,10 @@ public class GroupFragment extends Fragment {
             time = (int) diff;
         }
 
-        if(group.getIsActive()) {
+        if (group.getIsActive()) {
             tvDate.setText(String.format("Active: %d %s left!", time, unit));
             correctNumCheckIns = group.getNumWeeks() - weekDiff;
-        } else if (nowBeforeStart){
+        } else if (nowBeforeStart) {
             tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
         } else {
             tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
@@ -419,10 +537,6 @@ public class GroupFragment extends Fragment {
     }
 
     private void checkProximity() {
-//        if (location == null) {
-//            configChart(false, true, true);
-//            return;
-//        }
         ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
         query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
         query.whereEqualTo("group", group);
@@ -438,7 +552,7 @@ public class GroupFragment extends Fragment {
             }
         });
     }
-    
+
     private void saveCurrentUserLocation() {
         // requesting permission to get user's location
         if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
@@ -490,40 +604,23 @@ public class GroupFragment extends Fragment {
                     e.printStackTrace();
                     return;
                 } else {
-                    int weekNumber = 0;
                     List<PieEntry> entries = new ArrayList<>();
                     int totalCheckIns = 0;
                     // get last int of each numCheckIn, add to entries & keep track of sum
                     for (int i = 0; i < objects.size(); i++) {
                         Membership currMem = objects.get(i);
                         List<Integer> numCheckIns = currMem.getNumCheckIns();
-                        if (numCheckIns != null) {
-                            if (numCheckIns.isEmpty()) {
-                                numCheckIns.add(0);
-                            }
 
-                            if (numCheckIns.size() < correctNumCheckIns) {
-                                numCheckIns.add(0);
-                                currMem.setNumCheckIns(numCheckIns);
-                                currMem.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        Log.d("saved memb", "yay");
-                                    }
-                                });
-                            }
-                            int currWeek = numCheckIns.get(numCheckIns.size() - 1);
-                            weekNumber = numCheckIns.size();
-                            if (currWeek > 0) {
-                                totalCheckIns += currWeek;
-                                String currUser = currMem.getUser().getUsername();
-                                PieEntry newEntry = new PieEntry(currWeek, currUser);
-                                entries.add(newEntry);
-                            }
+
+                        int currWeek = numCheckIns.get(numCheckIns.size() - 1);
+                        if (currWeek > 0) {
+                            totalCheckIns += currWeek;
+                            String currUser = currMem.getUser().getUsername();
+                            PieEntry newEntry = new PieEntry(currWeek, currUser);
+                            entries.add(newEntry);
                         }
-                        // numCheckIns should not have size 0 because will not draw chart if inactive
-
                     }
+
                     // calculate total weekly check ins using frequency and the number of members
                     int expectedCheckIns = group.getFrequency() * objects.size();
                     int remainingCheckIns = expectedCheckIns - totalCheckIns;

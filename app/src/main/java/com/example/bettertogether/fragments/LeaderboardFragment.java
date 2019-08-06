@@ -174,10 +174,11 @@ public class LeaderboardFragment extends Fragment {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground);
 
         int i = 0;
+        int limit = 2;
         final ArrayList<String> xLabels = new ArrayList<>();
         ArrayList<BarEntry> entries = new ArrayList<>();
         for (Map.Entry<String, Group> element : idsToGroups.entrySet()) {
-            if (1 < groupsToPoints.get(element.getKey())) {
+            if (2 < groupsToPoints.get(element.getKey())) {
                 entries.add(new BarEntry(i++, groupsToPoints.get(element.getKey())));
                 xLabels.add(element.getValue().getName());
                 imageList.add(bitmap);
@@ -217,7 +218,8 @@ public class LeaderboardFragment extends Fragment {
         ArrayList<BarEntry> entries = new ArrayList<>();
         for (Map.Entry<String, Group> element : idsToGroups.entrySet()) {
             if (element.getValue().getCategory().equals(categoryName)) {
-                if (0 < groupsToPoints.get(element.getKey())) {
+                if (2 < groupsToPoints.get(element.getKey())) {
+
                     entries.add(new BarEntry(i, groupsToPoints.get(element.getKey())));
                     xLabels.add(element.getValue().getName());
                     imageList.add(bitmap);
