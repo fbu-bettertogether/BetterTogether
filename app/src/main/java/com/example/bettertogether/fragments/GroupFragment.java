@@ -164,6 +164,7 @@ public class GroupFragment extends Fragment {
     private boolean inGroup = false;
     int correctNumCheckIns = 0;
     boolean hasCheckInLeft = false;
+    boolean nowBeforeStart;
 
     public GroupFragment() {
         // Required empty public constructor
@@ -229,83 +230,9 @@ public class GroupFragment extends Fragment {
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
 
-        final Toolbar toolbar = view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(group.getName());
-        setHasOptionsMenu(true);
-
-        final ImageView imageView = view.findViewById(R.id.backdrop);
-        if (group.getIcon() != null) {
-            Glide.with(view.getContext())
-                    .load(group.getIcon().getUrl())
-                    .apply(RequestOptions.centerCropTransform())
-                    .into(imageView);
-        }
-
-        if (getCurrentUser().getParseFile("profileImage") != null) {
-            Glide.with(view.getContext())
-                    .load(((ParseFile) getCurrentUser().get("profileImage")).getUrl())
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(ivProfPic);
-        }
-        tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
-        tvCreatePost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                checkInPost();
-            }
-        });
-
-        // getting date from string stored in group
-        String startDateUgly = group.getStartDate();
-        String endDateUgly = group.getEndDate();
-
-        // translating string into Java Date
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
-        Date start = null;
-        Date end = null;
-        try {
-            start = sdf.parse(startDateUgly);
-            end = sdf.parse(endDateUgly);
-        } catch (java.text.ParseException e) {
-            e.printStackTrace();
-        }
-
-        // turning dates into relative time from now
-        Date now = Calendar.getInstance().getTime();
-        final boolean nowBeforeStart = now.before(start);
-
-        long diffInMillis = 0;
-        if (group.getIsActive()) {
-            diffInMillis = end.getTime() - now.getTime();
-        } else if (nowBeforeStart) {
-            diffInMillis = start.getTime() - now.getTime();
-        } else {
-            diffInMillis = end.getTime() - now.getTime();
-        }
-
-        long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
-        int weekDiff = (int) diff / 7;
-        String unit = "weeks";
-        int time = weekDiff;
-
-        if (weekDiff == 0) {
-            unit = "days";
-            time = (int) diff;
-        }
-
-        if(group.getIsActive()) {
-            tvDate.setText(String.format("Active: %d %s left!", time, unit));
-            correctNumCheckIns = group.getNumWeeks() - weekDiff;
-        } else if (nowBeforeStart){
-            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
-        } else {
-            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
-        }
-        tvDate.setTextColor(getResources().getColor(R.color.gray));
+        setUpToolbar(view);
+        setUpCreatePost(view);
+        setUpRelativeDates();
 
         ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
         parseQuery.whereEqualTo("user", getCurrentUser());
@@ -368,7 +295,7 @@ public class GroupFragment extends Fragment {
                         chart.getLayoutParams().width = 0;
                     }
                 } else {
-                    if (!group.getPrivacy().equals("private") & nowBeforeStart) {
+                    if (!group.getPrivacy().equals("private") && nowBeforeStart) {
                         ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
                         query.whereEqualTo("receiver", ParseUser.getCurrentUser());
                         query.whereEqualTo("group", group);
@@ -407,7 +334,95 @@ public class GroupFragment extends Fragment {
         queryPosts();
     }
 
+    private void setUpRelativeDates() {
+        // getting date from string stored in group
+        String startDateUgly = group.getStartDate();
+        String endDateUgly = group.getEndDate();
+
+        // translating string into Java Date
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+        Date start = null;
+        Date end = null;
+        try {
+            start = sdf.parse(startDateUgly);
+            end = sdf.parse(endDateUgly);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+
+        // turning dates into relative time from now
+        Date now = Calendar.getInstance().getTime();
+        nowBeforeStart = now.before(start);
+
+        long diffInMillis = 0;
+        if (group.getIsActive()) {
+            diffInMillis = end.getTime() - now.getTime();
+        } else if (nowBeforeStart) {
+            diffInMillis = start.getTime() - now.getTime();
+        } else {
+            diffInMillis = end.getTime() - now.getTime();
+        }
+
+        long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+        int weekDiff = (int) diff / 7;
+        String unit = "weeks";
+        int time = weekDiff;
+
+        if (weekDiff == 0) {
+            unit = "days";
+            time = (int) diff;
+        }
+
+        if(group.getIsActive()) {
+            tvDate.setText(String.format("Active: %d %s left!", time, unit));
+            correctNumCheckIns = group.getNumWeeks() - weekDiff;
+        } else if (nowBeforeStart){
+            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
+        } else {
+            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
+        }
+        tvDate.setTextColor(getResources().getColor(R.color.gray));
+    }
+
+    private void setUpCreatePost(View view) {
+        if (getCurrentUser().getParseFile("profileImage") != null) {
+            Glide.with(view.getContext())
+                    .load(((ParseFile) getCurrentUser().get("profileImage")).getUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(ivProfPic);
+        }
+        tvCreatePost.setText(String.format(" Let %s know what you're up to!", group.getName()));
+        tvCreatePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkInPost();
+            }
+        });
+    }
+
+    private void setUpToolbar(View view) {
+        final Toolbar toolbar = view.findViewById(R.id.toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle(group.getName());
+        setHasOptionsMenu(true);
+
+        final ImageView imageView = view.findViewById(R.id.backdrop);
+        if (group.getIcon() != null) {
+            Glide.with(view.getContext())
+                    .load(group.getIcon().getUrl())
+                    .apply(RequestOptions.centerCropTransform())
+                    .into(imageView);
+        }
+    }
+
     private void checkProximity() {
+//        if (location == null) {
+//            configChart(false, true, true);
+//            return;
+//        }
         ParseQuery<Membership> query = new ParseQuery<Membership>("Membership");
         query.whereWithinMiles("location", currMem.getParseGeoPoint("location"), 0.75);
         query.whereEqualTo("group", group);
@@ -423,6 +438,7 @@ public class GroupFragment extends Fragment {
             }
         });
     }
+    
     private void saveCurrentUserLocation() {
         // requesting permission to get user's location
         if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
