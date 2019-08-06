@@ -28,6 +28,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:text="UserName"
+        android:typeface="serif"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/tvGroup"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,6 +44,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="Post in _ group"
+        android:typeface="serif"
         app:layout_constraintBottom_toBottomOf="@+id/ivIcon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ivIcon" />
