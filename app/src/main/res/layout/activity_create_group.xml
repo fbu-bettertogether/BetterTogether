@@ -142,8 +142,7 @@
             android:id="@+id/spFrequency"
             android:layout_width="75dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="76dp"
             android:layout_marginTop="24dp"
             android:entries="@array/frequency_options"
             app:layout_constraintStart_toStartOf="parent"
@@ -153,30 +152,13 @@
             android:id="@+id/tvWeekLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
-            android:layout_marginLeft="0dp"
             android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:text="times a week, for"
+            android:layout_marginEnd="76dp"
+            android:text="times a week, starting on"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.045"
+            app:layout_constraintHorizontal_bias="0.423"
             app:layout_constraintStart_toEndOf="@+id/spFrequency"
             app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
-
-        <NumberPicker
-            android:id="@+id/npMinTime"
-            android:layout_width="65dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/calStartDate"
-            app:layout_constraintStart_toEndOf="@id/tvWeekLabel"
-            app:layout_constraintEnd_toStartOf="@+id/tvFromLabel"
-            app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel"
-            app:layout_constraintVertical_bias="0.0" />
 
         <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/calStartDate"
@@ -252,17 +234,6 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rvAddedMembers" />
-
-        <TextView
-            android:id="@+id/tvFromLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:text="minutes, starting on"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
 
         <View
             android:id="@+id/divider2"
