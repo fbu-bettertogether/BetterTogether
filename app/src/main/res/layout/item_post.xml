@@ -21,8 +21,8 @@
             android:id="@+id/ivProfileImage"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="2dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             card_view:layout_constraintStart_toStartOf="parent"
             card_view:layout_constraintTop_toTopOf="parent"
             card_view:srcCompat="@drawable/account" />
@@ -31,9 +31,10 @@
             android:id="@+id/tvUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="8dp"
             android:paddingLeft="5dp"
             android:text="TextView"
+            android:typeface="serif"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
             card_view:layout_constraintTop_toTopOf="parent" />
 
@@ -43,6 +44,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
             android:text="TextView"
+            android:typeface="serif"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintHorizontal_bias="0.0"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
@@ -56,20 +58,21 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
             android:text="TextView"
+            android:typeface="serif"
+            card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintStart_toStartOf="@+id/tvBody"
-            card_view:layout_constraintTop_toBottomOf="@+id/ivMedia"
-            android:layout_marginLeft="4dp" />
+            card_view:layout_constraintTop_toBottomOf="@+id/ivMedia" />
 
         <ImageButton
             android:id="@+id/ivLike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:background="@null"
+            card_view:layout_constraintBottom_toBottomOf="@+id/tvTime"
             card_view:layout_constraintEnd_toEndOf="parent"
-            card_view:layout_constraintTop_toBottomOf="@+id/ivMedia"
             card_view:srcCompat="@drawable/thumb_up_outline" />
 
         <ImageView
@@ -92,6 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="0"
+            android:typeface="serif"
             card_view:layout_constraintBottom_toBottomOf="@+id/ivLike"
             card_view:layout_constraintEnd_toStartOf="@+id/ivLike"
             card_view:layout_constraintTop_toTopOf="@+id/ivLike" />
