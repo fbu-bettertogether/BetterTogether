@@ -262,7 +262,11 @@ public class CreatePostActivity extends AppCompatActivity {
                 if (tagText.length() > 0) {
                     tagText = tagText.substring(0, tagText.length() - 1);
                 }
-                etPost.setText(etPost.getText() + " " + tagText);
+                if (etPost.getText() != null && etPost.getText().length() > 0) {
+                    etPost.setText(etPost.getText() + " " + tagText);
+                } else {
+                    etPost.setText(tagText);
+                }
             }
         }
     }

@@ -37,6 +37,14 @@ public class CheckAdapter extends RecyclerView.Adapter<CheckAdapter.ViewHolder> 
 
     }
 
+    public int getChecks() {
+        return checks;
+    }
+
+    public void setChecks(int checks) {
+        this.checks = checks;
+    }
+
     @Override
     public int getItemCount() {
         return maxChecks;

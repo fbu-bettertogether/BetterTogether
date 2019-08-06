@@ -339,7 +339,6 @@ public class GroupFragment extends Fragment {
                             hasCheckInLeft = false;
                         } else if (numCheckIns.get(numCheckIns.size() - 1) < currMem.getGroup().getFrequency()) {
                             hasCheckInLeft = true;
-                            group.setShowCheckInReminderBadge(true);
                         } else if (numCheckIns.get(numCheckIns.size() - 1) == currMem.getGroup().getFrequency()) {
                             group.setShowCheckInReminderBadge(false);
                         }
@@ -358,6 +357,7 @@ public class GroupFragment extends Fragment {
                         } else {
                             tvTimer.setText("You're done for the week!");
                             tvTimer.setVisibility(View.VISIBLE);
+                            group.setShowCheckInReminderBadge(false);
                             setHelpMessage("done for week");
                             btnCheckIn.setVisibility(View.INVISIBLE);
                             configChart(false, false, false);
@@ -509,7 +509,7 @@ public class GroupFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivProfPic);
         }
-        tvCreatePost.setText(String.format(" Let %s know what you're up to!", group.getName()));
+        tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -921,11 +921,12 @@ public class GroupFragment extends Fragment {
         Calendar prevCheckIn = Calendar.getInstance();
         Date lastCheckIn = currMem.getLastCheckIn();
         prevCheckIn.setTime(lastCheckIn);
-        boolean checkedInToday = (now.get(Calendar.DAY_OF_YEAR) == prevCheckIn.get(Calendar.DAY_OF_YEAR))
+        final boolean checkedInToday = (now.get(Calendar.DAY_OF_YEAR) == prevCheckIn.get(Calendar.DAY_OF_YEAR))
                 && (now.get(Calendar.YEAR) == prevCheckIn.get(Calendar.YEAR));
 
         if (!checkedInToday) {
             final int currWeekCheckIns = numCheckIns.get(numCheckIns.size() - 1);
+            group.setShowCheckInReminderBadge(true);
             tvTimer.setVisibility(View.INVISIBLE);
             btnCheckIn.setVisibility(View.VISIBLE);
             btnCheckIn.setEnabled(true);
@@ -933,13 +934,15 @@ public class GroupFragment extends Fragment {
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    checkAdapter.setChecks(checkAdapter.getChecks() + 1);
+                    checkAdapter.notifyDataSetChanged();
                     currMem.setLastCheckIn(now.getTime());
                     btnCheckIn.setVisibility(View.INVISIBLE);
 
                     if (currWeekCheckIns == group.getFrequency() - 1) {
                         // final check-in for the week
                         tvTimer.setText("Done for the week!");
+                        group.setShowCheckInReminderBadge(false);
                         setHelpMessage("done for week");
                         tvTimer.setVisibility(View.VISIBLE);
                         viewKonfetti.build()
@@ -955,6 +958,7 @@ public class GroupFragment extends Fragment {
 
                     } else {
                         setHelpMessage("already checked-in");
+                        group.setShowCheckInReminderBadge(false);
                         tvTimer.setText("Checked-in for the day!");
                         tvTimer.setVisibility(View.VISIBLE);
                         viewKonfetti.build()
@@ -1067,6 +1071,7 @@ public class GroupFragment extends Fragment {
 
         } else {
 //            btnCheckIn.setVisibility(View.INVISIBLE);
+            group.setShowCheckInReminderBadge(false);
             tvTimer.setVisibility(View.VISIBLE);
             tvTimer.setText("Checked-In today!");
             setHelpMessage("already checked-in");
@@ -1082,6 +1087,7 @@ public class GroupFragment extends Fragment {
             public void onClick(final DialogInterface dialog, int i) {
 
                 final int nthCheckIn = currWeekCheckIns + 1;
+                group.setShowCheckInReminderBadge(false);
 
                 ParseQuery<ParseUser> checkInBotQuery = ParseQuery.getQuery(ParseUser.class);
                 checkInBotQuery.whereEqualTo("username", "Check In Bot");
