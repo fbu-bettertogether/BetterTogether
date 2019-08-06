@@ -234,6 +234,14 @@ public class ProfileFragment extends Fragment {
                                                 public void done(ParseException e) {
                                                     if (e != null) {
                                                         e.printStackTrace();
+                                                    } else {
+                                                        currentUser.saveInBackground(new SaveCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                onFriendUpdate();
+                                                            }
+                                                        });
+
                                                     }
                                                 }
                                             });
@@ -252,6 +260,14 @@ public class ProfileFragment extends Fragment {
                                                             public void done(ParseException e) {
                                                                 if (e != null) {
                                                                     e.printStackTrace();
+                                                                } else {
+                                                                    currentUser.saveInBackground(new SaveCallback() {
+                                                                        @Override
+                                                                        public void done(ParseException e) {
+                                                                            onFriendUpdate();
+                                                                        }
+                                                                    });
+
                                                                 }
                                                             }
                                                         });
@@ -293,12 +309,6 @@ public class ProfileFragment extends Fragment {
                                 });
 
                             }
-                            currentUser.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                onFriendUpdate();
-                                }
-                            });
                         }
                     });
                 }
@@ -342,6 +352,10 @@ public class ProfileFragment extends Fragment {
     public void onFriendUpdate() {
         final ParseRelation relation = ParseUser.getCurrentUser().getRelation("friends");
         ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+        invitationParseQuery.include("inviter");
+        invitationParseQuery.include("receiver");
+        invitationParseQuery.include("group");
+
         invitationParseQuery.findInBackground(new FindCallback<Invitation>() {
             @Override
             public void done(List<Invitation> objects, ParseException e) {
@@ -361,7 +375,7 @@ public class ProfileFragment extends Fragment {
                                     }
                                 } else if (objects.get(i).getReceiver() != null && objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted().equals("rejected")) {
-                                        toRemove.remove(objects.get(i).getInviter());
+                                        toRemove.add(objects.get(i).getInviter());
                                     } else {
                                         toAdd.add(objects.get(i).getInviter());
                                     }
