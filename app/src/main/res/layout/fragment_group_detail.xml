@@ -19,6 +19,35 @@
             android:layout_height="wrap_content"
             tools:context=".HomeActivity">
 
+            <ImageView
+                android:id="@+id/ivHelp"
+                android:layout_width="23dp"
+                android:layout_height="26dp"
+                android:clickable="true"
+                app:layout_constraintBottom_toTopOf="@+id/chartFrame"
+                app:layout_constraintStart_toEndOf="@+id/btnCheckIn"
+                app:layout_constraintTop_toTopOf="@+id/btnCheckIn"
+                app:layout_constraintVertical_bias="0.531"
+                app:srcCompat="@drawable/baseline_help_outline_black_18dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvChecks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/chartFrame" />
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rvChecks">
+
+            </com.github.mikephil.charting.charts.PieChart>
+
             <Button
                 android:id="@+id/btnCheckIn"
                 android:layout_width="wrap_content"
@@ -105,31 +134,12 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ivProfPic" />
 
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/chart"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/chartFrame" />
-
             <nl.dionsegijn.konfetti.KonfettiView
                 android:id="@+id/viewKonfetti"
                 android:layout_width="match_parent"
                 android:layout_height="700dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/ivHelp"
-                android:layout_width="23dp"
-                android:layout_height="26dp"
-                android:clickable="true"
-                app:layout_constraintBottom_toTopOf="@+id/chart"
-                app:layout_constraintStart_toEndOf="@+id/btnCheckIn"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.531"
-                app:srcCompat="@drawable/baseline_help_outline_black_18dp" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

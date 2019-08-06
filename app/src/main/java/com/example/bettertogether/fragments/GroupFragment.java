@@ -13,7 +13,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.util.Log;
@@ -47,6 +46,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.AddUsersActivity;
 import com.example.bettertogether.AlarmReceiver;
+import com.example.bettertogether.CheckAdapter;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
 import com.example.bettertogether.FriendAdapter;
@@ -136,6 +136,9 @@ public class GroupFragment extends Fragment {
     private TextView tvDate;
     private TextView tvTimer;
     private ImageView ivHelp;
+
+    private CheckAdapter checkAdapter;
+    private RecyclerView rvChecks;
 
     private List<Integer> numCheckIns;
     private Membership currMem;
@@ -228,6 +231,8 @@ public class GroupFragment extends Fragment {
         chartFrame = view.findViewById(R.id.chartFrame);
         users = new ArrayList<>();
         friendAdapter = new FriendAdapter(users, getFragmentManager());
+
+        rvChecks = view.findViewById(R.id.rvChecks);
 
         final Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -359,6 +364,9 @@ public class GroupFragment extends Fragment {
                             configChart(false, false, false);
                         }
 
+                        checkAdapter = new CheckAdapter(numCheckIns.get(numCheckIns.size() - 1), group.getFrequency());
+                        rvChecks.setAdapter(checkAdapter);
+                        rvChecks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
                     } else {
                         btnCheckIn.setVisibility(View.INVISIBLE);
                         tvTimer.setVisibility(View.VISIBLE);
