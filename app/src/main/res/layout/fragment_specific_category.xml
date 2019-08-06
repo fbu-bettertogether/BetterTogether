@@ -28,15 +28,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tvSpecificCategoryName">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvGroupsInCategory"
+            android:id="@+id/rvGroupsCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="#FFFFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/tvSpecificCategoryName"
-            app:layout_constraintTop_toBottomOf="@+id/tvSpecificCategoryName" />
+            app:layout_constraintStart_toStartOf="@+id/tvCategoryName"
+            app:layout_constraintTop_toBottomOf="@+id/tvCategoryName" />
 
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

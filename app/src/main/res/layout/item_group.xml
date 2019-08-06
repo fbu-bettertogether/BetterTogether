@@ -26,6 +26,7 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:text="TextView"
+        android:typeface="serif"
         android:textSize="24dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/tvCategory"
