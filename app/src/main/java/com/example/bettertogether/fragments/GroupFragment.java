@@ -233,6 +233,7 @@ public class GroupFragment extends Fragment {
         setUpToolbar(view);
         setUpCreatePost(view);
         setUpRelativeDates();
+        doubleCheckNumCheckIns();
 
         ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
         parseQuery.whereEqualTo("user", getCurrentUser());
@@ -332,6 +333,49 @@ public class GroupFragment extends Fragment {
         });
         queryMembers();
         queryPosts();
+    }
+
+    private void doubleCheckNumCheckIns() {
+        ParseQuery<Membership> membershipQuery = ParseQuery.getQuery(Membership.class);
+        membershipQuery.whereEqualTo("group", group);
+        membershipQuery.include("numCheckIns");
+        membershipQuery.include("user");
+        membershipQuery.include("group");
+        membershipQuery.findInBackground(new FindCallback<Membership>() {
+            @Override
+            public void done(List<Membership> objects, ParseException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                    return;
+                }
+                // check that numCheckIns is correct size for all members
+                for (int i = 0; i < objects.size(); i++) {
+                    Membership currMem = objects.get(i);
+                    List<Integer> numCheckIns = currMem.getNumCheckIns();
+                    if (numCheckIns != null) {
+                        if (numCheckIns.isEmpty()) {
+                            numCheckIns.add(0);
+                        }
+
+                        while (numCheckIns.size() < correctNumCheckIns) {
+                            numCheckIns.add(0);
+                        }
+
+                        currMem.setNumCheckIns(numCheckIns);
+                        currMem.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                Log.d("saved memb", "yay");
+                            }
+                        });
+                    } else {
+                        currMem.setNumCheckIns(new ArrayList<Integer>());
+                        currMem.saveInBackground();
+                    }
+                }
+            }
+        });
+
     }
 
     private void setUpRelativeDates() {
@@ -497,30 +541,29 @@ public class GroupFragment extends Fragment {
                     for (int i = 0; i < objects.size(); i++) {
                         Membership currMem = objects.get(i);
                         List<Integer> numCheckIns = currMem.getNumCheckIns();
-                        if (numCheckIns != null) {
-                            if (numCheckIns.isEmpty()) {
-                                numCheckIns.add(0);
-                            }
-
-                            if (numCheckIns.size() < correctNumCheckIns) {
-                                numCheckIns.add(0);
-                                currMem.setNumCheckIns(numCheckIns);
-                                currMem.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        Log.d("saved memb", "yay");
-                                    }
-                                });
-                            }
-                            int currWeek = numCheckIns.get(numCheckIns.size() - 1);
-                            weekNumber = numCheckIns.size();
-                            if (currWeek > 0) {
-                                totalCheckIns += currWeek;
-                                String currUser = currMem.getUser().getUsername();
-                                PieEntry newEntry = new PieEntry(currWeek, currUser);
-                                entries.add(newEntry);
-                            }
+//                        if (numCheckIns != null) {
+//                            if (numCheckIns.isEmpty()) {
+//                                numCheckIns.add(0);
+//                            }
+//
+//                            if (numCheckIns.size() < correctNumCheckIns) {
+//                                numCheckIns.add(0);
+//                                currMem.setNumCheckIns(numCheckIns);
+//                                currMem.saveInBackground(new SaveCallback() {
+//                                    @Override
+//                                    public void done(ParseException e) {
+//                                        Log.d("saved memb", "yay");
+//                                    }
+//                                });
+//                            }
+                        int currWeek = numCheckIns.get(numCheckIns.size() - 1);
+                        if (currWeek > 0) {
+                            totalCheckIns += currWeek;
+                            String currUser = currMem.getUser().getUsername();
+                            PieEntry newEntry = new PieEntry(currWeek, currUser);
+                            entries.add(newEntry);
                         }
+//                        }
                         // numCheckIns should not have size 0 because will not draw chart if inactive
 
                     }
