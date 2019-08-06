@@ -58,6 +58,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="8dp"
             android:text="TextView"
+            android:typeface="serif"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintStart_toStartOf="@+id/tvBody"
             card_view:layout_constraintTop_toBottomOf="@+id/ivMedia" />
@@ -92,6 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="0"
+            android:typeface="serif"
             card_view:layout_constraintBottom_toBottomOf="@+id/ivLike"
             card_view:layout_constraintEnd_toStartOf="@+id/ivLike"
             card_view:layout_constraintTop_toTopOf="@+id/ivLike" />
