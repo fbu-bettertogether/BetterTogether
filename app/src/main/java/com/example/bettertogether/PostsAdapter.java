@@ -63,7 +63,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.tvTime.setText(post.getRelativeTimeAgo(post.getCreatedAt()));
 
         if (user.getUsername().equals("Check In Bot")) {
-            holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.fade_orange));
+            holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.post_border));
         } else {
             holder.itemView.setBackgroundColor(Color.WHITE);
         }
