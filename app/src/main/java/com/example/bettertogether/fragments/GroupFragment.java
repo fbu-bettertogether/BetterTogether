@@ -546,6 +546,7 @@ public class GroupFragment extends Fragment {
                 if (objects.size() == 1) {
                     setHelpMessage("proximity");
                     configChart(false, true, false);
+                    checkProximity();
                 } else {
                     configChart(false, true, true);
                 }
