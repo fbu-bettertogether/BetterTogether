@@ -391,7 +391,7 @@ public class GroupFragment extends Fragment {
                     .apply(RequestOptions.circleCropTransform())
                     .into(ivProfPic);
         }
-        tvCreatePost.setText(String.format(" Let %s know what you're up to!", group.getName()));
+        tvCreatePost.setText(String.format("Let %s know what you're up to!", group.getName()));
         tvCreatePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
