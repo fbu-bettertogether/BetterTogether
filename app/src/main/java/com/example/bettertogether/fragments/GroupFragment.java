@@ -920,7 +920,7 @@ public class GroupFragment extends Fragment {
         Calendar prevCheckIn = Calendar.getInstance();
         Date lastCheckIn = currMem.getLastCheckIn();
         prevCheckIn.setTime(lastCheckIn);
-        boolean checkedInToday = (now.get(Calendar.DAY_OF_YEAR) == prevCheckIn.get(Calendar.DAY_OF_YEAR))
+        final boolean checkedInToday = (now.get(Calendar.DAY_OF_YEAR) == prevCheckIn.get(Calendar.DAY_OF_YEAR))
                 && (now.get(Calendar.YEAR) == prevCheckIn.get(Calendar.YEAR));
 
         if (!checkedInToday) {
@@ -932,7 +932,8 @@ public class GroupFragment extends Fragment {
             btnCheckIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    checkAdapter.setChecks(checkAdapter.getChecks() + 1);
+                    checkAdapter.notifyDataSetChanged();
                     currMem.setLastCheckIn(now.getTime());
                     btnCheckIn.setVisibility(View.INVISIBLE);
 
