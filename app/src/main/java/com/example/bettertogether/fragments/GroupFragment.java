@@ -119,6 +119,7 @@ import static com.parse.ParseUser.getCurrentUser;
  * create an instance of this fragment.
  */
 public class GroupFragment extends Fragment {
+    // key and location params
     private static final int ACCESS_FINE_LOCATION_REQUEST_READ_CONTACTS = 36;
     public final int GROUP_INVITATION_REQUEST_CODE = 514;
     private static final int REQUEST_LOCATION = 1;
@@ -132,41 +133,48 @@ public class GroupFragment extends Fragment {
     public static final int REQUEST_CODE = 45;
     private ParseGeoPoint location;
 
+    // widget params
     private Button btnCheckIn;
     private TextView tvDate;
     private TextView tvTimer;
     private ImageView ivHelp;
+    private TextView tvCreatePost;
+    private ImageView ivProfPic;
 
+    // check-in check marks
     private CheckAdapter checkAdapter;
     private RecyclerView rvChecks;
 
+    // membership, group, and check-ins info
     private List<Integer> numCheckIns;
     private Membership currMem;
     private Category category;
-    private RecyclerView rvTimeline;
-    private PostsAdapter postsAdapter;
-    private FriendAdapter friendAdapter;
-    private List<Post> mPosts;
-    private List<ParseUser> users;
-    private Award first = new Award();
-    private Award oneWeek = new Award();
-    private Award tenacity = new Award();
-    private AwardFragment af = new AwardFragment();
-    private PieChart chart;
-    private ConstraintLayout constraintLayout;
-    private FrameLayout chartFrame;
-    private Context mcontext;
-    private TextView tvCreatePost;
-    private ImageView ivProfPic;
-    private ScrollView scrollView;
-    private KonfettiView viewKonfetti;
-    private Date start;
     private ArrayList<ParseUser> addedMembers;
     private List<ParseUser> addedUsers;
     List<Membership> memberships;
     private boolean inGroup = false;
     int correctNumCheckIns = 0;
     boolean hasCheckInLeft = false;
+
+    // posts fields
+    private RecyclerView rvTimeline;
+    private PostsAdapter postsAdapter;
+    private List<Post> mPosts;
+
+    // awards fields
+    private Award first = new Award();
+    private Award oneWeek = new Award();
+    private Award tenacity = new Award();
+    private AwardFragment af = new AwardFragment();
+
+    // chart widgets
+    private PieChart chart;
+    private FrameLayout chartFrame;
+    private Context mcontext;
+    private KonfettiView viewKonfetti;
+
+    // time fields
+    private Date start;
     boolean nowBeforeStart;
 
     public GroupFragment() {
@@ -215,8 +223,6 @@ public class GroupFragment extends Fragment {
         tvTimer = view.findViewById(R.id.tvTimer);
         chart = view.findViewById(R.id.chart);
         chart.setVisibility(View.INVISIBLE);
-        constraintLayout = view.findViewById(R.id.constraintLayout);
-        scrollView = view.findViewById(R.id.scrollView);
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
@@ -230,8 +236,6 @@ public class GroupFragment extends Fragment {
         rvTimeline.setAdapter(postsAdapter);
         rvTimeline.setLayoutManager(new LinearLayoutManager(getContext()));
         chartFrame = view.findViewById(R.id.chartFrame);
-        users = new ArrayList<>();
-        friendAdapter = new FriendAdapter(users, getFragmentManager());
         rvChecks = view.findViewById(R.id.rvChecks);
 
         setUpToolbar(view);
@@ -256,6 +260,8 @@ public class GroupFragment extends Fragment {
                         inGroup = true;
                         currMem = objects.get(0);
                         numCheckIns = currMem.getNumCheckIns();
+                        configChart(false);
+                        setUpCheckMarks();
 
                         if (numCheckIns.isEmpty()) {
                             hasCheckInLeft = false;
@@ -268,46 +274,42 @@ public class GroupFragment extends Fragment {
 
                         if (hasCheckInLeft) {
                             if (hasCheckedInToday()) {
-                                configChart(false);
-                                tvTimer.setVisibility(View.VISIBLE);
-                                tvTimer.setText("Checked-In today!");
+                                textInsteadOfBtn("Checked-in today!");
                                 setHelpMessage("already checked-in");
                             } else if (category.getName().equals("Get-Togethers")) {
                                 saveCurrentUserLocation();
                                 checkProximity();
-                                configChart(false);
                             } else {
                                 try {
                                     checkPlace(category.getLocationTypesList());
-                                    configChart(false);
                                 } catch (JSONException e1) {
                                     e1.printStackTrace();
                                 }
                             }
                         } else {
-                            tvTimer.setText("You're done for the week!");
-                            tvTimer.setVisibility(View.VISIBLE);
+                            textInsteadOfBtn("You're done for the week!");
                             setHelpMessage("done for week");
-                            btnCheckIn.setVisibility(View.INVISIBLE);
-                            configChart(false);
                         }
-
-                        checkAdapter = new CheckAdapter(numCheckIns.get(numCheckIns.size() - 1), group.getFrequency());
-                        rvChecks.setAdapter(checkAdapter);
-                        rvChecks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
                     } else {
-                        btnCheckIn.setVisibility(View.INVISIBLE);
-                        tvTimer.setVisibility(View.VISIBLE);
-                        tvTimer.setText("Group has not started yet! Hang tight!");
-                        chart.requestLayout();
-                        chart.getLayoutParams().height = 0;
-                        chart.getLayoutParams().width = 0;
+                        textInsteadOfBtn("Group has not started yet! Hang tight!");
+                        shrinkChart(chart);
                     }
                 }
             }
         });
-        queryMembers();
         queryPosts();
+    }
+
+    private void textInsteadOfBtn(String str) {
+        btnCheckIn.setVisibility(View.INVISIBLE);
+        tvTimer.setVisibility(View.VISIBLE);
+        tvTimer.setText(str);
+    }
+
+    private void setUpCheckMarks() {
+        checkAdapter = new CheckAdapter(numCheckIns.get(numCheckIns.size() - 1), group.getFrequency());
+        rvChecks.setAdapter(checkAdapter);
+        rvChecks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
     }
 
     private boolean hasCheckedInToday() {
@@ -352,6 +354,7 @@ public class GroupFragment extends Fragment {
             });
         } else {
             btnCheckIn.setText("Group is Unavailable");
+            shrinkChart(chart);
         }
     }
 
@@ -685,25 +688,6 @@ public class GroupFragment extends Fragment {
         }
     }
 
-
-    private void queryMembers() {
-            ParseQuery<Membership> parseQuery = new ParseQuery<Membership>(Membership.class);
-            parseQuery.addDescendingOrder("updatedAt");
-            parseQuery.whereEqualTo("group", group);
-            parseQuery.include("user");
-            parseQuery.findInBackground(new FindCallback<Membership>() {
-                @Override
-                public void done(List<Membership> objects, ParseException e) {
-                    if (e != null) {
-                        Log.e("Querying groups", "error with query");
-                        e.printStackTrace();
-                        return;
-                    }
-                    users.addAll(Membership.getAllUsers(objects));
-                    friendAdapter.notifyDataSetChanged();
-                }
-            });
-    }
     private void queryPosts() {
         ParseQuery<ParseObject> parseQuery = group.getRelation("posts").getQuery();
         parseQuery.addDescendingOrder("createdAt");
@@ -1114,23 +1098,6 @@ public class GroupFragment extends Fragment {
             // other 'case' lines to check for other
             // permissions this app might request.
         }
-    }
-
-    private void findCategory() {
-        ParseQuery<CatMembership> query = new ParseQuery<CatMembership>(CatMembership.class);
-        query.include("category");
-        query.whereEqualTo("group", group);
-        query.findInBackground(new FindCallback<CatMembership>() {
-            @Override
-            public void done(List<CatMembership> objects, ParseException e) {
-                if (e != null) {
-                    Log.e("Querying groups", "error with query");
-                    e.printStackTrace();
-                    return;
-                }
-                category = objects.get(0).getCategory();
-            }
-        });
     }
 
     @Override
