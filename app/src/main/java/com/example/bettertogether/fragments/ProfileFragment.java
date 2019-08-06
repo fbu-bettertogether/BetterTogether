@@ -186,14 +186,17 @@ public class ProfileFragment extends Fragment {
         ImageView ivPhotoActionBar = view.findViewById(R.id.ivPhotoActionBar);
         tvUserActionBar.setText(user.getUsername());
 
+        int placeholderId = R.drawable.account;
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
+                    .apply(new RequestOptions().placeholder(placeholderId).error(placeholderId))
                     .into(ivUserIcon);
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
+                    .apply(new RequestOptions().placeholder(placeholderId).error(placeholderId))
                     .into(ivPhotoActionBar);
         }
         onFriendUpdate();
