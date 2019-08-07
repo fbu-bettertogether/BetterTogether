@@ -99,6 +99,7 @@ public class ProfileFragment extends Fragment {
     private SimpleGroupAdapter simpleGroupAdapter;
     private AwardsAdapter awardsAdapter;
     private AwardFragment af;
+    int placeholderId = R.drawable.account;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -162,6 +163,150 @@ public class ProfileFragment extends Fragment {
         tvNumGroups = view.findViewById(R.id.tvNumGroups);
         tvNumPosts = view.findViewById(R.id.tvNumPosts);
 
+        setUpRecyclerViews();
+        setUpProfToolbar(view);
+        onFriendUpdate();
+        setUpPoints();
+
+        ivUserIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addFriend(view);
+            }
+        });
+    }
+
+    private void setUpPoints() {
+        ivServicePoints.setColorFilter(getResources().getColor(R.color.o9));
+        ivGetTogetherPoints.setColorFilter(getResources().getColor(R.color.o4));
+        ivFitnessPoints.setColorFilter(getResources().getColor(R.color.orange));
+        tvServicePoints.setText(Integer.toString(user.getInt("servicePoints")));
+        tvGetTogetherPoints.setText(Integer.toString(user.getInt("getTogetherPoints")));
+        tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
+    }
+
+    private void addFriend(View view) {
+        if (user.hasSameId(ParseUser.getCurrentUser())) {
+            Toast.makeText(view.getContext(), "Is current user", Toast.LENGTH_SHORT).show();
+            mListener.createProfilePicture(view);
+        } else {
+            final ParseUser currentUser = ParseUser.getCurrentUser();
+            final ParseRelation<ParseUser> relation = currentUser.getRelation("friends");
+            ParseQuery<ParseUser> query = relation.getQuery();
+            query.findInBackground(new FindCallback<ParseUser>() {
+                @Override
+                public void done(List<ParseUser> objects, ParseException e) {
+                    boolean found = false;
+                    for (int i = 0; i < objects.size(); i++) {
+                        if (objects.get(i).hasSameId(user)) {
+                            found = true;
+                        }
+                    }
+                    if (found) {
+                        relation.remove(user);
+                        ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+                        invitationParseQuery.whereEqualTo("inviter", ParseUser.getCurrentUser());
+                        invitationParseQuery.whereEqualTo("receiver", user);
+                        invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
+                            @Override
+                            public void done(Invitation object, ParseException e) {
+                                if (object != null) {
+                                    object.setAccepted("rejected");
+                                    object.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e != null) {
+                                                e.printStackTrace();
+                                            } else {
+                                                currentUser.saveInBackground(new SaveCallback() {
+                                                    @Override
+                                                    public void done(ParseException e) {
+                                                        onFriendUpdate();
+                                                    }
+                                                });
+
+                                            }
+                                        }
+                                    });
+
+                                } else {
+                                    ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+                                    invitationParseQuery.whereEqualTo("inviter", user);
+                                    invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
+                                    invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
+                                        @Override
+                                        public void done(Invitation object, ParseException e) {
+                                            if (object != null) {
+                                                object.setAccepted("rejected");
+                                                object.saveInBackground(new SaveCallback() {
+                                                    @Override
+                                                    public void done(ParseException e) {
+                                                        if (e != null) {
+                                                            e.printStackTrace();
+                                                        } else {
+                                                            currentUser.saveInBackground(new SaveCallback() {
+                                                                @Override
+                                                                public void done(ParseException e) {
+                                                                    onFriendUpdate();
+                                                                }
+                                                            });
+
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    } else {
+                        ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+                        invitationParseQuery.whereEqualTo("inviter", ParseUser.getCurrentUser());
+                        invitationParseQuery.whereEqualTo("receiver", user);
+                        invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
+                            @Override
+                            public void done(final Invitation sentInvitation, ParseException e) {
+                                ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+                                invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
+                                invitationParseQuery.whereEqualTo("inviter", user);
+                                invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
+                                    @Override
+                                    public void done(Invitation receivedInvitation, ParseException e) {
+                                        if (receivedInvitation == null & receivedInvitation == sentInvitation) {
+                                            Invitation invitation = new Invitation();
+                                            invitation.setInviter(ParseUser.getCurrentUser());
+                                            invitation.setReceiver(user);
+                                            invitation.setAccepted("sent");
+                                            invitation.saveInBackground();
+                                            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+                                            mfms.logToken(getContext());
+                                            Messaging.sendNotification((String) user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
+                                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                                            query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
+                                                public void done(ParseObject object, ParseException e) {
+                                                    if (e == null) {
+                                                        friendshipGoals = (Award) object;
+                                                        af.queryAward(friendshipGoals, false, true, getContext());
+                                                    } else {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+
+                            }
+                        });
+
+                    }
+                }
+            });
+        }
+    }
+
+    private void setUpRecyclerViews() {
         rvPosts.setAdapter(postsAdapter);
         rvPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         rvFriends.setAdapter(friendAdapter);
@@ -170,14 +315,14 @@ public class ProfileFragment extends Fragment {
         rvGroups.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvAwards.setAdapter(awardsAdapter);
         rvAwards.setLayoutManager(new GridLayoutManager(getContext(), 4));
+    }
 
-//        drawSettings();
+    private void setUpProfToolbar(View view) {
 
         final Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setLogo(user.get("profileImage").getUrl);
         toolbar.setTitle(user.getUsername());
         if (user.hasSameId(ParseUser.getCurrentUser()))
             setHasOptionsMenu(true);
@@ -186,150 +331,19 @@ public class ProfileFragment extends Fragment {
         ImageView ivPhotoActionBar = view.findViewById(R.id.ivPhotoActionBar);
         tvUserActionBar.setText(user.getUsername());
 
-        int placeholderId = R.drawable.account;
         if (user.get("profileImage") != null) {
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .apply(new RequestOptions().placeholder(placeholderId).error(placeholderId))
                     .into(ivUserIcon);
+
             Glide.with(view.getContext())
                     .load(((ParseFile) user.get("profileImage")).getUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .apply(new RequestOptions().placeholder(placeholderId).error(placeholderId))
                     .into(ivPhotoActionBar);
         }
-        onFriendUpdate();
-        ivUserIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (user.hasSameId(ParseUser.getCurrentUser())) {
-                    Toast.makeText(view.getContext(), "Is current user", Toast.LENGTH_SHORT).show();
-                    mListener.createProfilePicture(view);
-                } else {
-                    final ParseUser currentUser = ParseUser.getCurrentUser();
-                    final ParseRelation<ParseUser> relation = currentUser.getRelation("friends");
-                    ParseQuery<ParseUser> query = relation.getQuery();
-                    query.findInBackground(new FindCallback<ParseUser>() {
-                        @Override
-                        public void done(List<ParseUser> objects, ParseException e) {
-                            boolean found = false;
-                            for (int i = 0; i < objects.size(); i++) {
-                                if (objects.get(i).hasSameId(user)) {
-                                    found = true;
-                                }
-                            }
-                            if (found) {
-                                relation.remove(user);
-                                ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
-                                invitationParseQuery.whereEqualTo("inviter", ParseUser.getCurrentUser());
-                                invitationParseQuery.whereEqualTo("receiver", user);
-                                invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
-                                    @Override
-                                    public void done(Invitation object, ParseException e) {
-                                        if (object != null) {
-                                            object.setAccepted("rejected");
-                                            object.saveInBackground(new SaveCallback() {
-                                                @Override
-                                                public void done(ParseException e) {
-                                                    if (e != null) {
-                                                        e.printStackTrace();
-                                                    } else {
-                                                        currentUser.saveInBackground(new SaveCallback() {
-                                                            @Override
-                                                            public void done(ParseException e) {
-                                                                onFriendUpdate();
-                                                            }
-                                                        });
-
-                                                    }
-                                                }
-                                            });
-
-                                        } else {
-                                            ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
-                                            invitationParseQuery.whereEqualTo("inviter", user);
-                                            invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
-                                            invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
-                                                @Override
-                                                public void done(Invitation object, ParseException e) {
-                                                    if (object != null) {
-                                                        object.setAccepted("rejected");
-                                                        object.saveInBackground(new SaveCallback() {
-                                                            @Override
-                                                            public void done(ParseException e) {
-                                                                if (e != null) {
-                                                                    e.printStackTrace();
-                                                                } else {
-                                                                    currentUser.saveInBackground(new SaveCallback() {
-                                                                        @Override
-                                                                        public void done(ParseException e) {
-                                                                            onFriendUpdate();
-                                                                        }
-                                                                    });
-
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
-                            } else {
-                                ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
-                                invitationParseQuery.whereEqualTo("inviter", ParseUser.getCurrentUser());
-                                invitationParseQuery.whereEqualTo("receiver", user);
-                                invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
-                                    @Override
-                                    public void done(final Invitation sentInvitation, ParseException e) {
-                                        ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
-                                        invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
-                                        invitationParseQuery.whereEqualTo("inviter", user);
-                                        invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
-                                            @Override
-                                            public void done(Invitation receivedInvitation, ParseException e) {
-                                                if (receivedInvitation == null & receivedInvitation == sentInvitation) {
-                                                    Invitation invitation = new Invitation();
-                                                    invitation.setInviter(ParseUser.getCurrentUser());
-                                                    invitation.setReceiver(user);
-                                                    invitation.setAccepted("sent");
-                                                    invitation.saveInBackground();
-                                                    MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
-                                                    mfms.logToken(getContext());
-                                                    Messaging.sendNotification((String) user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
-                                                    ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
-                                                    query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
-                                                        public void done(ParseObject object, ParseException e) {
-                                                            if (e == null) {
-                                                                friendshipGoals = (Award) object;
-                                                                af.queryAward(friendshipGoals, false, true, getContext());
-                                                            } else {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        });
-
-                                    }
-                                });
-
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
-        ivServicePoints.setColorFilter(getResources().getColor(R.color.o9));
-        ivGetTogetherPoints.setColorFilter(getResources().getColor(R.color.o4));
-        ivFitnessPoints.setColorFilter(getResources().getColor(R.color.orange));
-        tvServicePoints.setText(Integer.toString(user.getInt("servicePoints")));
-        tvGetTogetherPoints.setText(Integer.toString(user.getInt("getTogetherPoints")));
-        tvFitnessPoints.setText(Integer.toString(user.getInt("fitnessPoints")));
     }
 
     @Override
@@ -379,13 +393,13 @@ public class ProfileFragment extends Fragment {
                                 if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("rejected")) {
                                         toRemove.add(objects.get(i).getReceiver());
-                                    } else {
+                                    } else if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("accepted")) {
                                         toAdd.add(objects.get(i).getReceiver());
                                     }
                                 } else if (objects.get(i).getReceiver() != null && objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted().equals("rejected")) {
                                         toRemove.add(objects.get(i).getInviter());
-                                    } else {
+                                    } else if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("accepted")) {
                                         toAdd.add(objects.get(i).getInviter());
                                     }
                                 }
