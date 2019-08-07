@@ -29,6 +29,7 @@ import com.example.bettertogether.ResultsAdapter;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
+import com.example.bettertogether.models.Membership;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -108,6 +109,7 @@ public class DiscoveryFragment extends Fragment {
     private void queryGroups(Category cat) {
         ParseQuery<CatMembership> query = new ParseQuery<CatMembership>(CatMembership.class);
         query.include("group");
+        query.addDescendingOrder("createdAt");
         query.whereEqualTo("category", cat);
         query.setLimit(10);
         query.findInBackground(new FindCallback<CatMembership>() {
