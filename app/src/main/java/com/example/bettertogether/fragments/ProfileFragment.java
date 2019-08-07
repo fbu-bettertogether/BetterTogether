@@ -393,13 +393,13 @@ public class ProfileFragment extends Fragment {
                                 if (objects.get(i).getInviter().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("rejected")) {
                                         toRemove.add(objects.get(i).getReceiver());
-                                    } else {
+                                    } else if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("accepted")) {
                                         toAdd.add(objects.get(i).getReceiver());
                                     }
                                 } else if (objects.get(i).getReceiver() != null && objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted().equals("rejected")) {
                                         toRemove.add(objects.get(i).getInviter());
-                                    } else {
+                                    } else if (objects.get(i).getAccepted() != null && objects.get(i).getAccepted().equals("accepted")) {
                                         toAdd.add(objects.get(i).getInviter());
                                     }
                                 }
