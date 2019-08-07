@@ -211,6 +211,7 @@ public class AwardFragment extends Fragment {
         if (userAward.getNumCompleted() == userAward.getNumRequired()) {
             userAward.setIfAchieved(true);
             showAlert("Congrats!", "You have received a new award: "+ awd.get("name") + ". Please check your trophy case on profile page.", context);
+            userAward.saveInBackground();
             return;
         }
         userAward.saveInBackground();
