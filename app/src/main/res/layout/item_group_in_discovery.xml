@@ -10,7 +10,7 @@
     android:layout_marginBottom="8dp"
     android:clickable="true"
     card_view:cardCornerRadius="8dp"
-    card_view:cardElevation="8dp">
+    card_view:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="250dp"
@@ -38,7 +38,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="Group Name"
-            android:typeface="serif"
+            android:fontFamily="sans-serif"
             android:textColor="@color/darkGrey"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:textColor="@color/darkGrey"
-            android:typeface="serif"
+            android:fontFamily="sans-serif"
             android:text="0 members"
             card_view:layout_constraintBottom_toBottomOf="@+id/tvGroupName"
             card_view:layout_constraintEnd_toEndOf="parent"

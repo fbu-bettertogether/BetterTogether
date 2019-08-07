@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Category Name"
-        android:typeface="serif"
+        android:fontFamily="sans-serif"
         android:textSize="26dp"
         android:textColor="@color/o4"
         android:textStyle="bold"

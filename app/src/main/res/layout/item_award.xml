@@ -24,7 +24,7 @@
         android:textAlignment="center"
         android:textSize="12dp"
         android:textStyle="bold|italic"
-        android:typeface="serif"
+        android:fontFamily="sans-serif"
         app:layout_constraintEnd_toEndOf="@+id/ivAwardImage"
         app:layout_constraintStart_toStartOf="@+id/ivAwardImage"
         app:layout_constraintTop_toBottomOf="@id/ivAwardImage" />
