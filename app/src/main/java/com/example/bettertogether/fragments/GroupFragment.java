@@ -253,8 +253,8 @@ public class GroupFragment extends Fragment {
                     notInGroupOptions();
                 } else {
                     setUpCreatePost(view);
+                    inGroup = true;
                     if (group.getIsActive()) {
-                        inGroup = true;
                         currMem = objects.get(0);
                         numCheckIns = currMem.getNumCheckIns();
                         configChart(false);
