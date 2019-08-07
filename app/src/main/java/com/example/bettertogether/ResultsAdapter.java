@@ -101,6 +101,7 @@ public class ResultsAdapter extends RecyclerView.Adapter<ResultsAdapter.ViewHold
             } else if (object.getClassName().equals("_User")) {
                 ParseUser user = (ParseUser) object;
                 tvGroupName.setText(user.getUsername());
+                tvDescription.setText("");
                 if (user.get("profileImage") != null) {
                     Glide.with(context)
                             .load(((ParseFile) user.get("profileImage")).getUrl())
