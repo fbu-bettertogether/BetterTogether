@@ -212,7 +212,7 @@ public class GroupFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         btnCheckIn = view.findViewById(R.id.btnCheckIn);
         btnCheckIn.setVisibility(View.INVISIBLE);
@@ -236,7 +236,6 @@ public class GroupFragment extends Fragment {
         rvChecks = view.findViewById(R.id.rvChecks);
 
         setUpToolbar(view);
-        setUpCreatePost(view);
         setUpRelativeDates();
         doubleCheckNumCheckIns();
 
@@ -253,8 +252,9 @@ public class GroupFragment extends Fragment {
                     // user is not in group
                     notInGroupOptions();
                 } else {
+                    setUpCreatePost(view);
+                    inGroup = true;
                     if (group.getIsActive()) {
-                        inGroup = true;
                         currMem = objects.get(0);
                         numCheckIns = currMem.getNumCheckIns();
                         configChart(false);
@@ -319,6 +319,9 @@ public class GroupFragment extends Fragment {
     }
 
     private void notInGroupOptions() {
+        shrinkChart(chart);
+        tvCreatePost.setVisibility(View.INVISIBLE);
+        ivProfPic.setVisibility(View.INVISIBLE);
         if (group.getPrivacy().equals("public") && nowBeforeStart) {
             ParseQuery<Invitation> query = new ParseQuery<Invitation>("Invitation");
             query.whereEqualTo("receiver", ParseUser.getCurrentUser());
@@ -327,9 +330,11 @@ public class GroupFragment extends Fragment {
                 @Override
                 public void done(Invitation object, ParseException e) {
                     if (object != null) {
-                        btnCheckIn.setText("Request Pending");
+                        textInsteadOfBtn("Request Pending");
+                        setHelpMessage("request pending");
                     } else {
-                        btnCheckIn.setText("Click to Join");
+                        textInsteadOfBtn("You are not in this group");
+                        setHelpMessage("join group");
                         btnCheckIn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -339,7 +344,7 @@ public class GroupFragment extends Fragment {
                                 invitation.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {
-                                        btnCheckIn.setText("Request Pending");
+                                        textInsteadOfBtn("Request Pending");
                                     }
                                 });
 
@@ -349,8 +354,7 @@ public class GroupFragment extends Fragment {
                 }
             });
         } else {
-            btnCheckIn.setText("Group is Unavailable");
-            shrinkChart(chart);
+            textInsteadOfBtn("Group is Unavailable");
         }
     }
 
@@ -829,6 +833,36 @@ public class GroupFragment extends Fragment {
                             builder3.show();
                             break;
 
+                        case "join group":
+                            AlertDialog.Builder builder4 = new AlertDialog.Builder(getActivity());
+                            builder4.setTitle("You are not currently in this group");
+                            builder4.setMessage("It is a public group, and it hasn't started yet, so you can join!");
+                            builder4.setPositiveButton("join group", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Invitation invitation = new Invitation();
+                                    invitation.setGroup(group);
+                                    invitation.setReceiver(ParseUser.getCurrentUser());
+                                    invitation.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            textInsteadOfBtn("Request Pending");
+                                            setHelpMessage("request pending");
+                                        }
+                                    });
+                                }
+                            });
+
+                            builder4.show();
+                            break;
+
+                        case "request pending":
+                            AlertDialog.Builder builder5 = new AlertDialog.Builder(getActivity());
+                            builder5.setTitle("You're request to join this group is still pending");
+                            builder5.setMessage("Check back later!");
+                            builder5.show();
+                            break;
+
                         default:
                             break;
                 }
@@ -975,12 +1009,11 @@ public class GroupFragment extends Fragment {
     }
 
     private void checkInCelebration(int currWeekCheckIns) {
+        group.setShowCheckInReminderBadge(false);
         if (currWeekCheckIns == group.getFrequency() - 1) {
             // final check-in for the week
-            tvTimer.setText("Done for the week!");
-            group.setShowCheckInReminderBadge(false);
+            textInsteadOfBtn("Done for the week!");
             setHelpMessage("done for week");
-            tvTimer.setVisibility(View.VISIBLE);
             viewKonfetti.build()
                     .addColors(Color.RED, getResources().getColor(R.color.white), getResources().getColor(R.color.gold), getResources().getColor(R.color.colorPrimary))
                     .setDirection(0.0, 359.0)
@@ -994,9 +1027,7 @@ public class GroupFragment extends Fragment {
 
         } else {
             setHelpMessage("already checked-in");
-            group.setShowCheckInReminderBadge(false);
-            tvTimer.setText("Checked-in for the day!");
-            tvTimer.setVisibility(View.VISIBLE);
+            textInsteadOfBtn("Checked-in for the day!");
             viewKonfetti.build()
                     .addColors(Color.YELLOW, Color.GREEN, Color.MAGENTA)
                     .setDirection(0.0, 359.0)
