@@ -35,7 +35,7 @@
             android:paddingLeft="5dp"
             android:layout_marginLeft="4dp"
             android:text="TextView"
-            android:typeface="serif"
+            android:fontFamily="sans-serif"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
             card_view:layout_constraintTop_toTopOf="parent" />
 
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="5dp"
             android:text="TextView"
-            android:typeface="serif"
+            android:fontFamily="sans-serif"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="8dp"
             card_view:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +64,7 @@
             android:layout_marginBottom="8dp"
             android:text="TextView"
             android:textColor="@color/gray"
-            android:typeface="serif"
+            android:fontFamily="sans-serif"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintStart_toStartOf="@+id/tvBody"
             card_view:layout_constraintTop_toBottomOf="@+id/ivMedia" />
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="0"
-            android:typeface="serif"
+            android:fontFamily="sans-serif"
             card_view:layout_constraintBottom_toBottomOf="@+id/ivLike"
             card_view:layout_constraintEnd_toStartOf="@+id/ivLike"
             card_view:layout_constraintTop_toTopOf="@+id/ivLike" />

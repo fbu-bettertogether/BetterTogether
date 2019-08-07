@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:textSize="28dp"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.048"
@@ -119,7 +119,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 android:text="0"
                 android:textSize="24dp"
                 app:layout_constraintEnd_toEndOf="@+id/ivFitnessPoints"
@@ -167,7 +167,7 @@
                 android:layout_height="32dp"
                 android:text="0"
                 android:textSize="24dp"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 android:textStyle="normal"
                 app:layout_constraintBottom_toBottomOf="@+id/tvGetTogetherPoints"
                 app:layout_constraintEnd_toEndOf="@+id/ivServicePoints"
@@ -203,7 +203,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Groups"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divNameGroups"
                 android:padding="8dp"/>
@@ -236,7 +236,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Friends"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divGroupsFriends"
                 android:padding="8dp"/>
@@ -269,7 +269,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Awards"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divFriendsAwards"
                 android:padding="8dp"/>
@@ -302,7 +302,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Posts"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divAwardsPosts"
                 android:padding="8dp"/>
@@ -321,7 +321,7 @@
 
             <TextView
                 android:id="@+id/tvNumGroups"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/gray"
@@ -334,7 +334,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/gray"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 app:layout_constraintBottom_toTopOf="@+id/divider8"
                 app:layout_constraintStart_toEndOf="@+id/tvFriendsLabel"
                 app:layout_constraintTop_toBottomOf="@+id/divGroupsFriends" />
@@ -344,7 +344,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/gray"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 app:layout_constraintBottom_toTopOf="@+id/divider9"
                 app:layout_constraintStart_toEndOf="@+id/tvAwardsLabel"
                 app:layout_constraintTop_toBottomOf="@+id/divFriendsAwards" />
@@ -354,7 +354,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/gray"
-                android:typeface="serif"
+                android:fontFamily="sans-serif"
                 app:layout_constraintBottom_toTopOf="@+id/divider10"
                 app:layout_constraintStart_toEndOf="@+id/tvPostsLabel"
                 app:layout_constraintTop_toBottomOf="@+id/divAwardsPosts" />

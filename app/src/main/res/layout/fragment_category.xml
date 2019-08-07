@@ -16,7 +16,7 @@
         android:textColor="@color/orange"
         android:textSize="26dp"
         android:textStyle="bold"
-        android:typeface="serif"
+        android:fontFamily="sans-serif"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,7 +31,7 @@
         android:textColor="@color/quantum_white_text"
         android:textSize="10dp"
         android:textStyle="bold"
-        android:typeface="serif"
+        android:fontFamily="sans-serif"
         app:layout_constraintBottom_toBottomOf="@+id/tvCategoryName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
