@@ -784,6 +784,11 @@ public class GroupFragment extends Fragment {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle("Get to a valid location");
                         builder.setMessage("This group requires you to be in a specific type of location to check in!");
+                        try {
+                            checkPlace(category.getLocationTypesList());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         builder.show();
                         break;
 
