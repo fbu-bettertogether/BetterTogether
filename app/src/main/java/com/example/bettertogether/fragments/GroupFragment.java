@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +32,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -49,7 +47,6 @@ import com.example.bettertogether.AlarmReceiver;
 import com.example.bettertogether.CheckAdapter;
 import com.example.bettertogether.CreatePostActivity;
 import com.example.bettertogether.Formatter;
-import com.example.bettertogether.FriendAdapter;
 import com.example.bettertogether.HomeActivity;
 import com.example.bettertogether.InvitationActivity;
 import com.example.bettertogether.Messaging;
@@ -57,7 +54,6 @@ import com.example.bettertogether.MyFirebaseMessagingService;
 import com.example.bettertogether.PostsAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.Award;
-import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Invitation;
@@ -520,7 +516,7 @@ public class GroupFragment extends Fragment {
                 }
             }
             else {
-                // if it is null, do something like displaying error and coming back to the menu activity
+                Log.e("saving location", "location is null");
             }
         }
     }
@@ -560,7 +556,6 @@ public class GroupFragment extends Fragment {
                     e.printStackTrace();
                     return;
                 } else {
-
                     List<PieEntry> entries = getChartEntries(objects);
                     // add to pie chart
                     PieDataSet dataSet = new PieDataSet(entries, "group stats");
@@ -773,7 +768,7 @@ public class GroupFragment extends Fragment {
         }
     }
 
-    // sets help message, place is true if the message pertains to place, otherwise is proximity issue
+    // sets help message if button is not shown or disabled, type specifies reason
     private void setHelpMessage(final String type) {
         ivHelp.setVisibility(View.VISIBLE);
         ivHelp.setOnClickListener(new View.OnClickListener() {
@@ -891,10 +886,9 @@ public class GroupFragment extends Fragment {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        doAlerts(currWeekCheckIns);
+                        checkInPostAlert(currWeekCheckIns);
                     }
                 }, 6000);
-
                 updateAwards();
             }
         });
@@ -1017,7 +1011,7 @@ public class GroupFragment extends Fragment {
     }
 
 
-    private void doAlerts(final int currWeekCheckIns) {
+    private void checkInPostAlert(final int currWeekCheckIns) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("You've checked in!");
         builder.setMessage("What do you want to do next?");
