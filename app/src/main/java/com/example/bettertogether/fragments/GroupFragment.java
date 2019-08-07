@@ -490,6 +490,7 @@ public class GroupFragment extends Fragment {
                     setHelpMessage("proximity");
                     drawButton(false);
                 } else {
+                    ivHelp.setVisibility(View.INVISIBLE);
                     drawButton(true);
                 }
             }
@@ -885,6 +886,7 @@ public class GroupFragment extends Fragment {
             return;
         }
 
+        ivHelp.setVisibility(View.INVISIBLE);
         btnCheckIn.setEnabled(true);
         btnCheckIn.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
