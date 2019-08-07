@@ -234,6 +234,14 @@ public class ProfileFragment extends Fragment {
                                                 public void done(ParseException e) {
                                                     if (e != null) {
                                                         e.printStackTrace();
+                                                    } else {
+                                                        currentUser.saveInBackground(new SaveCallback() {
+                                                            @Override
+                                                            public void done(ParseException e) {
+                                                                onFriendUpdate();
+                                                            }
+                                                        });
+
                                                     }
                                                 }
                                             });
@@ -252,6 +260,14 @@ public class ProfileFragment extends Fragment {
                                                             public void done(ParseException e) {
                                                                 if (e != null) {
                                                                     e.printStackTrace();
+                                                                } else {
+                                                                    currentUser.saveInBackground(new SaveCallback() {
+                                                                        @Override
+                                                                        public void done(ParseException e) {
+                                                                            onFriendUpdate();
+                                                                        }
+                                                                    });
+
                                                                 }
                                                             }
                                                         });
@@ -267,38 +283,41 @@ public class ProfileFragment extends Fragment {
                                 invitationParseQuery.whereEqualTo("receiver", user);
                                 invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
                                     @Override
-                                    public void done(Invitation object, ParseException e) {
-                                        if (object == null) {
-                                            Invitation invitation = new Invitation();
-                                            invitation.setInviter(ParseUser.getCurrentUser());
-                                            invitation.setReceiver(user);
-                                            invitation.setAccepted("sent");
-                                            invitation.saveInBackground();
-                                            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
-                                            mfms.logToken(getContext());
-                                            Messaging.sendNotification((String) user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
-                                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
-                                            query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
-                                                public void done(ParseObject object, ParseException e) {
-                                                    if (e == null) {
-                                                        friendshipGoals = (Award) object;
-                                                        af.queryAward(friendshipGoals, false, true, getContext());
-                                                    } else {
-                                                        e.printStackTrace();
-                                                    }
+                                    public void done(final Invitation sentInvitation, ParseException e) {
+                                        ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+                                        invitationParseQuery.whereEqualTo("receiver", ParseUser.getCurrentUser());
+                                        invitationParseQuery.whereEqualTo("inviter", user);
+                                        invitationParseQuery.getFirstInBackground(new GetCallback<Invitation>() {
+                                            @Override
+                                            public void done(Invitation receivedInvitation, ParseException e) {
+                                                if (receivedInvitation == null & receivedInvitation == sentInvitation) {
+                                                    Invitation invitation = new Invitation();
+                                                    invitation.setInviter(ParseUser.getCurrentUser());
+                                                    invitation.setReceiver(user);
+                                                    invitation.setAccepted("sent");
+                                                    invitation.saveInBackground();
+                                                    MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+                                                    mfms.logToken(getContext());
+                                                    Messaging.sendNotification((String) user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
+                                                    ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                                                    query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
+                                                        public void done(ParseObject object, ParseException e) {
+                                                            if (e == null) {
+                                                                friendshipGoals = (Award) object;
+                                                                af.queryAward(friendshipGoals, false, true, getContext());
+                                                            } else {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+                                                    });
                                                 }
-                                            });
-                                        }
+                                            }
+                                        });
+
                                     }
                                 });
 
                             }
-                            currentUser.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                onFriendUpdate();
-                                }
-                            });
                         }
                     });
                 }
@@ -342,6 +361,10 @@ public class ProfileFragment extends Fragment {
     public void onFriendUpdate() {
         final ParseRelation relation = ParseUser.getCurrentUser().getRelation("friends");
         ParseQuery<Invitation> invitationParseQuery = new ParseQuery<Invitation>("Invitation");
+        invitationParseQuery.include("inviter");
+        invitationParseQuery.include("receiver");
+        invitationParseQuery.include("group");
+
         invitationParseQuery.findInBackground(new FindCallback<Invitation>() {
             @Override
             public void done(List<Invitation> objects, ParseException e) {
@@ -361,7 +384,7 @@ public class ProfileFragment extends Fragment {
                                     }
                                 } else if (objects.get(i).getReceiver() != null && objects.get(i).getReceiver().hasSameId(ParseUser.getCurrentUser())) {
                                     if (objects.get(i).getAccepted().equals("rejected")) {
-                                        toRemove.remove(objects.get(i).getInviter());
+                                        toRemove.add(objects.get(i).getInviter());
                                     } else {
                                         toAdd.add(objects.get(i).getInviter());
                                     }

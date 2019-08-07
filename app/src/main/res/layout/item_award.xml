@@ -21,10 +21,12 @@
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:text="Award"
-        android:typeface="serif"
+        android:textAlignment="center"
+        android:textSize="12dp"
         android:textStyle="bold|italic"
-        app:layout_constraintStart_toStartOf="@+id/ivAwardImage"
+        android:typeface="serif"
         app:layout_constraintEnd_toEndOf="@+id/ivAwardImage"
+        app:layout_constraintStart_toStartOf="@+id/ivAwardImage"
         app:layout_constraintTop_toBottomOf="@id/ivAwardImage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
