@@ -4,8 +4,24 @@
     <item
         android:id="@+id/action_search"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="Search"
+        android:textColorHint="#FFFFFF"
+        android:textCursorDrawable="@null"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:title=""
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/action_create_group"
+        android:icon="@drawable/plus"
+        android:orderInCategory="100"
+        android:title="Create Group"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_show_leaderboard"
+        android:icon="@drawable/chart_bar"
+        android:orderInCategory="100"
+        android:title="Show leaderboard"
         app:showAsAction="always" />
 
 
