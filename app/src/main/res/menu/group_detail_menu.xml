@@ -29,7 +29,6 @@
     <item
         android:id="@+id/action_more"
         android:title="info"
-        android:icon="@drawable/baseline_chevron_right_black_18dp"
-        app:iconTint="@color/white"
+        android:icon="@drawable/baseline_info_white_18dp"
         app:showAsAction="ifRoom" />
 </menu>
