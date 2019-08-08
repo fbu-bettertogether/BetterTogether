@@ -440,6 +440,7 @@ public class ProfileFragment extends Fragment {
         parseQuery.whereEqualTo("user", user);
         parseQuery.setLimit(25);
         parseQuery.include("user");
+        parseQuery.include("group");
 
         parseQuery.findInBackground(new FindCallback<Post>() {
             @Override

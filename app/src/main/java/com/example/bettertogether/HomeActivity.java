@@ -215,7 +215,7 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                             });
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            Messaging.sendNotification((String) invitation.getReceiver().get("deviceId"), invitation.getReceiver().getUsername() + " just accepted your request to be in their group!");
+                            Messaging.sendNotification((String) invitation.getReceiver().get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just accepted your request to be in their group!");
                         }
                         invitation.setAccepted("accepted");
                         invitation.saveInBackground(new SaveCallback() {
