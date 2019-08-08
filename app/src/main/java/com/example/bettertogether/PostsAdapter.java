@@ -73,7 +73,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
         if (user.getUsername().equals("Check In Bot")) {
             holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.post_border));
+//            holder.ivCheckPost.setColorFilter(R.color.colorPrimary);
+            holder.ivCheckPost.setVisibility(View.VISIBLE);
         } else {
+            holder.ivCheckPost.setVisibility(View.INVISIBLE);
             holder.itemView.setBackgroundColor(Color.WHITE);
         }
 
@@ -176,6 +179,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public ImageView ivMedia;
         public TextView tvNumLikes;
         public TextView tvGroupName;
+        public ImageView ivCheckPost;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -189,6 +193,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             btnLike = (ImageButton) itemView.findViewById(R.id.ivLike);
             ivMedia = (ImageView) itemView.findViewById(R.id.ivMedia);
             tvGroupName = (TextView) itemView.findViewById(R.id.tvGroupName);
+            ivCheckPost = (ImageView) itemView.findViewById(R.id.ivCheckPost);
         }
     }
 

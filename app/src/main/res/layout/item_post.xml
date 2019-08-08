@@ -43,17 +43,17 @@
             android:id="@+id/tvBody"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
-            android:text="TextView"
-            android:fontFamily="sans-serif"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="8dp"
+            android:autoLink="all"
+            android:fontFamily="sans-serif"
+            android:paddingLeft="5dp"
+            android:text="TextView"
+            card_view:layout_constraintBottom_toTopOf="@id/ivMedia"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintHorizontal_bias="0.0"
             card_view:layout_constraintStart_toEndOf="@+id/ivProfileImage"
-            card_view:layout_constraintTop_toBottomOf="@+id/tvUsername"
-            card_view:layout_constraintBottom_toTopOf="@id/ivMedia"
-            android:autoLink="all"/>
+            card_view:layout_constraintTop_toBottomOf="@+id/tvUsername" />
 
         <TextView
             android:id="@+id/tvTime"
@@ -113,6 +113,16 @@
             android:text="TextView"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivCheckPost"
+            android:layout_width="21dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="12dp"
+            android:tint="@color/colorPrimary"
+            card_view:layout_constraintEnd_toStartOf="@+id/tvBody"
+            card_view:layout_constraintTop_toTopOf="@+id/tvBody"
+            card_view:srcCompat="@drawable/check_circle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
