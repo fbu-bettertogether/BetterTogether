@@ -19,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -321,8 +320,6 @@ public class ProfileFragment extends Fragment {
 
         final Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setTitle(user.getUsername());
         if (user.hasSameId(ParseUser.getCurrentUser()))
             setHasOptionsMenu(true);
@@ -355,11 +352,6 @@ public class ProfileFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                FragmentManager fragmentManager = ((AppCompatActivity) getContext()).getSupportFragmentManager();
-                GroupsFragment fragment = new GroupsFragment();
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-                break;
             case R.id.action_prof_logout:
                 ParseUser.logOut();
                 Intent intent = new Intent(getContext(), MainActivity.class);

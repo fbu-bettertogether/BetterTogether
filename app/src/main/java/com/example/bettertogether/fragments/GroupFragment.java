@@ -464,8 +464,6 @@ public class GroupFragment extends Fragment {
     private void setUpToolbar(View view) {
         final Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
         setHasOptionsMenu(true);
