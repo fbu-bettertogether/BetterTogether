@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.ProfileFragment;
+import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Like;
 import com.example.bettertogether.models.Post;
 import com.parse.DeleteCallback;
@@ -61,6 +62,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.tvUsername.setText(user.getString("username"));
         holder.tvBody.setText(post.getDescription());
         holder.tvTime.setText(post.getRelativeTimeAgo(post.getCreatedAt()));
+        Group group = (Group) post.getGroup();
+        holder.tvGroupName.setText(group.getName());
 
         if (user.getUsername().equals("Check In Bot")) {
             holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.post_border));
@@ -166,6 +169,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public ImageButton btnLike;
         public ImageView ivMedia;
         public TextView tvNumLikes;
+        public TextView tvGroupName;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -178,6 +182,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvNumLikes = (TextView) itemView.findViewById(R.id.tvNumLikes);
             btnLike = (ImageButton) itemView.findViewById(R.id.ivLike);
             ivMedia = (ImageView) itemView.findViewById(R.id.ivMedia);
+            tvGroupName = (TextView) itemView.findViewById(R.id.tvGroupName);
         }
     }
 

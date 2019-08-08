@@ -700,6 +700,7 @@ public class GroupFragment extends Fragment {
         ParseQuery<ParseObject> parseQuery = group.getRelation("posts").getQuery();
         parseQuery.addDescendingOrder("createdAt");
         parseQuery.include("user");
+        parseQuery.include("group");
         parseQuery.setLimit(25);
 
         parseQuery.findInBackground(new FindCallback<ParseObject>() {
