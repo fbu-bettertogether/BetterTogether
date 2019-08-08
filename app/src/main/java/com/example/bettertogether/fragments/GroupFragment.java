@@ -134,7 +134,6 @@ public class GroupFragment extends Fragment {
     private Button btnCheckIn;
     private TextView tvDate;
     private TextView tvTimer;
-    private ImageView ivHelp;
     private TextView tvCreatePost;
     private ImageView ivProfPic;
 
@@ -227,9 +226,6 @@ public class GroupFragment extends Fragment {
         tvCreatePost = view.findViewById(R.id.tvCreatePost);
         ivProfPic = view.findViewById(R.id.ivProfPic);
         viewKonfetti = view.findViewById(R.id.viewKonfetti);
-        ivHelp = view.findViewById(R.id.ivHelp);
-        ivHelp.setColorFilter(getResources().getColor(R.color.gray));
-        ivHelp.setVisibility(View.INVISIBLE);
         // setting up recycler view of posts
         rvTimeline = view.findViewById(R.id.rvTimeline);
         mPosts = new ArrayList<>();
@@ -272,12 +268,15 @@ public class GroupFragment extends Fragment {
                             group.setShowCheckInReminderBadge(false);
                         }
 
+                        if (category.getName().equals("Get-Togethers")) {
+                            saveCurrentUserLocation();
+                        }
+
                         if (hasCheckInLeft) {
                             if (hasCheckedInToday()) {
                                 textInsteadOfBtn("Checked-in today!");
                                 setHelpMessage("already checked-in");
                             } else if (category.getName().equals("Get-Togethers")) {
-                                saveCurrentUserLocation();
                                 checkProximity();
                             } else {
                                 try {
@@ -468,8 +467,6 @@ public class GroupFragment extends Fragment {
     private void setUpToolbar(View view) {
         final Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
         CollapsingToolbarLayout collapsingToolbar = view.findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(group.getName());
         setHasOptionsMenu(true);
@@ -780,16 +777,37 @@ public class GroupFragment extends Fragment {
 
     // sets help message if button is not shown or disabled, type specifies reason
     private void setHelpMessage(final String type) {
-        ivHelp.setVisibility(View.VISIBLE);
-        ivHelp.setOnClickListener(new View.OnClickListener() {
+        btnCheckIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 switch (type) {
 
                     case "place":
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle("Get to a valid location");
-                        builder.setMessage("This group requires you to be in a specific type of location to check in!");
+                        if (category.getName().equals("Fitness")) {
+                            builder.setMessage("This group requires you to be in a gym or fitness center to check in!");
+                        } else {
+                            builder.setMessage("This group requires you to be in a service location to check in!");
+                        }
+                        builder.setPositiveButton("I'm there!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                try {
+                                    checkPlace(category.getLocationTypesList());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        builder.setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+
                         builder.show();
                         break;
 
@@ -881,7 +899,6 @@ public class GroupFragment extends Fragment {
         btnCheckIn.setVisibility(View.VISIBLE);
 
         if (!enabled) {
-            btnCheckIn.setEnabled(false);
             btnCheckIn.setBackgroundColor(getResources().getColor(R.color.gray));
             return;
         }

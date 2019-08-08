@@ -171,17 +171,22 @@ public class LeaderboardFragment extends Fragment {
 
     private void drawGraph(Map<String, Integer> groupsToPoints, Map<String, Group> idsToGroups) {
         ArrayList<Bitmap> imageList = new ArrayList<>();
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground);
-
         int i = 0;
         int limit = 2;
         final ArrayList<String> xLabels = new ArrayList<>();
         ArrayList<BarEntry> entries = new ArrayList<>();
+        ArrayList<BarEntry> imageEntries = new ArrayList<>();
         for (Map.Entry<String, Group> element : idsToGroups.entrySet()) {
             if (2 < groupsToPoints.get(element.getKey())) {
-                entries.add(new BarEntry(i++, groupsToPoints.get(element.getKey())));
-                xLabels.add(element.getValue().getName());
-                imageList.add(bitmap);
+                try {
+                    byte[] data = element.getValue().getIcon().getData();
+                    entries.add(new BarEntry(i, groupsToPoints.get(element.getKey())));
+                    xLabels.add(element.getValue().getName());
+                    imageList.add(BitmapFactory.decodeByteArray(data, 0, data.length));
+                    i++;
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         }
         BarDataSet dataSet = new BarDataSet(entries, "Groups");
@@ -216,14 +221,19 @@ public class LeaderboardFragment extends Fragment {
         int i = 0;
         final ArrayList<String> xLabels = new ArrayList<>();
         ArrayList<BarEntry> entries = new ArrayList<>();
+        ArrayList<BarEntry> imageEntries = new ArrayList<>();
         for (Map.Entry<String, Group> element : idsToGroups.entrySet()) {
             if (element.getValue().getCategory().equals(categoryName)) {
                 if (2 < groupsToPoints.get(element.getKey())) {
-
                     entries.add(new BarEntry(i, groupsToPoints.get(element.getKey())));
-                    xLabels.add(element.getValue().getName());
-                    imageList.add(bitmap);
-                    i++;
+                    try {
+                        byte[] data = element.getValue().getIcon().getData();
+                        xLabels.add(element.getValue().getName());
+                        imageList.add(bitmap);
+                        i++;
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -233,7 +243,7 @@ public class LeaderboardFragment extends Fragment {
             @Override
             public String getFormattedValue(float value) {
                 if (xLabels.size() > value) {
-                    return xLabels.get((int) value);
+                    return xLabels.get((int) value).substring(0, xLabels.get((int) value).length() / 4);
                 } else return "";
             }
         });
@@ -246,6 +256,7 @@ public class LeaderboardFragment extends Fragment {
         dataSet.setColors(colors);
         BarData data = new BarData(dataSet);
         chart.setData(data);
+        chart.setDrawValueAboveBar(true);
         chart.setDrawBarShadow(true);
         chart.getDescription().setEnabled(false);
         chart.animateXY(200, 200);

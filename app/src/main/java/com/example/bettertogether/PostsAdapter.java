@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bettertogether.fragments.ProfileFragment;
+import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Like;
 import com.example.bettertogether.models.Post;
 import com.parse.DeleteCallback;
@@ -61,10 +62,22 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.tvUsername.setText(user.getString("username"));
         holder.tvBody.setText(post.getDescription());
         holder.tvTime.setText(post.getRelativeTimeAgo(post.getCreatedAt()));
+        Group group = (Group) post.getGroup();
+        if (group.has("name")) {
+            holder.tvGroupName.setVisibility(View.VISIBLE);
+            holder.tvGroupName.setText(group.getName());
+        } else {
+            holder.tvGroupName.setVisibility(View.INVISIBLE);
+        }
+
 
         if (user.getUsername().equals("Check In Bot")) {
-            holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.post_border));
+//            holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.post_border));
+//            holder.ivCheckPost.setColorFilter(R.color.colorPrimary);
+            holder.ivCheckPost.setVisibility(View.VISIBLE);
+            holder.tvGroupName.setVisibility(View.INVISIBLE);
         } else {
+            holder.ivCheckPost.setVisibility(View.INVISIBLE);
             holder.itemView.setBackgroundColor(Color.WHITE);
         }
 
@@ -112,7 +125,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
                     }
                 }
-                holder.tvNumLikes.setText(String.valueOf(objects.size()));
+
+                if (objects.size() > 0) {
+                    holder.tvNumLikes.setVisibility(View.VISIBLE);
+                    holder.tvNumLikes.setText(String.valueOf(objects.size()));
+                } else {
+                    holder.tvNumLikes.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -130,7 +149,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 @Override
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
-                                    holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) - 1));
+                                    if (Integer.parseInt(holder.tvNumLikes.getText().toString()) == 1) {
+                                        holder.tvNumLikes.setText("0");
+                                        holder.tvNumLikes.setVisibility(View.INVISIBLE);
+                                    } else {
+                                        holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) - 1));
+                                        holder.tvNumLikes.setVisibility(View.VISIBLE);
+                                    }
                                 }
                             });
                         } else {
@@ -142,6 +167,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
                                     holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) + 1));
+                                    holder.tvNumLikes.setVisibility(View.VISIBLE);
                                 }
                             });
 
@@ -166,6 +192,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         public ImageButton btnLike;
         public ImageView ivMedia;
         public TextView tvNumLikes;
+        public TextView tvGroupName;
+        public ImageView ivCheckPost;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -178,6 +206,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvNumLikes = (TextView) itemView.findViewById(R.id.tvNumLikes);
             btnLike = (ImageButton) itemView.findViewById(R.id.ivLike);
             ivMedia = (ImageView) itemView.findViewById(R.id.ivMedia);
+            tvGroupName = (TextView) itemView.findViewById(R.id.tvGroupName);
+            ivCheckPost = (ImageView) itemView.findViewById(R.id.ivCheckPost);
         }
     }
 
