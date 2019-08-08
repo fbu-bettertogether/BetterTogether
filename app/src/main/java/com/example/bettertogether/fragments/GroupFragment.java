@@ -438,12 +438,12 @@ public class GroupFragment extends Fragment {
         }
 
         if (group.getIsActive()) {
-            tvDate.setText(String.format("Active: %d %s left!", time, unit));
+            tvDate.setText(String.format("Active: %d %s left", time, unit));
             correctNumCheckIns = group.getNumWeeks() - weekDiff;
         } else if (nowBeforeStart) {
-            tvDate.setText(String.format("Inactive: starts in %d %s!", time, unit));
+            tvDate.setText(String.format("Inactive: starts in %d %s", time, unit));
         } else {
-            tvDate.setText(String.format("Inactive: completed %d %s ago!", time, unit));
+            tvDate.setText(String.format("Inactive: completed %d %s ago", time, unit));
         }
         tvDate.setTextColor(getResources().getColor(R.color.gray));
     }

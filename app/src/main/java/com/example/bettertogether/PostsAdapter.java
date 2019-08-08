@@ -72,13 +72,10 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
 
 
         if (user.getUsername().equals("Check In Bot")) {
-//            holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.post_border));
-//            holder.ivCheckPost.setColorFilter(R.color.colorPrimary);
             holder.ivCheckPost.setVisibility(View.VISIBLE);
             holder.tvGroupName.setVisibility(View.INVISIBLE);
         } else {
             holder.ivCheckPost.setVisibility(View.INVISIBLE);
-            holder.itemView.setBackgroundColor(Color.WHITE);
         }
 
         ParseFile profileImage = (ParseFile) user.get("profileImage");
