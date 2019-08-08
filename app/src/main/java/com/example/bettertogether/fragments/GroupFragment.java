@@ -340,6 +340,7 @@ public class GroupFragment extends Fragment {
                                 Invitation invitation = new Invitation();
                                 invitation.setGroup(group);
                                 invitation.setReceiver(ParseUser.getCurrentUser());
+                                invitation.setAccepted("sent");
                                 invitation.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(ParseException e) {

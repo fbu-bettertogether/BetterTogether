@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -61,9 +62,6 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         mRecyclerView = (RecyclerView)view.findViewById(R.id.recyclerview_rootview);
-        createGroupBtn = (Button) view.findViewById(R.id.create_group_btn);
-        btnLeaderboard = view.findViewById(R.id.btnLeaderboard);
-        btnShowMore = (Button)view.findViewById(R.id.show_more_btn);
         mLayoutManager = new LinearLayoutManager(getContext(),RecyclerView.VERTICAL,false);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -72,12 +70,6 @@ public class DiscoveryFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
         queryCategories();
-        btnLeaderboard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getFragmentManager().beginTransaction().replace(R.id.flContainer, new LeaderboardFragment()).commit();
-            }
-        });
     }
 
     private void queryCategories() {
@@ -108,6 +100,7 @@ public class DiscoveryFragment extends Fragment {
     private void queryGroups(Category cat) {
         ParseQuery<CatMembership> query = new ParseQuery<CatMembership>(CatMembership.class);
         query.include("group");
+        query.addDescendingOrder("createdAt");
         query.whereEqualTo("category", cat);
         query.setLimit(10);
         query.findInBackground(new FindCallback<CatMembership>() {
@@ -202,7 +195,20 @@ public class DiscoveryFragment extends Fragment {
 
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_create_group:
+                Log.d("DiscoveryFragment", "Go to create new post page from discovery.");
+                Intent i = new Intent(getContext(), MakeNewGroupActivity.class);
+                startActivityForResult(i, REQUEST_CODE);
+                break;
+            case R.id.action_show_leaderboard:
+                getFragmentManager().beginTransaction().replace(R.id.flContainer, new LeaderboardFragment()).commit();
+                break;
+        }
+        return true;
+    }
 
     private void display() {
         mainRecyclerAdapter = new DiscoveryAdapter(listOfListOfItems, getContext());
@@ -272,14 +278,6 @@ public class DiscoveryFragment extends Fragment {
 //				Log.i(LOGTAG,"X = " + dx + " and Y = " + dy);
             }
         });
-        createGroupBtn.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-                Log.d("DiscoveryFragment", "Go to create new post page from discovery.");
-                Intent i = new Intent(getContext(), MakeNewGroupActivity.class);
-                startActivityForResult(i, REQUEST_CODE);
-            }
-        });
     }
 }

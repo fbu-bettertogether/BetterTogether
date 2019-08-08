@@ -196,6 +196,9 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                                     }
                                 }
                             });
+                            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+                            mfms.logToken(getApplicationContext());
+                            Messaging.sendNotification((String) invitation.getInviter().get("deviceId"), invitation.getReceiver().getUsername() + " just accepted your invitation!");
                         } else {
                             Membership membership = new Membership();
                             membership.setUser(invitation.getReceiver());
@@ -210,12 +213,11 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                                     }
                                 }
                             });
-
+                            MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
+                            mfms.logToken(getApplicationContext());
+                            Messaging.sendNotification((String) invitation.getReceiver().get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just accepted your request to be in their group!");
                         }
                         invitation.setAccepted("accepted");
-                        MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
-                        mfms.logToken(getApplicationContext());
-                        Messaging.sendNotification((String) invitation.getInviter().get("deviceId"), invitation.getReceiver().getUsername() + " just accepted your invitation!");
                         invitation.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {

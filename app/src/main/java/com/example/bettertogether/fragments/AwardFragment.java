@@ -175,17 +175,17 @@ public class AwardFragment extends Fragment {
             @Override
             public void done(List<UserAward> objects, ParseException e) {
                 if (e != null) {
-                    Log.e("Querying groups", "error with query");
+                    Log.e("Querying userAwards", "error with query");
                     e.printStackTrace();
                     return;
                 }
                 userAwards = new ArrayList<>();
                 userAwards.addAll(objects);
-                if (checkAward) {
-                    checkAward(newAward, con);
-                }
                 if (setStatus) {
                     setAwardStatus(userAwards);
+                }
+                if (checkAward) {
+                    checkAward(newAward, con);
                 }
             }
         });
