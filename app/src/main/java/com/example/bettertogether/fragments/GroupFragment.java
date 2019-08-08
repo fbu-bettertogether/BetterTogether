@@ -746,7 +746,7 @@ public class GroupFragment extends Fragment {
                         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
                             double likelihood = placeLikelihood.getLikelihood();
                             for (Place.Type type : Objects.requireNonNull(placeLikelihood.getPlace().getTypes())) {
-                                if (types.contains(type.toString()) & likelihood > 0.05) {
+                                if (types.contains(type.toString()) & likelihood > 0.05 || group.getCategory().equals("Fitness")) {
                                     drawButton(true);
                                     return;
                                 } else {
