@@ -19,17 +19,21 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.bettertogether.fragments.AwardFragment;
 import com.example.bettertogether.fragments.DiscoveryFragment;
 import com.example.bettertogether.fragments.GroupsFragment;
 import com.example.bettertogether.fragments.HomeFragment;
 import com.example.bettertogether.fragments.ProfileFragment;
+import com.example.bettertogether.models.Award;
 import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -49,6 +53,9 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
     private String photoFileName = "photo.jpg";
     private File profilePhotoFile;
     private BottomNavigationView bottomNavigationView;
+    private Award friendshipGoals;
+    private AwardFragment af;
+
     public PlacesClient placesClient;
 
     @Override
@@ -57,6 +64,7 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
         setContentView(R.layout.activity_home);
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
+        af = new AwardFragment();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -94,8 +102,6 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
         }
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.action_groups);
-
-
     }
 
     @Override
@@ -171,7 +177,7 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                 int unmaskedRequestCode = requestCode & 0x0000ffff;
                 if (unmaskedRequestCode == INVITATION_REQUEST_CODE || unmaskedRequestCode == GROUP_INVITATION_REQUEST_CODE) {
                     List<Invitation> invitations = data.getParcelableArrayListExtra("taggedInvitations");
-                    for (Invitation invitation : invitations) {
+                    for (final Invitation invitation : invitations) {
                         if (invitation.getGroup() == null) {
                             ParseUser receiver = new ParseUser();
                             ParseUser inviter = new ParseUser();
@@ -198,7 +204,19 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                             });
                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                             mfms.logToken(getApplicationContext());
-                            Messaging.sendNotification((String) invitation.getInviter().get("deviceId"), invitation.getReceiver().getUsername() + " just accepted your invitation!");
+                            Messaging.sendNotification((String) invitation.getInviter().get("deviceId"), invitation.getReceiver().getUsername() + " just accepted your friend request!");
+                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
+                            query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
+                                public void done(ParseObject object, ParseException e) {
+                                    if (e == null) {
+                                        friendshipGoals = (Award) object;
+                                        af.queryAward(friendshipGoals, ParseUser.getCurrentUser(), false, true, getApplicationContext());
+                                        af.queryAward(friendshipGoals, invitation.getInviter(), false, true, getApplicationContext());
+                                    } else {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
                         } else {
                             Membership membership = new Membership();
                             membership.setUser(invitation.getReceiver());
