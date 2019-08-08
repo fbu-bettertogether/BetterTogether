@@ -177,7 +177,7 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                 int unmaskedRequestCode = requestCode & 0x0000ffff;
                 if (unmaskedRequestCode == INVITATION_REQUEST_CODE || unmaskedRequestCode == GROUP_INVITATION_REQUEST_CODE) {
                     List<Invitation> invitations = data.getParcelableArrayListExtra("taggedInvitations");
-                    for (Invitation invitation : invitations) {
+                    for (final Invitation invitation : invitations) {
                         if (invitation.getGroup() == null) {
                             ParseUser receiver = new ParseUser();
                             ParseUser inviter = new ParseUser();
@@ -210,7 +210,8 @@ public class HomeActivity extends AppCompatActivity implements ProfileFragment.O
                                 public void done(ParseObject object, ParseException e) {
                                     if (e == null) {
                                         friendshipGoals = (Award) object;
-                                        af.queryAward(friendshipGoals, false, true, getApplicationContext());
+                                        af.queryAward(friendshipGoals, ParseUser.getCurrentUser(), false, true, getApplicationContext());
+                                        af.queryAward(friendshipGoals, invitation.getInviter(), false, true, getApplicationContext());
                                     } else {
                                         e.printStackTrace();
                                     }

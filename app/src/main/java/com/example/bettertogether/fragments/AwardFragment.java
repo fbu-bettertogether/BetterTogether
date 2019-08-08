@@ -83,7 +83,7 @@ public class AwardFragment extends Fragment {
         if (getArguments() != null) {
             this.award = (Award) getArguments().getParcelable(ARG_AWARD);
         }
-        queryAward(award, true, false, getContext());
+        queryAward(award, user, true, false, getContext());
     }
 
     @Override
@@ -165,7 +165,7 @@ public class AwardFragment extends Fragment {
         }
     }
 
-    public void queryAward(Award awd, final Boolean setStatus, final Boolean checkAward, final Context con) {
+    public void queryAward(Award awd, ParseUser curr, final Boolean setStatus, final Boolean checkAward, final Context con) {
         newAward = awd;
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");

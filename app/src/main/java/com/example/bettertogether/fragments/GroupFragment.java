@@ -935,7 +935,7 @@ public class GroupFragment extends Fragment {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     first = (Award) object;
-                    af.queryAward(first, false, true, getContext());
+                    af.queryAward(first, getCurrentUser(), false, true, getContext());
                 } else {
                     e.printStackTrace();
                 }
@@ -945,7 +945,7 @@ public class GroupFragment extends Fragment {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     oneWeek = (Award) object;
-                    af.queryAward(oneWeek, false, true, getContext());
+                    af.queryAward(oneWeek, getCurrentUser(), false, true, getContext());
                 } else {
                     e.printStackTrace();
                 }
@@ -955,7 +955,7 @@ public class GroupFragment extends Fragment {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     tenacity = (Award) object;
-                    af.queryAward(tenacity, false, true, getContext());
+                    af.queryAward(tenacity, getCurrentUser(), false, true, getContext());
                 } else {
                     e.printStackTrace();
                 }
