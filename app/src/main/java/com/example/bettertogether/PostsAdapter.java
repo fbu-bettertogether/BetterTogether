@@ -63,7 +63,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         holder.tvBody.setText(post.getDescription());
         holder.tvTime.setText(post.getRelativeTimeAgo(post.getCreatedAt()));
         Group group = (Group) post.getGroup();
-        holder.tvGroupName.setText(group.getName());
+        if (group.has("name")) {
+            holder.tvGroupName.setVisibility(View.VISIBLE);
+            holder.tvGroupName.setText(group.getName());
+        } else {
+            holder.tvGroupName.setVisibility(View.INVISIBLE);
+        }
+
 
         if (user.getUsername().equals("Check In Bot")) {
             holder.itemView.setBackground(context.getResources().getDrawable(R.drawable.post_border));
