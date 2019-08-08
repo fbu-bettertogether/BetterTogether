@@ -40,6 +40,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:text="See All"
+        android:textSize="16sp"
         android:textColor="@color/blue"
         app:layout_constraintBottom_toTopOf="@+id/recyclerView_row"
         app:layout_constraintEnd_toEndOf="parent" />
