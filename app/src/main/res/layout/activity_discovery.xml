@@ -11,16 +11,16 @@
         android:layout_height="match_parent"
         tools:context=".HomeActivity">
 
-            <Button
-                android:id="@+id/create_group_btn"
-                android:layout_width="170dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:text="Create New Group"
-                android:fontFamily="sans-serif"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/appbar" />
+        <Button
+            android:id="@+id/create_group_btn"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Create New Group"
+            android:fontFamily="sans-serif"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appbar" />
 
         <Button
             android:id="@+id/btnLeaderboard"
@@ -38,6 +38,7 @@
             android:id="@+id/recyclerview_rootview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="16dp"
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

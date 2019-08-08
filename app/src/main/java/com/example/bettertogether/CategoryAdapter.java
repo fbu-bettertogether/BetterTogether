@@ -1,6 +1,7 @@
 package com.example.bettertogether;
 
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +67,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         private ImageView ivGroupProf;
         private ImageView ivBadgeIcon;
+        private ImageView ivBadgeInnerIcon;
         private TextView tvGroupName;
         private TextView tvCategory;
         private TextView tvDescription;
@@ -81,6 +83,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvDates = itemView.findViewById(R.id.tvDates);
             ivBadgeIcon = itemView.findViewById(R.id.ivBadgeIcon);
+            ivBadgeInnerIcon = itemView.findViewById(R.id.ivBadgeInnerIcon);
 
             itemView.setOnClickListener(this);
         }
@@ -114,8 +117,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
             if (group.getShowCheckInReminderBadge()) {
                 ivBadgeIcon.setVisibility(View.VISIBLE);
+                ivBadgeInnerIcon.setVisibility(View.VISIBLE);
             } else {
                 ivBadgeIcon.setVisibility(View.INVISIBLE);
+                ivBadgeInnerIcon.setVisibility(View.INVISIBLE);
             }
 
             String startDateUgly = group.getStartDate();

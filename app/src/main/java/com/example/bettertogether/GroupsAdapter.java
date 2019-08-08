@@ -67,6 +67,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
         private ImageView ivGroupProf;
         private ImageView ivBadgeIcon;
+        private ImageView ivBadgeInnerIcon;
         private TextView tvGroupName;
         private TextView tvCategory;
         private TextView tvDescription;
@@ -81,6 +82,7 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
             tvCategory = itemView.findViewById(R.id.tvCategory);
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvDates = itemView.findViewById(R.id.tvDates);
+            ivBadgeInnerIcon = itemView.findViewById(R.id.ivBadgeInnerIcon);
             ivBadgeIcon = itemView.findViewById(R.id.ivBadgeIcon);
 
             itemView.setOnClickListener(this);
@@ -115,8 +117,10 @@ public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder
 
             if (group.getShowCheckInReminderBadge()) {
                 ivBadgeIcon.setVisibility(View.VISIBLE);
+                ivBadgeInnerIcon.setVisibility(View.VISIBLE);
             } else {
                 ivBadgeIcon.setVisibility(View.INVISIBLE);
+                ivBadgeInnerIcon.setVisibility(View.INVISIBLE);
             }
 
             String startDateUgly = group.getStartDate();
