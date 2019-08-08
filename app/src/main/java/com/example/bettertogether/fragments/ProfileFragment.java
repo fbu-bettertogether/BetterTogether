@@ -69,7 +69,6 @@ public class ProfileFragment extends Fragment {
     public final int INVITATION_REQUEST_CODE = 232;
 
     private ParseUser user;
-    private Award friendshipGoals;
     private OnProfileFragmentInteraction mListener;
 
     private ImageView ivUserIcon;
@@ -98,7 +97,6 @@ public class ProfileFragment extends Fragment {
     private FriendAdapter friendAdapter;
     private SimpleGroupAdapter simpleGroupAdapter;
     private AwardsAdapter awardsAdapter;
-    private AwardFragment af;
     int placeholderId = R.drawable.account;
 
     public ProfileFragment() {
@@ -128,7 +126,6 @@ public class ProfileFragment extends Fragment {
         friendAdapter = new FriendAdapter(friends, getFragmentManager());
         simpleGroupAdapter = new SimpleGroupAdapter(getContext(), groups);
         awardsAdapter = new AwardsAdapter(getContext(), awards, achievedAwards, user);
-        af = new AwardFragment();
         queryPosts();
         queryFriends();
         queryGroups();
@@ -282,17 +279,6 @@ public class ProfileFragment extends Fragment {
                                             MyFirebaseMessagingService mfms = new MyFirebaseMessagingService();
                                             mfms.logToken(getContext());
                                             Messaging.sendNotification((String) user.get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just sent you a friend request!");
-                                            ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
-                                            query.getInBackground(getString(R.string.friendship_goals_award), new GetCallback<ParseObject>() {
-                                                public void done(ParseObject object, ParseException e) {
-                                                    if (e == null) {
-                                                        friendshipGoals = (Award) object;
-                                                        af.queryAward(friendshipGoals, false, true, getContext());
-                                                    } else {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                            });
                                         }
                                     }
                                 });
