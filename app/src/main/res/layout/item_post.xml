@@ -101,6 +101,7 @@
             android:layout_marginEnd="8dp"
             android:fontFamily="sans-serif"
             android:text="0"
+            android:visibility="invisible"
             card_view:layout_constraintBottom_toBottomOf="@+id/ivLike"
             card_view:layout_constraintEnd_toStartOf="@+id/ivLike"
             card_view:layout_constraintTop_toTopOf="@+id/ivLike" />

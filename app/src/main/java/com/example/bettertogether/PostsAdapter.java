@@ -125,7 +125,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                         holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
                     }
                 }
-                holder.tvNumLikes.setText(String.valueOf(objects.size()));
+
+                if (objects.size() > 0) {
+                    holder.tvNumLikes.setVisibility(View.VISIBLE);
+                    holder.tvNumLikes.setText(String.valueOf(objects.size()));
+                } else {
+                    holder.tvNumLikes.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -143,7 +149,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 @Override
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up_outline));
-                                    holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) - 1));
+                                    if (Integer.parseInt(holder.tvNumLikes.getText().toString()) == 1) {
+                                        holder.tvNumLikes.setText("0");
+                                        holder.tvNumLikes.setVisibility(View.INVISIBLE);
+                                    } else {
+                                        holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) - 1));
+                                        holder.tvNumLikes.setVisibility(View.VISIBLE);
+                                    }
                                 }
                             });
                         } else {
@@ -155,6 +167,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
                                 public void done(ParseException e) {
                                     holder.btnLike.setImageDrawable(context.getDrawable(R.drawable.thumb_up));
                                     holder.tvNumLikes.setText(String.valueOf(Integer.parseInt(holder.tvNumLikes.getText().toString()) + 1));
+                                    holder.tvNumLikes.setVisibility(View.VISIBLE);
                                 }
                             });
 
