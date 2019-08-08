@@ -268,12 +268,15 @@ public class GroupFragment extends Fragment {
                             group.setShowCheckInReminderBadge(false);
                         }
 
+                        if (category.getName().equals("Get-Togethers")) {
+                            saveCurrentUserLocation();
+                        }
+
                         if (hasCheckInLeft) {
                             if (hasCheckedInToday()) {
                                 textInsteadOfBtn("Checked-in today!");
                                 setHelpMessage("already checked-in");
                             } else if (category.getName().equals("Get-Togethers")) {
-                                saveCurrentUserLocation();
                                 checkProximity();
                             } else {
                                 try {
