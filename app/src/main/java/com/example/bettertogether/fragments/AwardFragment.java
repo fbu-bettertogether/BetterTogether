@@ -195,8 +195,7 @@ public class AwardFragment extends Fragment {
         String objId = awd.getObjectId();
         if (userAwards != null && userAwards.size() != 0) {
             userAward = userAwards.get(0);
-            if (userAward.getIfAchieved())
-                return;
+            if (userAward.getIfAchieved()) { return; }
         } else {
             userAward = new UserAward();
             userAward.setAward(awd);
@@ -208,13 +207,13 @@ public class AwardFragment extends Fragment {
             userAwards.add(userAward);
         }
         userAward.setNumCompleted(userAward.getNumCompleted() + 1);
+        userAward.saveInBackground();
         if (userAward.getNumCompleted() == userAward.getNumRequired()) {
             userAward.setIfAchieved(true);
             showAlert("Congrats!", "You have received a new award: "+ awd.get("name") + ". Please check your trophy case on profile page.", context);
             userAward.saveInBackground();
             return;
         }
-        userAward.saveInBackground();
 
         if (objId.equalsIgnoreCase(context.getResources().getString(R.string.flakiest_award))) {
             showAlert("Attention!", "Seems like you have been a bit flaky recently, you're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Flakiest Award!", context);

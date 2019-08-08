@@ -76,6 +76,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -161,6 +162,9 @@ public class GroupFragment extends Fragment {
     private Award first = new Award();
     private Award oneWeek = new Award();
     private Award tenacity = new Award();
+    private Award swole = new Award();
+    private Award angel = new Award();
+    private Award butterfly = new Award();
     private AwardFragment af = new AwardFragment();
 
     // chart widgets
@@ -633,6 +637,7 @@ public class GroupFragment extends Fragment {
             if (addedMembers != null) {
                 for (int i = 0; i < addedMembers.size(); i++) {
                     Messaging.sendNotification((String) addedMembers.get(i).get("deviceId"), ParseUser.getCurrentUser().getUsername() + " just added you to their group!");
+                    updateAwards(addedMembers.get(i));
                 }
             }
         }
@@ -924,18 +929,18 @@ public class GroupFragment extends Fragment {
                         checkInPostAlert(currWeekCheckIns);
                     }
                 }, 6000);
-                updateAwards();
+                updateAwards(getCurrentUser());
             }
         });
     }
 
-    private void updateAwards() {
+    private void updateAwards(final ParseUser curr) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
         query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     first = (Award) object;
-                    af.queryAward(first, getCurrentUser(), false, true, getContext());
+                    af.queryAward(first, curr, false, true, getContext());
                 } else {
                     e.printStackTrace();
                 }
@@ -945,7 +950,7 @@ public class GroupFragment extends Fragment {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     oneWeek = (Award) object;
-                    af.queryAward(oneWeek, getCurrentUser(), false, true, getContext());
+                    af.queryAward(oneWeek, curr, false, true, getContext());
                 } else {
                     e.printStackTrace();
                 }
@@ -955,12 +960,46 @@ public class GroupFragment extends Fragment {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
                     tenacity = (Award) object;
-                    af.queryAward(tenacity, getCurrentUser(), false, true, getContext());
+                    af.queryAward(tenacity, curr, false, true, getContext());
                 } else {
                     e.printStackTrace();
                 }
             }
         });
+        if (category.getName().equalsIgnoreCase("Fitness")) {
+            query.getInBackground(getString(R.string.swole_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        swole = (Award) object;
+                        af.queryAward(swole, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } else if (category.getName().equalsIgnoreCase("Service")) {
+            query.getInBackground(getString(R.string.angel_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        angel = (Award) object;
+                        af.queryAward(angel, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } else if (category.getName().equalsIgnoreCase("Get-Togethers")) {
+            query.getInBackground(getString(R.string.social_butterfly_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        butterfly = (Award) object;
+                        af.queryAward(butterfly, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     private void updatePoints() {
