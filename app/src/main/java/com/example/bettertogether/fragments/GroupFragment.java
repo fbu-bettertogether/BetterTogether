@@ -778,14 +778,31 @@ public class GroupFragment extends Fragment {
                 switch (type) {
 
                     case "place":
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                         builder.setTitle("Get to a valid location");
-                        builder.setMessage("This group requires you to be in a specific type of location to check in!");
-                        try {
-                            checkPlace(category.getLocationTypesList());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (category.getName().equals("Fitness")) {
+                            builder.setMessage("This group requires you to be in a gym or fitness center to check in!");
+                        } else {
+                            builder.setMessage("This group requires you to be in a service location to check in!");
                         }
+                        builder.setPositiveButton("I'm there!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                try {
+                                    checkPlace(category.getLocationTypesList());
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        builder.setNegativeButton("Got it!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+
                         builder.show();
                         break;
 
