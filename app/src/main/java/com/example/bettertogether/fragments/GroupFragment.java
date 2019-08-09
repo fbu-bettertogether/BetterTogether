@@ -141,6 +141,7 @@ public class GroupFragment extends Fragment {
     // check-in check marks
     private CheckAdapter checkAdapter;
     private RecyclerView rvChecks;
+    private Boolean justCheckedIn = false;
 
     // membership, group, and check-ins info
     private List<Integer> numCheckIns;
@@ -924,6 +925,7 @@ public class GroupFragment extends Fragment {
                 checkAdapter.notifyDataSetChanged();
                 currMem.setLastCheckIn(now.getTime());
                 btnCheckIn.setVisibility(View.INVISIBLE);
+                justCheckedIn = true;
 
                 checkInCelebration(currWeekCheckIns);
                 updatePoints();
@@ -955,36 +957,39 @@ public class GroupFragment extends Fragment {
     private void updateAwards(final ParseUser curr) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
 
-        query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    first = (Award) object;
-                    af.queryAward(first, curr, false, true, getContext());
-                } else {
-                    e.printStackTrace();
+        if (justCheckedIn) {
+            query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        first = (Award) object;
+                        af.queryAward(first, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
-        query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    oneWeek = (Award) object;
-                    af.queryAward(oneWeek, curr, false, true, getContext());
-                } else {
-                    e.printStackTrace();
+            });
+            query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        oneWeek = (Award) object;
+                        af.queryAward(oneWeek, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
-        query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    tenacity = (Award) object;
-                    af.queryAward(tenacity, curr, false, true, getContext());
-                } else {
-                    e.printStackTrace();
+            });
+            query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        tenacity = (Award) object;
+                        af.queryAward(tenacity, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+            justCheckedIn = false;
+        }
         if (!curr.getObjectId().equals(getCurrentUser().getObjectId())) {
             if (category.getName().equalsIgnoreCase("Fitness")) {
                 query.getInBackground(getString(R.string.swole_award), new GetCallback<ParseObject>() {
