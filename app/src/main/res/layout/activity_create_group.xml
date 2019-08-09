@@ -28,13 +28,13 @@
             android:id="@+id/layoutGroupName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="32dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="32dp"
             android:layout_marginRight="8dp"
             android:hint="Group Name"
-            app:counterEnabled="true"
+            app:counterEnabled="false"
             app:counterMaxLength="15"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,6 +44,7 @@
                 android:id="@+id/tvGroupName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
                 android:maxLength="15" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -53,13 +54,11 @@
             android:id="@+id/layoutGroupDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_marginEnd="32dp"
             android:hint="Group Description"
-            app:counterEnabled="true"
+            app:counterEnabled="false"
             app:counterMaxLength="100"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -69,175 +68,174 @@
                 android:id="@+id/tvGroupDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
                 android:maxLength="100" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <Spinner
             android:id="@+id/spPrivacy"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="160dp"
+            android:layout_height="25dp"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:entries="@array/privacy_options"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.452"
             app:layout_constraintStart_toEndOf="@+id/tvPrivacySetting"
-            app:layout_constraintTop_toBottomOf="@+id/layoutGroupDescription" />
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <TextView
             android:id="@+id/tvPrivacySetting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="24dp"
-            android:text="Privacy Setting"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
             android:fontFamily="sans-serif"
+            android:text="Privacy: "
+            android:textColor="@color/colorPrimary"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutGroupDescription" />
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <View
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="52dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:background="?android:attr/listDivider"
+            app:layout_constraintBottom_toTopOf="@+id/spPrivacy"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spPrivacy" />
+            app:layout_constraintTop_toBottomOf="@+id/layoutGroupDescription" />
 
         <TextView
             android:id="@+id/tvGroupGoalLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
-            android:text="The goal of this group is to make time for"
             android:fontFamily="sans-serif"
+            android:text="Type: "
+            android:textColor="@color/colorPrimary"
+            android:textSize="16dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider" />
+            app:layout_constraintTop_toBottomOf="@+id/spPrivacy" />
 
         <Spinner
             android:id="@+id/spCategory"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:entries="@array/category_options"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tvGroupGoalLabel"
-            app:layout_constraintTop_toBottomOf="@+id/divider" />
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/spPrivacy"
+            app:layout_constraintTop_toBottomOf="@+id/spPrivacy" />
 
         <Spinner
             android:id="@+id/spFrequency"
-            android:layout_width="75dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="76dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:entries="@array/frequency_options"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/spCategory"
+            app:layout_constraintStart_toStartOf="@+id/spPrivacy"
             app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
 
         <TextView
             android:id="@+id/tvWeekLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="76dp"
-            android:text="times a week, starting on"
-            android:fontFamily="sans-serif"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.423"
-            app:layout_constraintStart_toEndOf="@+id/spFrequency"
-            app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
-
-        <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/calStartDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spFrequency"
-            app:mcv_selectionColor="#00F"
-            app:mcv_showOtherDates="all" />
-
-        <TextView
-            android:id="@+id/tvNumWeeks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:text="for"
             android:fontFamily="sans-serif"
-            app:layout_constraintLeft_toLeftOf="parent"
+            android:text="Frequency: "
+            android:textColor="@color/colorPrimary"
+            android:textSize="16dp"
+            app:layout_constraintEnd_toStartOf="@id/spFrequency"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/npNumWeeks"
-            app:layout_constraintTop_toBottomOf="@+id/calStartDate" />
+            app:layout_constraintTop_toBottomOf="@+id/tvGroupGoalLabel" />
 
         <NumberPicker
             android:id="@+id/npNumWeeks"
             android:layout_width="100dp"
-            android:layout_height="65dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginLeft="16dp"
+            android:layout_height="100dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
             android:entries="@array/frequency_options"
-            app:layout_constraintTop_toBottomOf="@+id/calStartDate"
-            app:layout_constraintStart_toEndOf="@id/tvNumWeeks"
-            app:layout_constraintEnd_toStartOf="@+id/tvNumWeeks2"
-            android:gravity="center_horizontal"/>
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="@+id/spFrequency"
+            app:layout_constraintStart_toStartOf="@+id/spFrequency"
+            app:layout_constraintTop_toBottomOf="@+id/tvWeekLabel" />
 
         <TextView
             android:id="@+id/tvNumWeeks2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="48dp"
-            android:layout_marginRight="48dp"
-            android:text="weeks!"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="48dp"
             android:fontFamily="sans-serif"
-            app:layout_constraintTop_toBottomOf="@id/calStartDate"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:text="Weeks: "
+            android:textColor="@color/colorPrimary"
+            android:textSize="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvWeekLabel" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintBottom_toTopOf="@+id/calStartDate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNumWeeks2" />
+
+        <TextView
+            android:id="@+id/tvStartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start Date: "
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="32dp"
+            android:textSize="16dp"
+            app:layout_constraintTop_toBottomOf="@id/divider3"/>
+
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            android:id="@+id/calStartDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvStartDate"
+            app:mcv_selectionColor="#00F"
+            app:mcv_showOtherDates="all" />
 
 
         <Button
             android:id="@+id/create_btn"
             style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="24dp"
-            android:text="Create Group"
+            android:layout_marginTop="8dp"
             android:background="@color/orange"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
+            android:gravity="center_horizontal"
+            android:text="Create Group"
+            app:layout_constraintEnd_toEndOf="@+id/btnAddUsers"
+            app:layout_constraintStart_toStartOf="@+id/btnAddUsers"
             app:layout_constraintTop_toBottomOf="@+id/rvAddedMembers" />
 
         <View
@@ -252,43 +250,53 @@
             android:background="?android:attr/listDivider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/npNumWeeks" />
+            app:layout_constraintTop_toBottomOf="@+id/calStartDate" />
 
         <Button
             android:id="@+id/btnAddUsers"
             style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginRight="24dp"
+            android:layout_marginTop="28dp"
+            android:gravity="center_horizontal"
             android:text="Add Group Members!"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
         <TextView
             android:id="@+id/tvMembersLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
             android:layout_marginTop="16dp"
-            android:layout_marginLeft="24dp"
             android:layout_marginBottom="8dp"
             android:text="Added Members"
             android:fontFamily="sans-serif"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnAddUsers" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvAddedMembers"
             android:layout_width="0dp"
-            android:layout_height="150dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvMembersLabel" />
+
+        <ImageView
+            android:id="@+id/ivAddPhoto"
+            android:layout_width="31dp"
+            android:layout_height="28dp"
+            app:layout_constraintBottom_toBottomOf="@+id/ivGroupProf"
+            app:layout_constraintEnd_toEndOf="@+id/ivGroupProf"
+            app:srcCompat="@drawable/baseline_add_circle_black_18dp"
+            android:tint="@color/colorPrimary"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
