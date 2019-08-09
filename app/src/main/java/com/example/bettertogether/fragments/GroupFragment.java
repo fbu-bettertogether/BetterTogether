@@ -59,6 +59,7 @@ import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Invitation;
 import com.example.bettertogether.models.Membership;
 import com.example.bettertogether.models.Post;
+import com.example.bettertogether.models.UserAward;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -953,26 +954,27 @@ public class GroupFragment extends Fragment {
 
     private void updateAwards(final ParseUser curr) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
-        query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    first = (Award) object;
-                    af.queryAward(first, curr, false, true, getContext());
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
-        query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
-            public void done(ParseObject object, ParseException e) {
-                if (e == null) {
-                    oneWeek = (Award) object;
-                    af.queryAward(oneWeek, curr, false, true, getContext());
-                } else {
-                    e.printStackTrace();
-                }
-            }
-        });
+
+//        query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
+//            public void done(ParseObject object, ParseException e) {
+//                if (e == null) {
+//                    first = (Award) object;
+//                    af.queryAward(first, curr, false, true, getContext());
+//                } else {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+//            public void done(ParseObject object, ParseException e) {
+//                if (e == null) {
+//                    oneWeek = (Award) object;
+//                    af.queryAward(oneWeek, curr, false, true, getContext());
+//                } else {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
         query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
@@ -983,39 +985,41 @@ public class GroupFragment extends Fragment {
                 }
             }
         });
-        if (category.getName().equalsIgnoreCase("Fitness")) {
-            query.getInBackground(getString(R.string.swole_award), new GetCallback<ParseObject>() {
-                public void done(ParseObject object, ParseException e) {
-                    if (e == null) {
-                        swole = (Award) object;
-                        af.queryAward(swole, curr, false, true, getContext());
-                    } else {
-                        e.printStackTrace();
+        if (!curr.getObjectId().equals(getCurrentUser().getObjectId())) {
+            if (category.getName().equalsIgnoreCase("Fitness")) {
+                query.getInBackground(getString(R.string.swole_award), new GetCallback<ParseObject>() {
+                    public void done(ParseObject object, ParseException e) {
+                        if (e == null) {
+                            swole = (Award) object;
+                            af.queryAward(swole, curr, false, true, getContext());
+                        } else {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            });
-        } else if (category.getName().equalsIgnoreCase("Service")) {
-            query.getInBackground(getString(R.string.angel_award), new GetCallback<ParseObject>() {
-                public void done(ParseObject object, ParseException e) {
-                    if (e == null) {
-                        angel = (Award) object;
-                        af.queryAward(angel, curr, false, true, getContext());
-                    } else {
-                        e.printStackTrace();
+                });
+            } else if (category.getName().equalsIgnoreCase("Service")) {
+                query.getInBackground(getString(R.string.angel_award), new GetCallback<ParseObject>() {
+                    public void done(ParseObject object, ParseException e) {
+                        if (e == null) {
+                            angel = (Award) object;
+                            af.queryAward(angel, curr, false, true, getContext());
+                        } else {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            });
-        } else if (category.getName().equalsIgnoreCase("Get-Togethers")) {
-            query.getInBackground(getString(R.string.social_butterfly_award), new GetCallback<ParseObject>() {
-                public void done(ParseObject object, ParseException e) {
-                    if (e == null) {
-                        butterfly = (Award) object;
-                        af.queryAward(butterfly, curr, false, true, getContext());
-                    } else {
-                        e.printStackTrace();
+                });
+            } else if (category.getName().equalsIgnoreCase("Get-Togethers")) {
+                query.getInBackground(getString(R.string.social_butterfly_award), new GetCallback<ParseObject>() {
+                    public void done(ParseObject object, ParseException e) {
+                        if (e == null) {
+                            butterfly = (Award) object;
+                            af.queryAward(butterfly, curr, false, true, getContext());
+                        } else {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 

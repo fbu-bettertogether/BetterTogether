@@ -167,6 +167,7 @@ public class AwardFragment extends Fragment {
 
     public void queryAward(Award awd, ParseUser curr, final Boolean setStatus, final Boolean checkAward, final Context con) {
         newAward = awd;
+        user = curr;
         ParseQuery<UserAward> query = new ParseQuery<>(UserAward.class);
         query.include("award");
         query.whereEqualTo("user", user);
@@ -210,10 +211,12 @@ public class AwardFragment extends Fragment {
         userAward.saveInBackground();
         if (userAward.getNumCompleted() == userAward.getNumRequired()) {
             userAward.setIfAchieved(true);
+
             showAlert("Congrats!", "You have received a new award: "+ awd.get("name") + ". Please check your trophy case on profile page.", context);
             userAward.saveInBackground();
             return;
         }
+
 
         if (objId.equalsIgnoreCase(context.getResources().getString(R.string.flakiest_award))) {
             showAlert("Attention!", "Seems like you have been a bit flaky recently, you're " + (userAward.getNumRequired() - userAward.getNumCompleted()) + " groups from getting the Flakiest Award!", context);
