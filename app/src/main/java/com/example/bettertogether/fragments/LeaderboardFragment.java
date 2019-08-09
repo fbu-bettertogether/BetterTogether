@@ -1,8 +1,6 @@
 package com.example.bettertogether.fragments;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,27 +8,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bettertogether.GraphAdapter;
 import com.example.bettertogether.R;
 import com.example.bettertogether.models.CatMembership;
 import com.example.bettertogether.models.Category;
 import com.example.bettertogether.models.Group;
 import com.example.bettertogether.models.Membership;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.BarLineChartBase;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
@@ -44,11 +38,13 @@ public class LeaderboardFragment extends Fragment {
     private ImageView ivServicePoints;
     private ImageView ivFitnessPoints;
     private ImageView ivGetTogetherPoints;
+    private RecyclerView rvChart;
+    private GraphAdapter graphAdapter;
     private OnFragmentInteractionListener mListener;
+    private ArrayList<Integer> entries;
+    private ArrayList<ParseFile> imageEntries;
     Map<String, Integer> groupsToPoints;
     Map<String, Group> idsToGroups;
-    BarChart chart;
-    ProgressBar progressBar;
 
 
     public LeaderboardFragment() {
@@ -65,7 +61,8 @@ public class LeaderboardFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        entries = new ArrayList<>();
+        imageEntries = new ArrayList<>();
     }
 
     @Override
@@ -79,8 +76,12 @@ public class LeaderboardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        chart = view.findViewById(R.id.barchart);
-        progressBar = view.findViewById(R.id.progressBar);
+
+        rvChart = view.findViewById(R.id.rvChart);
+        graphAdapter = new GraphAdapter(entries, imageEntries);
+        rvChart.setAdapter(graphAdapter);
+        rvChart.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
         ivFitnessPoints = view.findViewById(R.id.ivFitnessPoints);
         ivServicePoints = view.findViewById(R.id.ivServicePoints);
         ivGetTogetherPoints = view.findViewById(R.id.ivGetTogetherPoints);
@@ -88,12 +89,10 @@ public class LeaderboardFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.orange, getActivity().getTheme()));
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 drawGraph(groupsToPoints, idsToGroups, "Fitness");
-                progressBar.setVisibility(View.INVISIBLE);
 
             }
         });
@@ -101,12 +100,10 @@ public class LeaderboardFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.orange, getActivity().getTheme()));
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 drawGraph(groupsToPoints, idsToGroups, "Get-Togethers");
-                progressBar.setVisibility(View.INVISIBLE);
 
             }
         });
@@ -114,13 +111,10 @@ public class LeaderboardFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
                 ivServicePoints.setImageTintList(getResources().getColorStateList(R.color.orange, getActivity().getTheme()));
                 ivFitnessPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
                 ivGetTogetherPoints.setImageTintList(getResources().getColorStateList(R.color.quantum_black_100, getActivity().getTheme()));
-                drawGraph(groupsToPoints, idsToGroups, "Fitness");
-                progressBar.setVisibility(View.INVISIBLE);
-
+                drawGraph(groupsToPoints, idsToGroups, "Service");
             }
         });
         queryMembers();
@@ -170,97 +164,34 @@ public class LeaderboardFragment extends Fragment {
     }
 
     private void drawGraph(Map<String, Integer> groupsToPoints, Map<String, Group> idsToGroups) {
-        ArrayList<Bitmap> imageList = new ArrayList<>();
         int i = 0;
-        int limit = 2;
         final ArrayList<String> xLabels = new ArrayList<>();
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        ArrayList<BarEntry> imageEntries = new ArrayList<>();
         for (Map.Entry<String, Group> element : idsToGroups.entrySet()) {
-            if (2 < groupsToPoints.get(element.getKey())) {
-                try {
-                    byte[] data = element.getValue().getIcon().getData();
-                    entries.add(new BarEntry(i, groupsToPoints.get(element.getKey())));
-                    xLabels.add(element.getValue().getName());
-                    imageList.add(BitmapFactory.decodeByteArray(data, 0, data.length));
+            if (0 < groupsToPoints.get(element.getKey())) {
+                entries.add(groupsToPoints.get(element.getKey()));
+                imageEntries.add(element.getValue().getIcon());
                     i++;
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
             }
         }
-        BarDataSet dataSet = new BarDataSet(entries, "Groups");
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return xLabels.get((int) value);
-            }
-        });
-        dataSet.setBarBorderWidth(0.9f);
-        List<Integer> colors = new ArrayList<>();
-        colors.add(getResources().getColor(R.color.orange));
-        colors.add(getResources().getColor(R.color.o4));
-        colors.add(getResources().getColor(R.color.o8));
-        colors.add(getResources().getColor(R.color.colorPrimaryDark));
-        dataSet.setColors(colors);
-        BarData data = new BarData(dataSet);
-        chart.setData(data);
-        chart.setDrawBarShadow(true);
-        chart.getDescription().setEnabled(false);
-        chart.animateXY(300, 300);
-        chart.invalidate();
-        progressBar.setVisibility(View.INVISIBLE);
+        graphAdapter.notifyDataSetChanged();
 
     }
 
     private void drawGraph(Map<String, Integer> groupsToPoints, Map<String, Group> idsToGroups, String categoryName) {
-        ArrayList<Bitmap> imageList = new ArrayList<>();
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_foreground);
-
+        entries.clear();
+        imageEntries.clear();
         int i = 0;
         final ArrayList<String> xLabels = new ArrayList<>();
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        ArrayList<BarEntry> imageEntries = new ArrayList<>();
         for (Map.Entry<String, Group> element : idsToGroups.entrySet()) {
-            if (element.getValue().getCategory().equals(categoryName)) {
-                if (2 < groupsToPoints.get(element.getKey())) {
-                    entries.add(new BarEntry(i, groupsToPoints.get(element.getKey())));
-                    try {
-                        byte[] data = element.getValue().getIcon().getData();
-                        xLabels.add(element.getValue().getName());
-                        imageList.add(bitmap);
-                        i++;
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+            if (element.getValue().getCategory().equals(categoryName))
+                if (0 < groupsToPoints.get(element.getKey())) {
+                    entries.add(groupsToPoints.get(element.getKey()));
+                    imageEntries.add(element.getValue().getIcon());
+                    i++;
                 }
-            }
         }
-        BarDataSet dataSet = new BarDataSet(entries, "Groups");
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                if (xLabels.size() > value) {
-                    return xLabels.get((int) value).substring(0, xLabels.get((int) value).length() / 4);
-                } else return "";
-            }
-        });
-        dataSet.setBarBorderWidth(0.9f);
-        List<Integer> colors = new ArrayList<>();
-        colors.add(getResources().getColor(R.color.orange));
-        colors.add(getResources().getColor(R.color.o4));
-        colors.add(getResources().getColor(R.color.o8));
-        colors.add(getResources().getColor(R.color.colorPrimaryDark));
-        dataSet.setColors(colors);
-        BarData data = new BarData(dataSet);
-        chart.setData(data);
-        chart.setDrawValueAboveBar(true);
-        chart.setDrawBarShadow(true);
-        chart.getDescription().setEnabled(false);
-        chart.animateXY(200, 200);
-        chart.invalidate();
+        graphAdapter.notifyDataSetChanged();
+
     }
 
     public int sum(List<Integer> list) {
@@ -292,19 +223,6 @@ public class LeaderboardFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
-    }
-
-    public class DayAxisValueFormatter extends ValueFormatter {
-        private final BarLineChartBase<?> chart;
-
-        public DayAxisValueFormatter(BarLineChartBase<?> chart) {
-            this.chart = chart;
-        }
-
-        @Override
-        public String getFormattedValue(float value) {
-            return "your text " + value;
-        }
     }
 
 }
