@@ -968,26 +968,26 @@ public class GroupFragment extends Fragment {
                     }
                 }
             });
-//            query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
-//                public void done(ParseObject object, ParseException e) {
-//                    if (e == null) {
-//                        oneWeek = (Award) object;
-//                        af.queryAward(oneWeek, curr, false, true, getContext());
-//                    } else {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
-//            query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
-//                public void done(ParseObject object, ParseException e) {
-//                    if (e == null) {
-//                        tenacity = (Award) object;
-//                        af.queryAward(tenacity, curr, false, true, getContext());
-//                    } else {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
+            query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        oneWeek = (Award) object;
+                        af.queryAward(oneWeek, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
+                public void done(ParseObject object, ParseException e) {
+                    if (e == null) {
+                        tenacity = (Award) object;
+                        af.queryAward(tenacity, curr, false, true, getContext());
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
             justCheckedIn = false;
         }
         if (!curr.getObjectId().equals(getCurrentUser().getObjectId())) {
