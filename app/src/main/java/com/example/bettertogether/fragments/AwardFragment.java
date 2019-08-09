@@ -194,7 +194,7 @@ public class AwardFragment extends Fragment {
 
     public void checkAward(Award awd, Context context) {
         String objId = awd.getObjectId();
-        if (userAwards != null && userAwards.size() != 0) {
+        if (userAwards != null && userAwards.size() > 0) {
             userAward = userAwards.get(0);
             if (userAward.getIfAchieved()) { return; }
         } else {

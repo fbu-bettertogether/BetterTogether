@@ -955,26 +955,26 @@ public class GroupFragment extends Fragment {
     private void updateAwards(final ParseUser curr) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Award");
 
-//        query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
-//            public void done(ParseObject object, ParseException e) {
-//                if (e == null) {
-//                    first = (Award) object;
-//                    af.queryAward(first, curr, false, true, getContext());
-//                } else {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
-//            public void done(ParseObject object, ParseException e) {
-//                if (e == null) {
-//                    oneWeek = (Award) object;
-//                    af.queryAward(oneWeek, curr, false, true, getContext());
-//                } else {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        query.getInBackground(getString(R.string.first_complete_award), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    first = (Award) object;
+                    af.queryAward(first, curr, false, true, getContext());
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
+        query.getInBackground(getString(R.string.one_week_streak_award), new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    oneWeek = (Award) object;
+                    af.queryAward(oneWeek, curr, false, true, getContext());
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
         query.getInBackground(getString(R.string.tenacity_guru_award), new GetCallback<ParseObject>() {
             public void done(ParseObject object, ParseException e) {
                 if (e == null) {
