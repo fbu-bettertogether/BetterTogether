@@ -16,11 +16,13 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -70,6 +72,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
     private AddUsersAdapter adapter;
     private ArrayList<ParseUser> addedMembers;
     private List<ParseUser> addedUsers = new ArrayList<ParseUser>();
+    private TextView tvMembersLabel;
 
     public final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     private final int ADD_REQUEST_CODE = 20;
@@ -95,7 +98,7 @@ public class MakeNewGroupActivity extends AppCompatActivity {
         spFrequency = (Spinner) findViewById(R.id.spFrequency);
         cdStartDate = (MaterialCalendarView) findViewById(R.id.calStartDate);
         rvAddedMembers = (RecyclerView) findViewById(R.id.rvAddedMembers);
-
+        tvMembersLabel = (TextView) findViewById(R.id.tvMembersLabel);
         createBtn = (Button) findViewById(R.id.create_btn);
         btnAddUsers = (Button) findViewById(R.id.btnAddUsers);
         npNumWeeks = (NumberPicker) findViewById(R.id.npNumWeeks);
@@ -235,6 +238,15 @@ public class MakeNewGroupActivity extends AppCompatActivity {
 //            photoFile = getPhotoFileUri(getRealPathFromURI(getApplicationContext(), selectedImage));
 //            groupProf.setImageURI(selectedImage);
         } else if (requestCode == ADD_REQUEST_CODE && resultCode == RESULT_OK) {
+            rvAddedMembers.requestLayout();
+            rvAddedMembers.getLayoutParams().height = 300;
+            rvAddedMembers.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            rvAddedMembers.setVisibility(View.VISIBLE);
+            tvMembersLabel.requestLayout();
+            tvMembersLabel.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            tvMembersLabel.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            tvMembersLabel.setVisibility(View.VISIBLE);
+
             addedMembers = data.getParcelableArrayListExtra("addedMembers");
             addedUsers.addAll(addedMembers);
             adapter.notifyDataSetChanged();
