@@ -42,13 +42,14 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:cropToPadding="true"
             android:maxHeight="50dp"
             android:scaleType="centerCrop"
             card_view:layout_constraintEnd_toEndOf="parent"
             card_view:layout_constraintStart_toStartOf="@+id/ivProfileImage"
-            card_view:layout_constraintTop_toBottomOf="@+id/ivProfileImage"
+            card_view:layout_constraintTop_toBottomOf="@+id/tvBody"
             card_view:srcCompat="@android:color/background_light" />
 
         <TextView
@@ -83,6 +84,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
+            android:layout_marginTop="4dp"
             android:layout_marginRight="8dp"
             android:autoLink="all"
             android:fontFamily="sans-serif"
@@ -120,7 +122,7 @@
             android:id="@+id/ivCheckPost"
             android:layout_width="21dp"
             android:layout_height="20dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="8dp"
             android:tint="@color/colorPrimary"
             card_view:layout_constraintEnd_toStartOf="@+id/tvBody"
             card_view:layout_constraintTop_toTopOf="@+id/tvBody"
